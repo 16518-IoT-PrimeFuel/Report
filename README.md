@@ -85,11 +85,10 @@
 
 **Link del repositorio del informe:**  
 
-https://github.com/16518-IoT-PrimeFuel/Report
 
 **Link del repositorio de la Landing Page:**  
 
-**Link del repositorio del fronted:**  
+**Link del repositorio del frontend:**  
 
 **Link del repositorio del backend:**  
 
@@ -99,11 +98,11 @@ https://github.com/16518-IoT-PrimeFuel
 
 **Link del figma:** 
 
-**Link de de Swagger desplegado con render:**
+**Link de Swagger desplegado con render:**
 
 **Link de frontend desplegado con vercel:**
 
-**Link de la Landing Page desplegagada con github pages:**
+**Link de la Landing Page desplegada con github pages:**
 
 Este informe ha sido desarrollado de forma colaborativa mediante GitHub, empleando GitFlow y Conventional Commits. Cada miembro del equipo ha contribuido con commits y ramas durante el desarrollo del proyecto.
 
