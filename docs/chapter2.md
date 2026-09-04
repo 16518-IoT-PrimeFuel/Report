@@ -119,23 +119,23 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
 #### a. Diferenciación a través de especialización
 Una de las principales estrategias de **PrimeFuel** es la **especialización en el flujo completo de pedido de combustible**. A diferencia de soluciones como **Zavgar**, que están orientadas principalmente al control y análisis del consumo de combustible en flotas, nuestra plataforma se enfoca en las **interacciones B2B** entre empresas solicitantes y proveedores. Esto nos permite ofrecer un control dedicado del pedido, gestión de la logística, y reportes detallados de consumo y entregas, lo cual no está presente en la mayoría de las plataformas competidoras.
 
-- **Táctica**: Desarrollar funcionalidades para la validación automática de pagos, gestión de stock en tiempo real y la optimización del transporte logrando la automatización de procesos que solo eran logrados de forma manual. Esto crea una ventaja frente a competidores como **FuelCloud**, que se centran más en el control físico del combustible y menos en la administración a nivel operativo.
+- **Táctica**: Desarrollar funcionalidades para la validación automática de pagos, gestión de stock en tiempo real y la optimización del transporte logrando la automatización de procesos que solo eran logrados de forma manual. Esto incluye el monitoreo IoT del nivel de los tanques del cliente, la generación automática de la solicitud de pedido cuando se cruza un umbral configurado y con un proveedor de confianza previamente seleccionado, y la posibilidad de que ese proveedor acepte o rechace la solicitud directamente desde la plataforma. Esto crea una ventaja frente a competidores como **FuelCloud**, que se centran más en el control físico del combustible y menos en la administración a nivel operativo.
 
 #### b. Innovación en la interfaz de usuario y experiencia
 
 El sistema de **PrimeFuel** está diseñado para ofrecer una **experiencia de usuario optimizada**, algo que **Wialon**, **FuelCloud** y la propia **OSINERGMIN** no abordan en sus plataformas. Al ser una solución especializada y dirigida a una tarea específica, podemos dedicar más recursos en crear una interfaz intuitiva y procesos bien definidos brindando comodidad y seguridad a nuestros usuarios.
 
-- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita a los usuarios acceder a reportes de consumo, validar pedidos y coordinar logística con facilidad. Además, ofrecer **soporte y formación continua** para asegurar que los usuarios aprovechen al máximo todas las funcionalidades del sistema.
+- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita a los usuarios acceder a reportes de consumo, validar pedidos y coordinar logística con facilidad, incluyendo una visualización clara del nivel del tanque en tiempo real y del estado de cada solicitud (pendiente, aceptada o rechazada). Además, ofrecer **soporte y formación continua** para asegurar que los usuarios aprovechen al máximo todas las funcionalidades del sistema.
 
 #### c. Flexibilidad en precios y modelo SaaS escalable
 El modelo de precios de **PrimeFuel** ofrece **planes escalables basados en suscripción**, lo que hace que sea más accesible para medianas y grandes empresas. Esto es más competitivo frente a **Wialon**, que puede no ser una opción viable para empresas que solo requieren una solución de pedidos de combustible. También es más asequible que **FuelCloud**, que requiere una inversión considerable en hardware, instalación y mantenimiento.
 
-- **Táctica**: Ofrecer un modelo de suscripción flexible y **precios competitivos**, con **múltiples niveles de suscripción** adaptados a las necesidades de diferentes empresas. Esto permitirá que empresas de menor tamaño puedan acceder a la plataforma sin comprometer su presupuesto, a la vez que se asegura el crecimiento a largo plazo a medida que la empresa crece.
+- **Táctica**: Ofrecer un modelo de suscripción flexible y **precios competitivos**, con **múltiples niveles de suscripción** adaptados a las necesidades de diferentes empresas. Esto permitirá que empresas de menor tamaño puedan acceder a la plataforma sin comprometer su presupuesto, a la vez que se asegura el crecimiento a largo plazo a medida que la empresa crece. El módulo de monitoreo IoT podrá ofrecerse como una capa adicional dentro de este modelo escalable, evitando que el costo del sensor sea una barrera de entrada para empresas más pequeñas.
 
 #### d. Aprovechamiento de la digitalización en la logística
-El sector de la logística está experimentando una transformación digital acelerada. **PrimeFuel** se aprovechará de esta tendencia buscando la integración de la plataforma con otras soluciones logísticas (como los sistemas de gestión de vehículos o flotas). De esta forma podemos ofrecer una solución más completa y eficiente.
+El sector de la logística está experimentando una transformación digital acelerada. **PrimeFuel** se aprovechará de esta tendencia incorporando monitoreo IoT del nivel de combustible en los tanques de almacenamiento de las empresas solicitantes, permitiendo que la plataforma cuente con datos reales y actualizados sobre sus reservas, en lugar de depender únicamente de la revisión manual que realizan hoy.
 
-- **Táctica**: Colaborar con empresas de **gestión de flotas** para optimizar el proceso de asignación de vehículos, cisternas y choferes. También se considerará la posibilidad de integrar **sensores IoT** en los camiones de reparto para un control más preciso sobre el combustible transportado y la entrega.
+- **Táctica**: Instalar sensores de nivel en los tanques de las empresas del segmento comprador, configurables por umbral crítico según la capacidad y el consumo de cada cliente. Esta información permitirá generar alertas automáticas cuando el nivel de combustible se acerque al punto de reposición, y en los casos donde el cliente tenga un proveedor de confianza configurado, generar automáticamente la solicitud de pedido correspondiente. De esta forma, PrimeFuel deja de depender de que el cliente detecte manualmente la necesidad de abastecimiento, y puede anticiparse a ella con datos reales del propio tanque.
 
 #### e. Expansión hacia mercados internacionales
 Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo de negocio y la flexibilidad de la plataforma la hacen ideal para expandirse a **mercados internacionales**. Competidores como **Wialon** ya tienen presencia en mercados globales, pero su enfoque en empresas grandes y sus altos costos de implementación pueden ser una barrera para empresas de menor tamaño, limitando su alcance.
@@ -166,6 +166,7 @@ Las entrevistas buscan comprender el proceso actual de abastecimiento antes de p
 12. ¿Qué reportes o métricas necesitan para tomar decisiones operativas?
 13. ¿Con qué sistemas tendría que integrarse una nueva plataforma?
 14. ¿Qué condiciones serían necesarias para que la empresa adopte una plataforma de este tipo?
+15. Si un cliente de confianza tuviera configurada la reposición automática, ¿qué necesitarían ver en la solicitud para poder aceptarla o rechazarla con seguridad?
 
 ---
 
@@ -187,6 +188,7 @@ Las entrevistas buscan comprender el proceso actual de abastecimiento antes de p
 12. ¿Qué herramientas utilizan actualmente, como Excel, llamadas, correos o WhatsApp?
 13. ¿Qué información les gustaría recibir automáticamente?
 14. ¿Qué dificultades podrían tener para implementar un sensor o una plataforma digital?
+15. ¿Confiarían en que la plataforma genere automáticamente la solicitud de pedido con un proveedor de su elección cuando el tanque llegue a un nivel crítico, o preferirían aprobar cada solicitud manualmente antes de que se envíe?
 
 Al finalizar cada entrevista, se puede presentar brevemente la propuesta de FullTank y preguntar cómo se adapta al proceso descrito por el entrevistado. Esta explicación debe realizarse después de las preguntas principales para evitar influir en las respuestas.
 
