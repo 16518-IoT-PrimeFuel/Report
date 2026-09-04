@@ -235,8 +235,10 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
     <tr>
       <td width="25%"><b>Comunica oralmente con efectividad a rangos de audiencia</b></td>
       <td>
+        <b>AV1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
+        Realizacion de entrevistas para cada sector, apoyo en la documentacion del proyecto, apoyo en la realizacion de c4 model.<br>
         <b>Ponce Perales Alberto Alejandro</b>
       </td>
       <td></td>
@@ -244,6 +246,7 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
     <tr>
       <td width="25%"><b>Comunica por escrito con efectividad a diferentes rangos de audiencia</b></td>
       <td>
+        <b>AV1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
         <b>Ponce Perales Alberto Alejandro</b>

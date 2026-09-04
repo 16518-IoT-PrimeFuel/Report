@@ -146,39 +146,49 @@ Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo
 
 ### 2.2.1. Diseño de entrevistas.
 
-**A. Proveedores de Combustible**
+Las entrevistas buscan comprender el proceso actual de abastecimiento antes de presentar la propuesta de FullTank. Por ese motivo, las preguntas se formulan de manera abierta y se enfocan en experiencias concretas, especialmente en la revisión del nivel de los tanques, la creación de pedidos y la coordinación de los despachos.
+
+**A. Proveedores de combustible**
 
 **Preguntas:**
 
-1. ¿Cuál es su cargo dentro de la empresa proveedora?
-2. ¿Qué tipos de clientes atienden principalmente (logística, construcción, minería, agroindustria)?
-3. ¿Qué volumen de operaciones realizan mensualmente?
-4. ¿Cómo gestionan actualmente los pedidos y contratos de sus clientes?
-5. ¿Qué problemas han experimentado con los métodos tradicionales (llamadas, correos, planillas)?
-6. ¿Utilizan algún software especializado para ventas o logística? 
-7. ¿Qué características valoraría más en una plataforma digital para gestionar pedidos?
-8. ¿Considera que una solución que centralice cotizaciones, contratos y entregas sería útil para su empresa?
-9. ¿Qué tan importante es para ustedes tener reportes históricos y comparativos de ventas?
-10. ¿Qué estrategias usan actualmente para fidelizar clientes, y cómo cree que una plataforma como FullTank podría apoyarlos?
+1. ¿Cuál es su cargo y qué responsabilidades tiene en la gestión de pedidos o despachos?
+2. ¿Qué tipos de clientes atiende la empresa y qué volumen aproximado de pedidos gestiona?
+3. Cuénteme sobre el último pedido de combustible que recibió. ¿Por qué medio llegó y cómo lo registró?
+4. ¿Cómo organizan actualmente los pedidos, contratos y despachos?
+5. ¿Qué herramientas utilizan para registrar y consultar esa información?
+6. ¿Qué errores o dificultades se presentan con mayor frecuencia durante la gestión de los pedidos?
+7. ¿Cómo coordinan las cantidades, fechas, rutas y lugares de entrega?
+8. ¿Cómo informan al cliente sobre la confirmación y el avance del despacho?
+9. ¿Cuánto tiempo dedican a responder consultas sobre el estado de los pedidos?
+10. ¿Qué ocurre cuando un cliente solicita combustible con poca anticipación?
+11. ¿Qué información sobre el nivel o consumo del tanque del cliente les ayudaría a planificar mejor las entregas?
+12. ¿Qué reportes o métricas necesitan para tomar decisiones operativas?
+13. ¿Con qué sistemas tendría que integrarse una nueva plataforma?
+14. ¿Qué condiciones serían necesarias para que la empresa adopte una plataforma de este tipo?
 
 ---
 
-**B. Empresas Solicitantes**
+**B. Empresas solicitantes de combustible**
 
 **Preguntas:**
 
-1. ¿Cuál es su cargo en la empresa? 
-2. ¿Hace cuánto tiempo trabaja en el sector energético/logístico? 
-3. ¿Qué volumen de combustible gestionan aproximadamente al mes? 
-4. ¿Cómo gestionan actualmente la compra y control de combustible? 
-5. ¿Qué herramientas usan (Excel, llamadas, correos, sistemas propios)? 
-6. ¿Cuáles son los principales problemas que enfrentan con su sistema actual?
-7. ¿Qué tan importante es para usted contar con trazabilidad en tiempo real? 
-8. ¿Qué dispositivos utilizan para gestionar pedidos (PC, móvil, tablet)? 
-9. ¿Qué información considera más valiosa al momento de comprar combustible (precio, tiempo de entrega, historial de proveedor, etc.)? 
-10. ¿Cómo afecta la falta de transparencia en los precios a sus decisiones de compra? 
-11. ¿Le interesaría recibir notificaciones en tiempo real sobre cambios de precio o estado de sus pedidos? 
-12. ¿Qué barreras considera que dificultarían implementar una solución digital como FullTank en su empresa?
+1. ¿Cuál es su cargo y qué responsabilidades tiene relacionadas con el combustible?
+2. ¿Para qué operaciones utiliza combustible la empresa?
+3. ¿La empresa cuenta con tanques de almacenamiento? ¿Qué capacidad aproximada tienen?
+4. ¿Cómo revisan actualmente el nivel de combustible de los tanques?
+5. ¿Con qué frecuencia realizan esa revisión?
+6. ¿Cómo identifican que es necesario solicitar una reposición?
+7. Cuénteme sobre la última vez que realizaron un pedido de combustible. ¿Cómo fue el proceso?
+8. ¿Por qué medio contactan actualmente al proveedor?
+9. ¿Qué problemas suelen presentarse al realizar o dar seguimiento a un pedido?
+10. ¿Alguna vez han tenido retrasos o desabastecimiento? ¿Qué consecuencias tuvo para sus operaciones?
+11. ¿Qué información necesitan consultar durante el proceso: nivel del tanque, cantidad solicitada, fecha de entrega o estado del despacho?
+12. ¿Qué herramientas utilizan actualmente, como Excel, llamadas, correos o WhatsApp?
+13. ¿Qué información les gustaría recibir automáticamente?
+14. ¿Qué dificultades podrían tener para implementar un sensor o una plataforma digital?
+
+Al finalizar cada entrevista, se puede presentar brevemente la propuesta de FullTank y preguntar cómo se adapta al proceso descrito por el entrevistado. Esta explicación debe realizarse después de las preguntas principales para evitar influir en las respuestas.
 
 ### 2.2.2 Registro de entrevistas
 
