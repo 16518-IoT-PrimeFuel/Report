@@ -30,8 +30,8 @@
       <td>Castro Pariona Jefferson Ernesto</td>
     </tr>
     <tr>
-      <td>-</td>
-      <td>-</td>
+      <td>u20221a118</td>
+      <td>Katherine Maryory Mejia Aliaga</td>
     </tr>
     <tr>
       <td>u202320684</td>
@@ -75,6 +75,7 @@
         - Bonifacio Jaramillo Samuel Jesus <br>
         - Castro Pariona Jefferson Ernesto <br>
         - Ponce Perales Alberto Alejandro
+        - Mejia Aliaga Katherine Maryory
       </td>
       <td></td>
     </tr>
