@@ -227,18 +227,16 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 - Entrevista 3:
 
-| Campo                    | Detalle |
+| Campo | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
-
+| **Nombre entrevistado** | Gabriela Carranza |
+| **Edad** | 30 años |
+| **Departamento** | Miraflores |
+| **Inicio del video** | 00:00 |
+| **Fin del video** | 11:33 |
+| **Link del video** | https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing    |
+| **Foto entrevista** | <img src="../assets/chapter-2/entrevista seg1/gabriela seg-1.png" alt="Entrevista a Gabriela Carranza" width="500"/> |
+| **Resumen** | Gabriela, encargada de logística de una empresa constructora, señala que gestiona el abastecimiento de diésel para maquinaria pesada y un grupo electrógeno. Explica que cuentan con un tanque de aproximadamente 1,000 galones, cuyo nivel revisa diariamente el encargado de campo y comunica por WhatsApp. Los pedidos se coordinan mediante llamadas, correos y WhatsApp, mientras que los ingresos y consumos se registran en Excel. Identifica como principales dificultades la información dispersa, la incertidumbre sobre los horarios de entrega y los retrasos que han ocasionado la detención temporal de maquinaria. Considera útil recibir alertas de nivel bajo, confirmaciones de pedidos y avisos de retrasos. Para implementar sensores y una plataforma digital, señala la necesidad de evaluar los costos, la conectividad, la capacitación y el soporte técnico. Prefiere aprobar las solicitudes antes de enviarlas al proveedor para mantener el control del presupuesto y las cantidades, aunque consideraría automatizarlas posteriormente con límites y controles para evitar pedidos duplicados. |
 
 **2. Segmento 2: Proveedores de combustible**
 
