@@ -256,16 +256,16 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 - Entrevista 2:
 
-| Campo                    | Detalle |
+| Campo | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+| **Nombre entrevistado** | Estefani Ocampos |
+| **Edad** | 33 años |
+| **Departamento** | Surquillo |
+| **Inicio del video** | 00:00 |
+| **Fin del video** | 11:54 |
+| **Link del video** | https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing |
+| **Foto entrevista** | <img src="../assets/chapter-2/entrevista seg2/estefani seg-2.png" alt="Entrevista a Estefani Ocampos" width="500"/> |
+| **Resumen** | Estefani, coordinadora de pedidos y despachos en una distribuidora de combustible, señala que su área atiende a constructoras, empresas de transporte y plantas industriales, gestionando aproximadamente entre ocho y doce pedidos diarios. Explica que utilizan Excel, correos, WhatsApp y llamadas, además de sistemas de facturación y GPS que no están integrados con el registro de pedidos. Identifica dificultades relacionadas con solicitudes incompletas, cambios no actualizados y posibles registros duplicados. Estima que dedica entre una y dos horas diarias a responder consultas sobre los despachos. Considera útil disponer de información actualizada sobre el nivel, la capacidad y el consumo de los tanques de los clientes para anticipar las entregas. Para adoptar FullTank, destaca la integración con los sistemas existentes, la capacitación, el soporte y los permisos de acceso. Ante solicitudes automáticas, requiere información completa del pedido, autorización del cliente y controles de duplicidad, además de verificar la disponibilidad de combustible y transporte antes de aceptarlas. Propone comenzar con algunos clientes habituales para evaluar el funcionamiento de la plataforma. |
 
 
 - Entrevista 3:
