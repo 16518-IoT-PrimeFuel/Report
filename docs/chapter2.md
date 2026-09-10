@@ -229,14 +229,14 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 | Campo                    | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+| **Nombre entrevistado** | Renzo Aguilar |
+| **Edad**               | 36 |
+| **Departamento**       | Lima |
+| **Inicio del video**   | 00:00:00 |
+| **Fin del video**      | 00:03:49 |
+| **Link del video**     | https://upcedupe-my.sharepoint.com/:v:/g/personal/u202312700_upc_edu_pe/IQBsJbWTfC77Q660AJPfD6bbAR57wQAbh2TSy8zloK92Mq0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=nN124a |
+| **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
+| **Resumen**           | Renzo Aguilar, responsable de logística en una empresa constructora, revisa el nivel de sus tanques de forma manual y coordina pedidos por llamadas y WhatsApp sin registro centralizado. Ha sufrido paralización de maquinaria por desabastecimiento. Prefiere aprobar manualmente cada solicitud automática al menos al inicio, hasta ganar confianza en la plataforma. |
 
 
 
@@ -274,14 +274,14 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 | Campo                    | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+| **Nombre entrevistado** | Milagros Rojas |
+| **Edad**               | 30 |
+| **Departamento**       | Lima |
+| **Inicio del video**   | 00:00:00 |
+| **Fin del video**      | 00:03:47 |
+| **Link del video**     | https://upcedupe-my.sharepoint.com/:v:/g/personal/u202312700_upc_edu_pe/IQDUk0I5os_2SKDyYbaQxJ9JAecYWQ1WphbJ67EKMeSFwT8?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=MOhwmk  |
+| **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
+| **Resumen**           | Milagros Rojas, coordinadora de operaciones en una distribuidora de combustible, gestiona pedidos por WhatsApp y los registra manualmente en Excel, sin integración con contratos ni despachos. Identifica errores de registro y duplicidad de confirmaciones como problemas frecuentes. Confiaría en la reposición automática si puede ver nivel del tanque, cantidad, fecha y stock disponible antes de aceptar. |
 
 
 ### 2.2.3 Análisis de entrevistas
