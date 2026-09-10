@@ -199,44 +199,74 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 - Entrevista 1:
 
-
-| Campo                    | Detalle |
+| Campo | Detalle |
 |-------------------------|---------|
 | **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
+| **Edad** | - |
+| **Departamento** | - |
+| **Inicio del video** | - |
+| **Fin del video** | - |
+| **Link del video** | - |
+| **Foto entrevista** | - |
+| **Resumen** | - |
 
 - Entrevista 2:
 
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Gabriela Carranza</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>30 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Miraflores</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>11:33</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td><a href="https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing">https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td><img src="../assets/chapter-2/entrevista seg1/gabriela seg-1.png" alt="Entrevista a Gabriela Carranza" width="500"/></td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>Gabriela, encargada de logística de una empresa constructora, señala que gestiona el abastecimiento de diésel para maquinaria pesada y un grupo electrógeno. Explica que cuentan con un tanque de aproximadamente 1,000 galones, cuyo nivel revisa diariamente el encargado de campo y comunica por WhatsApp. Los pedidos se coordinan mediante llamadas, correos y WhatsApp, mientras que los ingresos y consumos se registran en Excel. Identifica como principales dificultades la información dispersa, la incertidumbre sobre los horarios de entrega y los retrasos que han ocasionado la detención temporal de maquinaria. Considera útil recibir alertas de nivel bajo, confirmaciones de pedidos y avisos de retrasos. Para implementar sensores y una plataforma digital, señala la necesidad de evaluar los costos, la conectividad, la capacitación y el soporte técnico. Prefiere aprobar las solicitudes antes de enviarlas al proveedor para mantener el control del presupuesto y las cantidades, aunque consideraría automatizarlas posteriormente con límites y controles para evitar pedidos duplicados.</td>
+    </tr>
+  </tbody>
+</table>
 
 - Entrevista 3:
 
 | Campo | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | Gabriela Carranza |
-| **Edad** | 30 años |
-| **Departamento** | Miraflores |
-| **Inicio del video** | 00:00 |
-| **Fin del video** | 11:33 |
-| **Link del video** | https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing    |
-| **Foto entrevista** | <img src="../assets/chapter-2/entrevista seg1/gabriela seg-1.png" alt="Entrevista a Gabriela Carranza" width="500"/> |
-| **Resumen** | Gabriela, encargada de logística de una empresa constructora, señala que gestiona el abastecimiento de diésel para maquinaria pesada y un grupo electrógeno. Explica que cuentan con un tanque de aproximadamente 1,000 galones, cuyo nivel revisa diariamente el encargado de campo y comunica por WhatsApp. Los pedidos se coordinan mediante llamadas, correos y WhatsApp, mientras que los ingresos y consumos se registran en Excel. Identifica como principales dificultades la información dispersa, la incertidumbre sobre los horarios de entrega y los retrasos que han ocasionado la detención temporal de maquinaria. Considera útil recibir alertas de nivel bajo, confirmaciones de pedidos y avisos de retrasos. Para implementar sensores y una plataforma digital, señala la necesidad de evaluar los costos, la conectividad, la capacitación y el soporte técnico. Prefiere aprobar las solicitudes antes de enviarlas al proveedor para mantener el control del presupuesto y las cantidades, aunque consideraría automatizarlas posteriormente con límites y controles para evitar pedidos duplicados. |
+| **Nombre entrevistado** | - |
+| **Edad** | - |
+| **Departamento** | - |
+| **Inicio del video** | - |
+| **Fin del video** | - |
+| **Link del video** | - |
+| **Foto entrevista** | - |
+| **Resumen** | - |
 
 **2. Segmento 2: Proveedores de combustible**
 
@@ -256,16 +286,48 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 - Entrevista 2:
 
-| Campo | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | Estefani Ocampos |
-| **Edad** | 33 años |
-| **Departamento** | Surquillo |
-| **Inicio del video** | 00:00 |
-| **Fin del video** | 11:54 |
-| **Link del video** | https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing |
-| **Foto entrevista** | <img src="../assets/chapter-2/entrevista seg2/estefani seg-2.png" alt="Entrevista a Estefani Ocampos" width="500"/> |
-| **Resumen** | Estefani, coordinadora de pedidos y despachos en una distribuidora de combustible, señala que su área atiende a constructoras, empresas de transporte y plantas industriales, gestionando aproximadamente entre ocho y doce pedidos diarios. Explica que utilizan Excel, correos, WhatsApp y llamadas, además de sistemas de facturación y GPS que no están integrados con el registro de pedidos. Identifica dificultades relacionadas con solicitudes incompletas, cambios no actualizados y posibles registros duplicados. Estima que dedica entre una y dos horas diarias a responder consultas sobre los despachos. Considera útil disponer de información actualizada sobre el nivel, la capacidad y el consumo de los tanques de los clientes para anticipar las entregas. Para adoptar FullTank, destaca la integración con los sistemas existentes, la capacitación, el soporte y los permisos de acceso. Ante solicitudes automáticas, requiere información completa del pedido, autorización del cliente y controles de duplicidad, además de verificar la disponibilidad de combustible y transporte antes de aceptarlas. Propone comenzar con algunos clientes habituales para evaluar el funcionamiento de la plataforma. |
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Estefani Ocampos</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>33 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Surquillo</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>11:54</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td><a href="https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing">https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td><img src="../assets/chapter-2/entrevista seg2/estefani seg-2.png" alt="Entrevista a Estefani Ocampos" width="500"/></td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>Estefani, coordinadora de pedidos y despachos en una distribuidora de combustible, señala que su área atiende a constructoras, empresas de transporte y plantas industriales, gestionando aproximadamente entre ocho y doce pedidos diarios. Explica que utilizan Excel, correos, WhatsApp y llamadas, además de sistemas de facturación y GPS que no están integrados con el registro de pedidos. Identifica dificultades relacionadas con solicitudes incompletas, cambios no actualizados y posibles registros duplicados. Estima que dedica entre una y dos horas diarias a responder consultas sobre los despachos. Considera útil disponer de información actualizada sobre el nivel, la capacidad y el consumo de los tanques de los clientes para anticipar las entregas. Para adoptar FullTank, destaca la integración con los sistemas existentes, la capacitación, el soporte y los permisos de acceso. Ante solicitudes automáticas, requiere información completa del pedido, autorización del cliente y controles de duplicidad, además de verificar la disponibilidad de combustible y transporte antes de aceptarlas. Propone comenzar con algunos clientes habituales para evaluar el funcionamiento de la plataforma.</td>
+    </tr>
+  </tbody>
+</table>
 
 
 - Entrevista 3:
