@@ -38,8 +38,8 @@
       <td>Ponce Perales Alberto Alejandro</td>
     </tr>
     <tr>
-      <td>-</td>
-      <td>-</td>
+      <td>u202321843</td>
+      <td>Delgado Carrasco Schneider Carlos Alberto</td>
     </tr>
     <tr>
       <td>-</td>
@@ -74,8 +74,9 @@
       <td>
         - Bonifacio Jaramillo Samuel Jesus <br>
         - Castro Pariona Jefferson Ernesto <br>
-        - Ponce Perales Alberto Alejandro
-        - Mejia Aliaga Katherine Maryory
+        - Ponce Perales Alberto Alejandro <br>
+        - Mejia Aliaga Katherine Maryory <br>
+        - Delgado Carrasco Schneider Carlos Alberto
       </td>
       <td></td>
     </tr>
@@ -240,7 +241,8 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
         Realizacion de entrevistas para cada sector, apoyo en la documentacion del proyecto, apoyo en la realizacion de c4 model.<br>
-        <b>Ponce Perales Alberto Alejandro</b>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
       </td>
       <td></td>
     </tr>
@@ -250,7 +252,8 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         <b>AV1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
-        <b>Ponce Perales Alberto Alejandro</b>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
       </td>
       <td></td>
     </tr>

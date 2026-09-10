@@ -45,6 +45,13 @@
       <td>Ingeniería de Software</td>
       <td>Estudiante de la carrera de Ingeniería de Software en la UPC. Actualmente cuento con conocimientos en lenguajes de programación como C + + y manejo de Java. Considero que mis mayores virtudes son: la responsabilidad, capacidad de adaptarme, trabajar en equipo y la resiliencia.</td>
     </tr>
+    <tr>
+      <td><img src="../assets/chapter-1/members/schneider.jpeg" alt="Schneider Carlos Alberto Delgado Carrasco"></td>
+      <td>Schneider Carlos Alberto Delgado Carrasco</td>
+      <td>u202321843</td>
+      <td>Ingeniería de Software</td>
+      <td>Soy estudiante de Ingeniería de Software en la UPC, con conocimientos en programación y bases de datos. Me interesa la tecnología, la innovación y el desarrollo de soluciones digitales que mejoren la vida de las personas. Estoy comprometido con mi formación y busco nuevos retos que me permitan crecer a nivel académico y personal.</td>
+    </tr>
   </tbody>
 </table>
 
