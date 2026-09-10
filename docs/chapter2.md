@@ -200,17 +200,59 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 - Entrevista 1:
 
 
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Sebastian Beingolea</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>33 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>San Isidro</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>10:13</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td>
+        <a href="https://www.youtube.com/watch?v=KBK9qF3dAbY">
+          https://www.youtube.com/watch?v=KBK9qF3dAbY
+        </a>
+      </td>
+    </tr>
+    <tr>
+  <td><strong>Foto entrevista</strong></td>
+    <td>
+      <img src="../assets/chapter-2/img-interviews/seg1-Sebastian.png" 
+          alt="Entrevista a Sebastian Beingolea" 
+          width="500"/>
+    </td>
+  </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>
+        Sebastian Beingolea forma parte del segmento 1, enfocado en empresas solicitantes del servicio de combustible. Durante la entrevista se recopila información sobre sus necesidades, procesos actuales y principales dificultades relacionadas con la gestión del abastecimiento de combustible, identificando oportunidades de mejora mediante herramientas digitales que permitan optimizar la comunicación, seguimiento de pedidos y control del suministro.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
 
 - Entrevista 2:
 
@@ -244,16 +286,59 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 - Entrevista 1:
 
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Andres Rodriguez</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>30 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Lince</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>06:54</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td>
+        <a href="https://www.youtube.com/watch?v=r_hFYg3dLmE">
+          https://www.youtube.com/watch?v=r_hFYg3dLmE
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td>
+        <img src="../assets/chapter-2/img-interviews/seg2-Andres.png" 
+             alt="Entrevista a Andres Rodriguez" 
+             width="500"/>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>
+        Andres Rodriguez forma parte del segmento 2, enfocado en proveedores de combustible. Durante la entrevista se aborda la perspectiva de los proveedores respecto al proceso de atención de pedidos, coordinación con clientes, distribución del combustible y principales retos operativos. Se identifican oportunidades de mejora relacionadas con la gestión de solicitudes, comunicación con los clientes, planificación de entregas y uso de herramientas digitales que permitan optimizar el seguimiento de pedidos, disponibilidad de stock y eficiencia del servicio.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
 
 
 - Entrevista 2:
