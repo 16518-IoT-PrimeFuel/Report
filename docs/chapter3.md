@@ -104,7 +104,7 @@
   <td>US-08</td>
   <td>Registrar información de pago</td>
   <td>Como solicitante, quiero ingresar la información de los pagos correspondientes para validar el pedido ante el proveedor.</td>
-  <td><b>Escenario 1: Registro exitoso de depósitos</b><br/>Dado que el solicitante ingresa la información de depósitos,<br/>Cuando registra el pedido,<br/>Estos quedan vinculados a él.<br/><br/><b>Escenario 2: Validación del formulario de ingreso de depósitos</b><br/>Dado que el solicitante intenta ingresar los datos del depósito,<br/>Cuando excede el límite de caracteres,<br/>Entonces el sistema muestra un mensaje de error.<br/><br/><b>Escenario 3: Validación de depósitos ya registrados</b><br/>Dado que el solicitante ingresa un depósito con un número de operación repetido,<br/>Cuando intenta seguir con el registro,<br/>Entonces el sistema notifica el error.</td>
+  <td><b>Escenario 1: Registro exitoso de depósitos</b><br/>Dado que el solicitante ingresa la información de depósitos,<br/>Cuando registra el pedido,<br/>Estos quedan vinculados a él.<br/><br/><b>Escenario 2: Número de operación con formato inválido</b><br/>Dado que el solicitante ingresa un número de operación que no corresponde a un formato bancario válido,<br/>Cuando intenta registrar el depósito,<br/>Entonces el sistema muestra un mensaje de error.<br/><br/><b>Escenario 3: Validación de depósitos ya registrados</b><br/>Dado que el solicitante ingresa un depósito con un número de operación repetido,<br/>Cuando intenta seguir con el registro,<br/>Entonces el sistema notifica el error.</td>
   <td>EP02</td>
 </tr>
 <tr>
@@ -119,6 +119,13 @@
   <td>Ver detalle de pedido</td>
   <td>Como usuario de ambos segmentos, quiero ver el detalle completo de un pedido para revisar toda la información asociada.</td>
   <td><b>Escenario 1: Visualización completa del detalle</b><br/>Dado que el usuario selecciona un pedido desde su panel,<br/>Cuando se carga la vista de detalle,<br/>Entonces puede ver tipo de combustible, cantidad, estado, fechas, datos de pago y asignación logística.<br/><br/><b>Escenario 2: Pedido no encontrado</b><br/>Dado que el usuario intenta acceder al detalle de un pedido inexistente,<br/>Cuando se carga la vista,<br/>Entonces el sistema muestra un mensaje de error y ofrece regresar al listado.<br/><br/><b>Escenario 3: Restricción de acceso a pedidos ajenos</b><br/>Dado que el usuario intenta acceder al detalle de un pedido que no le pertenece,<br/>Cuando carga la URL directamente,<br/>Entonces el sistema restringe el acceso y redirige a su propio panel.</td>
+  <td>EP02</td>
+</tr>
+<tr>
+  <td>US-50</td>
+  <td>Generar solicitud automática por umbral de tanque</td>
+  <td>Como sistema, quiero generar automáticamente una solicitud de pedido cuando el sensor IoT detecte que el nivel del tanque alcanzó el umbral crítico configurado y exista un proveedor de confianza asociado, para que el solicitante no dependa de una revisión manual.</td>
+  <td><b>Escenario 1: Generación automática exitosa</b><br/>Dado que el sensor reporta un nivel igual o menor al umbral configurado y la empresa tiene un proveedor de confianza asignado,<br/>Cuando el sistema procesa la lectura,<br/>Entonces se crea automáticamente una solicitud con estado "Pendiente" sin intervención del solicitante.<br/><br/><b>Escenario 2: Sin proveedor de confianza configurado</b><br/>Dado que el sensor detecta el umbral crítico pero la empresa no tiene proveedor de confianza asignado,<br/>Cuando se procesa la lectura,<br/>Entonces el sistema notifica al solicitante para que registre el pedido manualmente.<br/><br/><b>Escenario 3: Umbral aún no alcanzado</b><br/>Dado que el sensor reporta un nivel por encima del umbral configurado,<br/>Cuando se procesa la lectura,<br/>Entonces no se genera ninguna solicitud.</td>
   <td>EP02</td>
 </tr>
 
