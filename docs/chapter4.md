@@ -181,54 +181,155 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se detalla el diseño interno de cada *bounded context* identificado en la sección 4.1, aplicando los patrones tácticos de DDD. Para cada contexto se describen sus cuatro capas —**Domain**, **Interface**, **Application** e **Infrastructure**— y se presentan sus diagramas de componentes y de código.
+En este nivel se documentan exclusivamente los bounded contexts **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI.
 
-### 4.2.X. Bounded Context: \<Bounded Context Name\>
 
-> *por completar.*
+Esta sección documenta únicamente los bounded contexts **Notification** e **Inventory**, con base en la inspección del código fuente, la ejecución local del backend y las pruebas realizadas desde Swagger UI. La aplicación se compiló con Maven usando el JBR de IntelliJ IDEA (Java 25.0.4) y el parámetro maven.compiler.release=25, porque el proyecto declara Java 26 y ese JDK no estaba instalado. Para la evidencia runtime se levantó una instancia MySQL aislada en 127.0.0.1:3307 y el backend en http://localhost:8080; no se modificó el código del backend.
 
-Breve descripción del contexto delimitado: su propósito de negocio dentro de FullTank, los actores que interactúan con él y los contextos con los que se relaciona según el *Context Mapping* de la Sección 4.1.2.
+### 4.2.1. Bounded Context: Notification
 
-#### 4.2.X.1. Domain Layer.
+Notification centraliza las notificaciones internas que reciben compradores y proveedores autenticados ante eventos relevantes. El agregado conserva la referencia del evento, pero mantiene separado el ciclo de vida de órdenes y usuarios.
 
-Contiene las entidades, agregados, value objects, así como comandos, consultas e interfaces que definen el comportamiento del dominio.
+#### 4.2.1.1. Domain Layer
 
-#### 4.2.X.2. Interface Layer.
+El core es el agregado Notification, ubicado en notification.domain.model.aggregates. Conserva userId, type, title, message, read, referenceId y createdAt. El constructor de creación inicializa read=false y markAsRead() cambia el estado a leído. NotificationType restringe el tipo de notificación.
 
-Expone los endpoints del sistema (controladores REST) y componentes encargados de transformar datos entre modelos externos e internos.
-
-#### 4.2.X.3. Application Layer.
-
-Implementa la lógica de negocio mediante servicios que ejecutan comandos y consultas.
-
-#### 4.2.X.4. Infrastructure Layer.
-
-Define los mecanismos de persistencia y comunicación con sistemas externos, incluyendo repositorios y servicios de integración.
-
-#### 4.2.X.5. Bounded Context Software Architecture Component Level Diagrams.
-
-En el nivel de componentes se detalla la descomposición interna de los contenedores, enfocándose principalmente en el contenedor **FullTank API**, donde reside la lógica de negocio del sistema.
-
-El *component diagram* organiza la arquitectura interna siguiendo los *bounded contexts* definidos en el dominio. Cada uno representa un módulo backend con responsabilidades específicas:
-
-- **Identity & Access BC:** gestiona el registro de usuarios (clientes y proveedores), autenticación mediante credenciales de correo electrónico y contraseña, autorización basada en roles, emisión de tokens JWT, recuperación de contraseñas y administración de perfiles. Redirige al usuario según su rol tras el inicio de sesión.
-- **Catalog BC:** *bounded context* orientado al cliente que permite explorar los proveedores disponibles en la plataforma, consultar el catálogo de productos (tipos de combustible, precios por litro) que ofrece cada proveedor y asignar productos seleccionados a los equipos registrados del cliente. Consume datos del *Inventory BC* para obtener disponibilidad y del *Equipment BC* para validar compatibilidad de tipo de combustible.
-- **Equipment BC:** gestiona los equipos del cliente, tales como vehículos, generadores y maquinaria. Cada equipo registra su tipo, marca, modelo, tipo de combustible requerido, capacidad del tanque y estado operativo. Permite al cliente agregar, actualizar, eliminar y listar sus equipos, así como asignar o cambiar el tipo de combustible asociado.
-- **Inventory BC:** *bounded context* orientado al proveedor que administra el inventario de combustible, incluyendo niveles de stock disponible y precio por litro según tipo de combustible. Valida la información de los ítems al momento de registro o actualización y notifica al administrador ante cambios relevantes.
-- **Ordering BC:** orquesta el ciclo de vida completo de las órdenes, desde la creación de solicitudes por parte del cliente hasta su cierre por parte del proveedor. Incluye las operaciones de creación de solicitud, cancelación, aceptación, rechazo, despacho, confirmación de entrega y cierre. Valida la información de cada solicitud, notifica al proveedor o cliente según corresponda y, al cerrar una orden, descuenta el inventario correspondiente.
-- **Payment BC:** gestiona el registro de pagos mediante comprobantes (vouchers), valida que el monto total coincida con el precio del combustible solicitado y habilita la aprobación de órdenes una vez verificado el respaldo financiero.
-- **Fulfillment BC:** administra los recursos logísticos del proveedor, incluyendo el registro de transportes (vehículos de distribución) y conductores. Permite asignar un transporte y un conductor a una orden aprobada para su despacho, y libera ambos recursos cuando la orden es cerrada.
-- **Notification BC:** genera notificaciones dentro del sistema en respuesta a eventos relevantes del dominio, como cambios en el estado de las órdenes (creación, aprobación, rechazo, despacho, entrega, cierre). Permite a los usuarios visualizar su historial de notificaciones y marcarlas como leídas.
-- **Reporting & Analytics BC:** procesa información histórica de órdenes cerradas para generar reportes de consumo (perspectiva del cliente) y ventas (perspectiva del proveedor), incluyendo gráficos de tendencias y la generación de archivos PDF descargables.
-
-En el diagrama se refleja cómo la Web Application consume los servicios de cada componente backend mediante endpoints REST organizados por contexto. Cada *bounded context* accede a la base de datos para gestionar la información correspondiente a su dominio. Existen interacciones relevantes entre contextos: *Ordering* depende de *Payment* para validar pagos antes de aprobar órdenes; *Ordering* interactúa con *Fulfillment* para coordinar la asignación de flota y su liberación al cerrar órdenes; *Ordering* actualiza el stock en *Inventory* al cerrar órdenes; *Catalog* lee datos de *Inventory* para mostrar disponibilidad de productos y valida contra *Equipment* la compatibilidad de tipos de combustible; *Notification* reacciona a cambios de estado en órdenes; y *Reporting* consume datos de órdenes cerradas para generar agregados analíticos. Algunos componentes se integran con sistemas externos: *Identity & Access* con el servicio de correo electrónico, *Payment* con almacenamiento en la nube para comprobantes y *Reporting & Analytics* con el generador de PDFs.
-
-De esta manera, los *component diagrams* permiten entender cómo la arquitectura se organiza internamente en módulos coherentes con el dominio, cómo se relacionan entre sí y cómo colaboran para implementar la funcionalidad completa de FullTank.
+Los comandos son CreateNotificationCommand y MarkNotificationAsReadCommand; las consultas son GetNotificationByIdQuery, GetNotificationsByUserIdQuery y GetUnreadNotificationsByUserIdQuery. NotificationRepository es el puerto de persistencia que mantiene el dominio independiente de JPA.
 
 <div align="center">
-  <img src="../assets/chapter-4/c4-model/BackendComponents-dark.png" alt="Component diagram" width="500"/>
-  <p><em>Figura 4.4: Diagrama de componentes del backend de FullTank.</em></p>
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/notification/code-notification.png" alt="Código del agregado Notification" width="100%"/>
+  <p><em>Figura 4.4: Agregado raíz Notification.</em></p>
 </div>
+
+#### 4.2.1.2. Interface Layer
+
+NotificationsController transforma los recursos HTTP mediante assemblers y delega en los servicios de aplicación. Expone:
+
+- POST /api/v1/notifications
+- POST /api/v1/notifications/{notificationId}/mark-as-read
+- GET /api/v1/notifications/{notificationId}
+- GET /api/v1/notifications/user/{userId}
+- GET /api/v1/notifications/user/{userId}/unread
+- GET /api/v1/notifications/provider/{providerId}
+- GET /api/v1/notifications/buyer/{companyId}
+
+La autorización mediante @PreAuthorize valida el usuario actual y la creación exige exactamente uno de userId, companyId o providerId.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/notification/code-notifications-controller.png" alt="NotificationsController" width="100%"/>
+  <p><em>Figura 4.5: Interface de Notification.</em></p>
+</div>
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/notification/swagger-notifications.png" alt="Swagger de Notifications" width="100%"/>
+  <p><em>Figura 4.6: Operaciones de Notifications en Swagger UI.</em></p>
+</div>
+
+#### 4.2.1.3. Application Layer
+
+NotificationCommandServiceImpl crea el agregado y lo persiste, o lo recupera para ejecutar markAsRead(). NotificationQueryServiceImpl resuelve las consultas. Las interfaces NotificationCommandService y NotificationQueryService definen los contratos de aplicación.
+
+Flujo: NotificationsController → servicio de aplicación → Notification → NotificationRepository.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/notification/code-notification-application.png" alt="Servicios de aplicación de Notification" width="100%"/>
+  <p><em>Figura 4.7: Application de Notification.</em></p>
+</div>
+
+#### 4.2.1.4. Infrastructure Layer
+
+NotificationPersistenceEntity se mapea a la tabla notifications; type se almacena como texto e is_read representa el estado de lectura. NotificationPersistenceAssembler transforma entre JPA y dominio, NotificationPersistenceRepository encapsula Spring Data y NotificationRepositoryImpl implementa el puerto.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/notification/code-notification-infrastructure.png" alt="Persistencia de Notification" width="100%"/>
+  <p><em>Figura 4.8: Infrastructure de Notification.</em></p>
+</div>
+
+#### 4.2.1.5. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Crear notificación | 201 Created |
+| Consultar por id, usuario y no leídas | 200 OK |
+| Marcar como leída | 200 OK |
+| No leídas después de marcar | 200 OK, colección vacía |
+| Acceso de proveedor al endpoint buyer | 403 Forbidden |
+| Swagger sin token | 401 Unauthorized |
+
+### 4.2.2. Bounded Context: Inventory
+
+Inventory administra productos de combustible ofrecidos por proveedores: nombre, tipo, precio por unidad, unidad, stock, capacidad, proveedor y estado active. El proveedor gestiona sus productos y el comprador consulta los productos visibles. El contexto mantiene su propio modelo y persistencia.
+
+#### 4.2.2.1. Domain Layer
+
+El core es el agregado raíz FuelProduct, ubicado en inventory.domain.model.aggregates. Encapsula name, fuelType, pricePerUnit, unit, availableStock, capacity, providerId y active. active se habilita por defecto al crear el producto si el comando no lo especifica.
+
+updateStock(newStock) modifica el stock disponible y update(command) actualiza los datos editables, conservando active cuando no viene informado. FuelType restringe el tipo. Los comandos son CreateFuelProductCommand, UpdateFuelProductCommand, UpdateFuelProductStockCommand y DeleteFuelProductCommand; las consultas son GetAllFuelProductsQuery, GetFuelProductByIdQuery y GetFuelProductsByProviderIdQuery. FuelProductRepository es el puerto de persistencia.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/inventory/code-fuel-product.png" alt="Código del agregado FuelProduct" width="100%"/>
+  <p><em>Figura 4.9: Agregado raíz FuelProduct.</em></p>
+</div>
+
+#### 4.2.2.2. Interface Layer
+
+FuelProductsController transforma recursos y expone:
+
+- POST /api/v1/fuel-products
+- POST /api/v1/fuel-products/{fuelProductId}/update-stock
+- GET /api/v1/fuel-products
+- GET /api/v1/fuel-products/{fuelProductId}
+- GET /api/v1/fuel-products/provider/{providerId}
+- PUT /api/v1/fuel-products/{fuelProductId}
+- DELETE /api/v1/fuel-products/{fuelProductId}
+
+@PreAuthorize separa capacidades de comprador y proveedor y valida la propiedad del recurso. InventoryController no agrega endpoints operativos; el controlador del módulo es FuelProductsController.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/inventory/code-fuel-products-controller.png" alt="FuelProductsController" width="100%"/>
+  <p><em>Figura 4.10: Interface de Inventory.</em></p>
+</div>
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/inventory/swagger-fuel-products.png" alt="Swagger de Fuel Products" width="100%"/>
+  <p><em>Figura 4.11: Operaciones de Fuel Products en Swagger UI.</em></p>
+</div>
+
+#### 4.2.2.3. Application Layer
+
+FuelProductCommandServiceImpl coordina creación, actualización de stock, actualización general y eliminación. Recupera el agregado antes de actualizar y devuelve not found si no existe; traduce los conflictos de integridad de eliminación a un error de conflicto. El servicio de consultas devuelve productos por id, proveedor o colección.
+
+Flujo: FuelProductsController → servicio de aplicación → FuelProduct → FuelProductRepository.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/inventory/code-fuel-product-application.png" alt="Servicios de aplicación de Inventory" width="100%"/>
+  <p><em>Figura 4.12: Application de Inventory.</em></p>
+</div>
+
+#### 4.2.2.4. Infrastructure Layer
+
+FuelProductPersistenceEntity se mapea a fuel_products y conserva proveedor, stock, capacidad y active. FuelProductPersistenceAssembler realiza el mapeo; FuelProductPersistenceRepository provee Spring Data; y FuelProductRepositoryImpl implementa el puerto del dominio.
+
+El directorio físico se llama infraestructure, aunque las declaraciones de paquete usan infrastructure.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/inventory/code-fuel-product-infrastructure.png" alt="Persistencia de FuelProduct" width="100%"/>
+  <p><em>Figura 4.13: Infrastructure de Inventory.</em></p>
+</div>
+
+#### 4.2.2.5. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Crear producto | 201 Created |
+| Consultar por id y proveedor | 200 OK |
+| Actualizar stock y producto | 200 OK |
+| Eliminar producto | 204 No Content |
+| Consultar producto eliminado | 404 Not Found |
+| Acceso de proveedor al endpoint buyer | 403 Forbidden |
+| Swagger sin token | 401 Unauthorized |
+
+La evidencia se guarda por módulo en Report/assets/chapter-4/Bounded Context Evidence. El backend y MySQL usados fueron locales y aislados; no se modificó el código fuente.
 
 #### 4.2.X.6. Bounded Context Software Architecture Code Level Diagrams.
 
