@@ -250,16 +250,7 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         Participó en las reuniones de coordinación y comunicó aportes para el desarrollo de la solución y la organización del trabajo.<br>
       </td>
       <td>
-        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
-        Fortaleció su capacidad para explicar propuestas y coordinar acuerdos de manera clara con el equipo.<br>
-        <b>Castro Pariona Jefferson Ernesto</b><br>
-        Mejoró su capacidad para comunicar hallazgos de entrevistas y convertirlos en aportes comprensibles para el equipo.<br>
-        <b>Mejia Aliaga Katherine Maryory</b><br>
-        Reforzó su capacidad para expresar propuestas y participar activamente en la toma de decisiones del equipo.<br>
-        <b>Ponce Perales Alberto Alejandro</b><br>
-        Fortaleció su comunicación oral al sustentar ideas y colaborar en la definición de la solución.<br>
-        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
-        Mejoró su capacidad para comunicar aportes técnicos y coordinar actividades con los demás integrantes.<br>
+        La participación en reuniones, entrevistas y sesiones de brainstorming permitió al equipo fortalecer su capacidad para comunicar ideas, hallazgos y propuestas de manera clara, coordinar acuerdos y colaborar en la definición de la solución.
       </td>
     </tr>
     <tr>
@@ -278,16 +269,7 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         Apoyó en la elaboración y revisión del informe, verificando que la información técnica y las propuestas estuvieran documentadas.<br>
       </td>
       <td>
-        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
-        Reforzó su capacidad para estructurar información técnica y expresarla de manera comprensible en un documento académico.<br>
-        <b>Castro Pariona Jefferson Ernesto</b><br>
-        Mejoró su capacidad para documentar resultados y presentar información de forma ordenada y consistente.<br>
-        <b>Mejia Aliaga Katherine Maryory</b><br>
-        Fortaleció su capacidad para redactar y revisar contenido, contribuyendo a la coherencia general del informe.<br>
-        <b>Ponce Perales Alberto Alejandro</b><br>
-        Reforzó su capacidad para comunicar ideas por escrito y revisar su claridad antes de integrarlas al informe.<br>
-        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
-        Mejoró su capacidad para documentar aspectos técnicos con precisión y mantener consistencia en el informe.<br>
+        La elaboración y revisión colaborativa del informe permitió al equipo fortalecer su capacidad para estructurar, redactar y presentar información técnica de forma clara, ordenada, coherente y comprensible para diferentes rangos de audiencia.
       </td>
     </tr>
   </tbody>
