@@ -42,8 +42,8 @@
       <td>Delgado Carrasco Schneider Carlos Alberto</td>
     </tr>
     <tr>
-      <td>-</td>
-      <td>-</td>
+      <td>u202312700</td>
+      <td>Lopez Goitia Carlos Alberto</td>
     </tr>
     <tr>
       <td>-</td>
@@ -76,7 +76,8 @@
         - Castro Pariona Jefferson Ernesto <br>
         - Ponce Perales Alberto Alejandro <br>
         - Mejia Aliaga Katherine Maryory <br>
-        - Delgado Carrasco Schneider Carlos Alberto
+        - Delgado Carrasco Schneider Carlos Alberto<br>
+        -Lopez Goitia Carlos Alberto
       </td>
       <td></td>
     </tr>
@@ -248,6 +249,8 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         Participó en las sesiones de brainstorming y comunicó ideas para definir y mejorar las funcionalidades del proyecto.<br>
         <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
         Participó en las reuniones de coordinación y comunicó aportes para el desarrollo de la solución y la organización del trabajo.<br>
+        <b>Lopez Goitia Carlos Alberto</b><br>
+        Participó en las reuniones de coordinación del equipo, exponiendo el estado de avance del informe y comunicando aportes para la organización de los entregables.<br>
       </td>
       <td>
         La participación en reuniones, entrevistas y sesiones de brainstorming permitió al equipo fortalecer su capacidad para comunicar ideas, hallazgos y propuestas de manera clara, coordinar acuerdos y colaborar en la definición de la solución.
@@ -267,6 +270,8 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
         Contribuyó en la redacción y revisión de contenidos, aportando ideas para mejorar la explicación de la solución.<br>
         <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
         Apoyó en la elaboración y revisión del informe, verificando que la información técnica y las propuestas estuvieran documentadas.<br>
+        <b>Lopez Goitia Carlos Alberto</b><br>
+        Redactó documentación técnica del proyecto, incluyendo la conversión del README a PDF y los scripts de video del entregable, procurando que la información fuera clara y comprensible para el lector.<br>
       </td>
       <td>
         La elaboración y revisión colaborativa del informe permitió al equipo fortalecer su capacidad para estructurar, redactar y presentar información técnica de forma clara, ordenada, coherente y comprensible para diferentes rangos de audiencia.
