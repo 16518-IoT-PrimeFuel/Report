@@ -52,6 +52,14 @@
       <td>Ingeniería de Software</td>
       <td>Soy estudiante de Ingeniería de Software en la UPC, con conocimientos en programación y bases de datos. Me interesa la tecnología, la innovación y el desarrollo de soluciones digitales que mejoren la vida de las personas. Estoy comprometido con mi formación y busco nuevos retos que me permitan crecer a nivel académico y personal.</td>
     </tr>
+    <tr>
+      <td><img src="../assets/chapter-1/members/CarlosLopez.jpg" alt="Carlos Alberto Lopez Goitia">
+      </td>
+      <td>Carlos Alberto Lopez Goitia</td>
+      <td>u202312700</td>
+      <td>Ingeniería de Software</td>
+      <td>Estudiante de Ingeniería de Software en la UPC. Cuento con experiencia en desarrollo full-stack: frontend móvil con Flutter y Kotlin/Jetpack Compose, backend con .NET 8 y MySQL, y desarrollo de aplicaciones web con Angular, Node.js/Express y MongoDB. He trabajado en proyectos desplegados en la nube (Azure) usando Docker para la orquestación de servicios, además de diseño de APIs REST y modelado de bases de datos NoSQL.</td>
+    </tr>
   </tbody>
 </table>
 
