@@ -239,23 +239,56 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
       <td>
         <b>AV1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Participó en las reuniones de coordinación del equipo y comunicó propuestas para el avance del proyecto mediante nuestro canal de Discord.<br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
-        Realizacion de entrevistas para cada sector, apoyo en la documentacion del proyecto, apoyo en la realizacion de c4 model.<br>
+        Participó en las entrevistas con los usuarios y en las reuniones de coordinación, comunicando hallazgos e ideas para los entregables del proyecto.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Participó en las reuniones del equipo y comunicó propuestas para organizar el desarrollo de los entregables y mejorar la solución.<br>
         <b>Ponce Perales Alberto Alejandro</b><br>
+        Participó en las sesiones de brainstorming y comunicó ideas para definir y mejorar las funcionalidades del proyecto.<br>
         <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Participó en las reuniones de coordinación y comunicó aportes para el desarrollo de la solución y la organización del trabajo.<br>
       </td>
-      <td></td>
+      <td>
+        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Fortaleció su capacidad para explicar propuestas y coordinar acuerdos de manera clara con el equipo.<br>
+        <b>Castro Pariona Jefferson Ernesto</b><br>
+        Mejoró su capacidad para comunicar hallazgos de entrevistas y convertirlos en aportes comprensibles para el equipo.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Reforzó su capacidad para expresar propuestas y participar activamente en la toma de decisiones del equipo.<br>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        Fortaleció su comunicación oral al sustentar ideas y colaborar en la definición de la solución.<br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Mejoró su capacidad para comunicar aportes técnicos y coordinar actividades con los demás integrantes.<br>
+      </td>
     </tr>
     <tr>
       <td width="25%"><b>Comunica por escrito con efectividad a diferentes rangos de audiencia</b></td>
       <td>
         <b>AV1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Redactó y revisó contenido técnico del informe, procurando que las ideas y propuestas del proyecto fueran claras para el lector.<br>
         <b>Castro Pariona Jefferson Ernesto</b><br>
+        Apoyó en la redacción y documentación del proyecto, especialmente en la organización de entrevistas, análisis y entregables.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Contribuyó en la redacción y revisión de los contenidos del informe para mantener claridad y coherencia entre sus secciones.<br>
         <b>Ponce Perales Alberto Alejandro</b><br>
+        Contribuyó en la redacción y revisión de contenidos, aportando ideas para mejorar la explicación de la solución.<br>
         <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Apoyó en la elaboración y revisión del informe, verificando que la información técnica y las propuestas estuvieran documentadas.<br>
       </td>
-      <td></td>
+      <td>
+        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Reforzó su capacidad para estructurar información técnica y expresarla de manera comprensible en un documento académico.<br>
+        <b>Castro Pariona Jefferson Ernesto</b><br>
+        Mejoró su capacidad para documentar resultados y presentar información de forma ordenada y consistente.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Fortaleció su capacidad para redactar y revisar contenido, contribuyendo a la coherencia general del informe.<br>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        Reforzó su capacidad para comunicar ideas por escrito y revisar su claridad antes de integrarlas al informe.<br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Mejoró su capacidad para documentar aspectos técnicos con precisión y mantener consistencia en el informe.<br>
+      </td>
     </tr>
   </tbody>
 </table>
