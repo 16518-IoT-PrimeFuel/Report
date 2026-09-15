@@ -569,3 +569,96 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 <div align="center">
   <img src="../assets/chapter-4/database/baseDatos_analysis.png" alt="Tablas de Reporting & Analytics"/>
 </div>
+
+### 4.2.8. Bounded Context: Payment
+
+### 4.2.8.1. Domain Layer.
+
+|     Clase     |      Tipo      |                                  Propósito                                 |
+|:-------------:|:--------------:|:--------------------------------------------------------------------------:|
+|    Payment    | Aggregate Root | Entidad principal que gestiona la información del pago y su ciclo de vida. |
+| PaymentStatus |  Value Object  |                 Representar los estados posibles del pago.                 |
+| PaymentMethod |  Value Object  |           Identificar el método utilizado para realizar el pago.           |
+
+### 4.2.8.2. Interface Layer.
+
+|          Clase          |       Tipo      |                                                     Propósito                                                    |
+|:-----------------------:|:---------------:|:----------------------------------------------------------------------------------------------------------------:|
+|      PaymentStatus      | REST Controller |              Exponer los endpoints HTTP para gestionar la creación, estado y consulta de los pagos.              |
+| CompletePaymentResource |   DTO (Record)  |      Representar los datos de entrada requeridos por el cliente para solicitar la creación de un nuevo pago.     |
+| CreatePaymentResource   | DTO (Record)    | Representar el dato enviado por el cliente necesario para marcar un pago como completado.                        |
+| PaymentResource         | DTO (Record)    | Representar los datos de salida con la información detallada del pago que se devuelve como respuesta al cliente. |
+
+### 4.2.8.3. Application Layer.
+
+|           Clase           |       Tipo      |                                                     Propósito                                                     |
+|:-------------------------:|:---------------:|:-----------------------------------------------------------------------------------------------------------------:|
+|   PaymentCommandService   |    Interface    |                      Definir los casos de uso para las operaciones que modifican información.                     |
+| PaymentCommandServiceImpl | Command Handler | Implementar la lógica real que ejecuta las operaciones de modificación coordinando el dominio y la base de datos. |
+| PaymentQueryService       | Interface       | Definir los casos de uso para las operaciones de solo lectura.                                                    |
+| PaymentQueryServiceImpl   | Command Handler | Implementar la lógica para ejecutar las consultas y devolver la información de los pagos sin alterar ningún dato. |
+
+### 4.2.8.4. Infrastructure Layer.
+
+|             Clase            |            Tipo            |                                                              Propósito                                                             |
+|:----------------------------:|:--------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
+|     PaymentRepositoryImpl    |     Repository Adapter     |                         Actúa como un adaptador que conecta las operaciones de negocio con Spring Data JPA.                        |
+| PaymentPersistenceAssembler  |     Assembler / Mapper     | Funciona como un traductor bidireccional, transformando los objetos del modelo de dominio a entidades de persistencia y viceversa. |
+| PaymentPersistenceEntity     | JPA Entity                 | Representa la estructura de la tabla payments en la base de datos relacional.                                                      |
+| PaymentPersistenceRepository | Spring Data JPA Repository | Encargada de ejecutar las consultas SQL automáticas y personalizadas directamente sobre la base de datos.                          |
+
+### 4.2.8.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![](/assets/chapter4/bounded/payment1.png)
+
+### 4.2.8.6. Bounded Context Software Architecture Code Level Diagrams.
+
+### 4.2.8.6.1. Bounded Context Domain Layer Class Diagrams.
+
+![](/assets/chapter4/bounded/payment3.png)
+
+### 4.2.8.6.2. Bounded Context Database Design Diagram.
+
+![](/assets/chapter4/bounded/payment4.png)
+
+### 4.2.9. Bounded Context: Reporting
+
+### 4.2.9.1. Domain Layer.
+
+|           Clase           |     Tipo     |                                             Propósito                                             |
+|:-------------------------:|:------------:|:-------------------------------------------------------------------------------------------------:|
+|   GetBuyerAnalyticsQuery  | Domain Query |  Define la estructura de la consulta para solicitar las analíticas y métricas de los compradores. |
+| GetPlatformSummaryQuery   | Domain Query |  Define la estructura de la consulta para obtener el resumen general del estado de la plataforma. |
+| GetProviderAnalyticsQuery | Domain Query | Define la estructura de la consulta para solicitar las analíticas y métricas de los proveedores.  |
+| BuyerAnalytics            | Value Object | Modela los datos de valor inmutables que representan las analíticas consolidadas de un comprador. |
+| MonthlyAmount             | Value Object | Modela los montos monetarios agrupados por periodo mensual para reportes y estadísticas.          |
+| PlatformSummary           | Value Object | Modela los indicadores y datos globales que componen el resumen general de la plataforma.         |
+| ProviderAnalytics         | Value Object | Modela los datos de valor inmutables que representan las analíticas y métricas de un proveedor.   |
+
+### 4.2.9.2. Interface Layer.
+
+|                       Clase                       |       Tipo      |                                                       Propósito                                                      |
+|:-------------------------------------------------:|:---------------:|:--------------------------------------------------------------------------------------------------------------------:|
+|                AnalyticsController                | REST Controller |       Expone los endpoints HTTP para gestionar y recibir las solicitudes de consulta de analíticas y resúmenes.      |
+|               BuyerAnalyticsResource              |  REST Resource  |            Define la estructura de datos JSON que se expone al cliente para las analíticas de compradores.           |
+|              PlatformSummaryResource              |  REST Resource  |         Define la estructura de datos JSON que se expone al cliente para el resumen general de la plataforma.        |
+|             ProviderAnalyticsResource             |  REST Resource  |            Define la estructura de datos JSON que se expone al cliente para las analíticas de proveedores.           |
+|   BuyerAnalyticsResourceFromValueObjectAssembler  |    Assembler    |    Convierte el objeto de valor del dominio (BuyerAnalytics) al recurso de presentación (BuyerAnalyticsResource).    |
+|  PlatformSummaryResourceFromValueObjectAssembler  |    Assembler    |   Convierte el objeto de valor del dominio (PlatformSummary) al recurso de presentación (PlatformSummaryResource).   |
+| ProviderAnalyticsResourceFromValueObjectAssembler |    Assembler    | Convierte el objeto de valor del dominio (ProviderAnalytics) al recurso de presentación (ProviderAnalyticsResource). |
+
+### 4.2.9.3. Application Layer.
+
+|           Clase           |             Tipo             |                                                           Propósito                                                          |
+|:-------------------------:|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------------:|
+|   AnalyticsQueryService   |         Query Service        | Define el contrato de los servicios de consulta para coordinar el procesamiento de las solicitudes de reportes y analíticas. |
+| AnalyticsQueryServiceImpl | Query Service Implementation | Implementa la lógica de negocio descrita por el contrato para procesar y resolver las consultas de analíticas en el sistema. |
+
+### 4.2.9.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![](/assets/chapter4/bounded/reporting1.png)
+
+### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
+### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
+![](/assets/chapter4/bounded/reporting2.png)
+
