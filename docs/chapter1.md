@@ -67,6 +67,15 @@
       <td>Ingeniería de Software</td>
       <td>Ingeniero de software creando soluciones basadas en la nube, AWS Certified. Estudiante de Ingeniería de Software en la UPC, actualmente en octavo ciclo.</td>
     </tr>
+    <tr>
+      <td><img src="../assets/chapter-1/members/KatherineMejia.png" alt="Katherine Maryory Mejia Aliaga">
+      </td>
+      <td>Katherine Maryory Mejia Aliaga</td>
+      <td>u20221a118</td>
+      <td>Ingeniería de Software</td>
+      <td>Soy studiante de 7mo ciclo de Ingeniería de Software (21 años), apasionada por el desarrollo de proyectos de Internet de las Cosas (IoT) y con un fuerte interés en
+        aprender a guiar y liderar iniciativas tecnológicas.
+      </td>
   </tbody>
 </table>
 
