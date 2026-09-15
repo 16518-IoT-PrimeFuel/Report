@@ -46,8 +46,8 @@
       <td>Lopez Goitia Carlos Alberto</td>
     </tr>
     <tr>
-      <td>-</td>
-      <td>-</td>
+      <td>u202223286</td>
+      <td>Rodriguez Parco Joseph Pablo</td>
     </tr>
   </table>
 </div>
