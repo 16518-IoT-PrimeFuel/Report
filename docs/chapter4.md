@@ -663,4 +663,3 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 ### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
 
 ![](/assets/chapter4/reporting2.png)
-
