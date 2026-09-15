@@ -131,7 +131,9 @@ La arquitectura de software de FullTank se documenta mediante el **modelo C4**, 
 
 El **System Landscape Diagram** muestra el panorama general en el que se inserta FullTank, incluyendo a sus usuarios (empresas solicitantes y proveedores de combustible) y los sistemas externos con los que interactúa, como la plataforma de sensores IoT, la pasarela de pagos y el servicio de correo electrónico.
 
-> *Diagrama por completar.*
+<div align="center">
+  <img src="../assets/chapter-4/class-diagrams/landspace-diagram.png" alt="Landspace Diagram" width="500"/>
+</div>
 
 #### 4.1.3.2. Software Architecture Context Level Diagrams
 
@@ -177,7 +179,9 @@ Esta vista permite entender la distribución de responsabilidades entre la capa 
 
 El **Deployment Diagram** describe la distribución física de los contenedores en la infraestructura de despliegue, incluyendo los entornos de producción y desarrollo, los servicios de hosting de frontend y backend, la base de datos y los dispositivos IoT instalados en las instalaciones de las empresas solicitantes.
 
-> *Diagrama por completar.*
+<div align="center">
+  <img src="../assets/chapter-4/class-diagrams/deploy-diagram.png" alt="Deploy Diagrams" width="500"/>
+</div>
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
