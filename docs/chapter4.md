@@ -897,7 +897,117 @@ La evidencia visual debe incluir capturas de Swagger que demuestren la creación
 
 ![Swagger - Provider Ratings](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/swagger-provider-ratings.png)
 
-### 4.2.6. Bounded Context: Ordering
+### 4.2.6. Bounded Context: Fulfillment
+
+| Elemento | Descripción |
+| :------: | :---------: |
+| Propósito | Coordinar los recursos logísticos del proveedor (vehículos y conductores) y gestionar el ciclo de vida de la entrega física del combustible desde que la orden es despachada hasta que se confirma su recepción o su fallo. |
+| Actores | Proveedores, que administran su flota (vehículos y conductores) y ejecutan las entregas; compradores, que consultan el estado de su entrega; administradores, que consultan el total de entregas de la plataforma. |
+| Relación con otros contextos | Al crear una entrega valida la propiedad del proveedor contra IAM, consulta la orden en **Ordering** para confirmar que pertenece a ese proveedor y la despacha (`order.dispatch()`), descuenta el stock reservado en **Inventory** (`product.updateStock()`) y, al completarla, acredita el combustible recibido en **Equipment** (`equipment.receiveFuel()`) y marca la orden como recibida (`order.receive()`). No existe un bus de eventos: la coordinación entre contextos ocurre por llamadas directas a los repositorios de esos otros dominios dentro del mismo command service, un acoplamiento fuerte característico del monolito modular.
+
+#### 4.2.6.1. Domain Layer.
+
+El core de Fulfillment es el agregado raíz `Delivery`, que orquesta el ciclo de vida de una entrega y valida las transiciones de estado (`SCHEDULED → DISPATCHED → DELIVERED`, o `→ FAILED`). `Vehicle` y `Driver` son agregados raíz independientes que representan los recursos logísticos del proveedor; su ciclo de vida (alta, edición, baja) es autónomo y no depende de `Delivery`, aunque esta última los referencia por identificador al momento de asignarlos a una entrega.
+
+En el Event Storming original (ver evidencia de sesión) estos agregados se modelaron como `Transport` y `Dispatch`; en la implementación final del backend se materializaron como `Vehicle` y `Delivery` respectivamente, mientras que `Driver` conservó su nombre. La regla de negocio "envío gratis cuando la orden se cierra", capturada en la sesión de Event Storming, no tiene traducción visible en el código actual: ni `Delivery` ni el módulo de Payment aplican una lógica de tarifas o descuentos de envío.
+
+|     Clase     |      Tipo      |                                  Propósito                                 |
+| :-----------: | :------------: | :--------------------------------------------------------------------------------------------------------------------------------------: |
+| `Delivery` | Aggregate Root | Gestiona orden, proveedor, conductor, vehículo, estado y fechas de despacho/entrega de una entrega. Expone `dispatch()`, `complete()` y `fail(String)` como comportamiento del dominio. |
+| `Vehicle` | Aggregate Root | Gestiona placa, marca, modelo, capacidad, unidad y disponibilidad del vehículo de un proveedor. Expone `update()` para modificar sus datos. |
+| `Driver` | Aggregate Root | Gestiona nombre, apellido, número de licencia, contacto y disponibilidad del conductor de un proveedor. Expone `update()` para modificar sus datos. |
+| `DeliveryStatus` | Value Object | Restringe los estados válidos de una entrega: `SCHEDULED`, `DISPATCHED`, `DELIVERED`, `FAILED`. |
+| `CreateDeliveryCommand` | Domain Command | Define los datos necesarios para programar una entrega: orden, proveedor, conductor, vehículo, fecha programada y notas. |
+| `DispatchDeliveryCommand` | Domain Command | Identifica la entrega que pasa a estado despachado. |
+| `CompleteDeliveryCommand` | Domain Command | Identifica la entrega que se marca como entregada. |
+| `FailDeliveryCommand` | Domain Command | Identifica la entrega que falla, junto con el motivo. |
+| `GetAllDeliveriesQuery` | Domain Query | Define la consulta de todas las entregas registradas. |
+| `GetDeliveryByIdQuery` | Domain Query | Define la consulta de una entrega por su identificador. |
+| `GetDeliveryByOrderIdQuery` | Domain Query | Define la consulta de la entrega asociada a una orden. |
+| `DeliveryRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Delivery` sin depender de JPA. |
+| `VehicleRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Vehicle`, incluida la consulta por proveedor. |
+| `DriverRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Driver`, incluida la consulta por proveedor. |
+
+#### 4.2.6.2. Interface Layer.
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------: |
+| `DeliveriesController` | REST Controller | Expone la API `/api/v1/deliveries`: creación, despacho, completado, fallo y consultas (todas, por proveedor, por id, por orden). Aplica `@PreAuthorize` con `CurrentUserAccess` para restringir la creación y el listado global al proveedor dueño o al rol `ADMIN`. |
+| `VehiclesController` | REST Controller | Expone la API `/api/v1/vehicles`: CRUD completo filtrado por `providerId`, validando propiedad del proveedor en cada operación. |
+| `DriversController` | REST Controller | Expone la API `/api/v1/drivers`: CRUD completo filtrado por `providerId`, validando propiedad del proveedor en cada operación. |
+| `FulfillmentController` | REST Controller (marcador) | Clase vacía sin rutas activas; no expone endpoints. Es un remanente documental, igual que otros marcadores detectados en el resto de la plataforma. |
+| `CreateDeliveryResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para programar una entrega. |
+| `DeliveryResource` | REST Resource (DTO) | Define la representación JSON de una entrega devuelta al cliente. |
+| `FailDeliveryResource` | REST Resource (DTO) | Define el cuerpo JSON con el motivo del fallo de una entrega. |
+| `VehicleResource` | REST Resource (DTO) | Define la representación JSON de entrada/salida de un vehículo. |
+| `DriverResource` | REST Resource (DTO) | Define la representación JSON de entrada/salida de un conductor. |
+| `CreateDeliveryCommandFromResourceAssembler` | Assembler / Transformer | Convierte `CreateDeliveryResource` en `CreateDeliveryCommand`. |
+| `DeliveryResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado `Delivery` en `DeliveryResource` para la respuesta HTTP. |
+
+#### 4.2.6.3. Application Layer.
+
+Solo `Delivery` tiene una capa de aplicación explícita, porque es el único agregado del contexto con reglas de negocio que cruzan otros bounded contexts (Ordering, Inventory, Equipment). `Vehicle` y `Driver` no tienen command/query services: sus controladores (`VehiclesController`, `DriversController`) invocan directamente sus repositorios de dominio, sin capa intermedia; es una simplificación consistente con lo observado en el resto de la plataforma (`provider-ratings` sigue el mismo patrón).
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------: |
+| `DeliveryCommandService` | Command Service (Interface) | Define el contrato para crear, despachar, completar y fallar una entrega. |
+| `DeliveryCommandServiceImpl` | Command Service Implementation | Orquesta la creación de la entrega: valida que conductor y vehículo pertenezcan al proveedor y estén disponibles, valida capacidad del vehículo contra la cantidad solicitada, valida stock disponible en Inventory, evita entregas duplicadas por orden, y al completar libera conductor/vehículo, acredita combustible en Equipment y marca la orden como recibida. |
+| `DeliveryQueryService` | Query Service (Interface) | Define el contrato para consultar por id, por orden y el listado completo. |
+| `DeliveryQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas delegando en `DeliveryRepository`. |
+
+#### 4.2.6.4. Infrastructure Layer.
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------: |
+| `DeliveryPersistenceEntity` | JPA Entity | Representa la tabla `deliveries`: orden, proveedor, conductor, vehículo, estado (enum como texto), fechas de despacho/entrega, fecha programada y notas. |
+| `VehiclePersistenceEntity` | JPA Entity | Representa la tabla `vehicles`: proveedor, placa (única), marca, modelo, capacidad, unidad y estado. |
+| `DriverPersistenceEntity` | JPA Entity | Representa la tabla `drivers`: proveedor, nombre, apellido, número de licencia (único), teléfono, correo y estado. |
+| `DeliveryPersistenceAssembler` | Assembler / Mapper | Convierte entre `Delivery` y `DeliveryPersistenceEntity`. |
+| `VehiclePersistenceAssembler` | Assembler / Mapper | Convierte entre `Vehicle` y `VehiclePersistenceEntity`. |
+| `DriverPersistenceAssembler` | Assembler / Mapper | Convierte entre `Driver` y `DriverPersistenceEntity`. |
+| `DeliveryPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por orden y por proveedor. |
+| `VehiclePersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y la consulta de vehículos por proveedor. |
+| `DriverPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y la consulta de conductores por proveedor. |
+| `DeliveryRepositoryImpl` | Repository Adapter | Implementa `DeliveryRepository` y adapta sus operaciones a Spring Data JPA. |
+| `VehicleRepositoryImpl` | Repository Adapter | Implementa `VehicleRepository` y adapta sus operaciones a Spring Data JPA. |
+| `DriverRepositoryImpl` | Repository Adapter | Implementa `DriverRepository` y adapta sus operaciones a Spring Data JPA. |
+
+#### 4.2.6.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Component Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-structurizr-components.png)
+
+#### 4.2.6.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.6.6.1. Bounded Context Domain Layer Class Diagram.
+
+![Domain Layer Class Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-domain-uml.png)
+
+##### 4.2.6.6.2. Bounded Context Database Design Diagram.
+
+*Responsabilidad:* almacena los recursos logísticos del proveedor y su asignación a las entregas de cada orden.
+
+- **deliveries:** `id` (PK), `order_id` (FK → orders), `provider_id` (FK → providers), `driver_id` (FK → drivers), `vehicle_id` (FK → vehicles), `status` (`SCHEDULED`/`DISPATCHED`/`DELIVERED`/`FAILED`), `scheduled_date`, `dispatched_at`, `delivered_at`, `notes`, `created_at`, `updated_at`.
+- **vehicles:** `id` (PK), `provider_id` (FK → providers), `license_plate` (único), `brand`, `model`, `capacity`, `unit`, `status`, `created_at`, `updated_at`.
+- **drivers:** `id` (PK), `provider_id` (FK → providers), `first_name`, `last_name`, `license_number` (único), `phone_number`, `email`, `status`, `created_at`, `updated_at`.
+
+![Database Design Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-database-design.png)
+
+#### 4.2.6.7. Runtime Evidence.
+
+| Operación | Resultado esperado |
+| :-------: | :-------: |
+| Crear entrega con conductor/vehículo disponibles y del mismo proveedor | `201 Created` |
+| Crear entrega con conductor o vehículo de otro proveedor | `409 Conflict` |
+| Crear entrega con capacidad de vehículo insuficiente | `409 Conflict` |
+| Crear entrega duplicada para la misma orden | `409 Conflict` |
+| Despachar / completar / fallar entrega | `200 OK` |
+| Consultar entrega por id, por orden y por proveedor | `200 OK` |
+| Listar todas las entregas (rol distinto de `ADMIN`) | `403 Forbidden` |
+| CRUD de vehículos y conductores del proveedor dueño | `200`/`201`/`204` según operación |
+| Acceso a vehículos/conductores de otro proveedor | `404 Not Found` |
+| Swagger sin token | `401 Unauthorized` |
+
+### 4.2.7. Bounded Context: Ordering
 
 | Elemento | Descripción |
 |---|---|
@@ -905,7 +1015,7 @@ La evidencia visual debe incluir capturas de Swagger que demuestren la creación
 | Actores | Compradores que crean solicitudes y confirman/cancelan órdenes; proveedores que aceptan o rechazan solicitudes. |
 | Relación con otros contextos | Consulta Inventory (`FuelProductQueryService`) para validar el producto y calcular el precio total; referencia `equipmentId` de Equipment y es consumido por Payment, Fulfillment y Reporting mediante el `orderId`, sin bus de eventos ni transacción distribuida entre módulos. |
 
-#### 4.2.6.1. Domain Layer
+#### 4.2.7.1. Domain Layer
 
 El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal reside en el value object `OrderStatus`: cada método del agregado protege las transiciones válidas del ciclo de vida, por ejemplo `dispatch()` lanza excepción si el estado no es `PENDING`, y `receive()` exige que la orden esté `DISPATCHED`. `confirm()` y `cancel()`, en cambio, no validan el estado previo antes de aplicarse.
 
@@ -925,7 +1035,7 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 
 > Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.X.3 y 4.2.X.4).
 
-#### 4.2.6.2. Interface Layer
+#### 4.2.7.2. Interface Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
@@ -942,7 +1052,7 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 
 > Nota: a diferencia de `FuelOrderResource`, la conversión de `FuelRequestPersistenceEntity` a `FuelRequestResource` no tiene un assembler dedicado; se resuelve con un método estático privado dentro de `FuelRequestsController`.
 
-#### 4.2.6.3. Application Layer
+#### 4.2.7.3. Application Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
@@ -954,7 +1064,7 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 
 > Nota: a diferencia de `FuelOrderCommandService`/`FuelOrderQueryService`, `FuelRequestService` no sigue el patrón interfaz + implementación; es una única clase concreta anotada con `@Service`.
 
-#### 4.2.6.4. Infrastructure Layer
+#### 4.2.7.4. Infrastructure Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
@@ -965,19 +1075,19 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 | `FuelRequestPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `buyerCompanyId` y `providerId`; se usa directamente, sin puerto de dominio intermedio. |
 | `FuelOrderRepositoryImpl` | Repository Adapter | Implementa el puerto `FuelOrderRepository` y adapta sus operaciones a Spring Data JPA. |
 
-#### 4.2.6.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.7.5. Bounded Context Software Architecture Component Level Diagrams.
 Component Diagram - Ordering Bounded Context
 
 <img src="../assets/chapter-4/bc/ordering/Ordering-Components-dark.png" alt="Component Level Diagrams"/>
 
-#### 4.2.6.6. Bounded Context Software Architecture Code Level Diagrams.
+#### 4.2.7.6. Bounded Context Software Architecture Code Level Diagrams.
 
-##### 4.2.6.6.1. Bounded Context Domain Layer Class Diagram.
+##### 4.2.7.6.1. Bounded Context Domain Layer Class Diagram.
 Domain Layer Class Diagram - Ordering Bounded Context
 
 <img src="../assets/chapter-4/bc/ordering/BoundedContextDomainLayerClassDiagram.png" alt="Bounded Context Code Level Diagrams"/>
 
-#### 4.2.6.7. Runtime Evidence.
+#### 4.2.7.7. Runtime Evidence.
 
 | Operación | Resultado |
 |---|---|
@@ -1092,4 +1202,3 @@ Domain Layer Class Diagram - Ordering Bounded Context
 ### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
 ### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
 ![](/assets/chapter4/bounded/reporting2.png)
-
