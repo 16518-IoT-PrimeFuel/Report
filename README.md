@@ -70,7 +70,7 @@
   <tbody>
     <tr>
       <td>AV1</td>
-      <td></td>
+      <td>14/09/26</td>
       <td>
         - Bonifacio Jaramillo Samuel Jesus <br>
         - Castro Pariona Jefferson Ernesto <br>
@@ -79,33 +79,32 @@
         - Delgado Carrasco Schneider Carlos Alberto<br>
         -Lopez Goitia Carlos Alberto
       </td>
-      <td></td>
+      <td>Creación y consolidación de los capítulos I, II, III y IV del informe, incluyendo la documentación de requisitos, diseño estratégico y diseño táctico de los bounded contexts.</td>
     </tr>
   </tbody>
 </table>
 
 ## Project Report Collaboration Insights
 
-**Link del repositorio del informe:**  
+**Link del repositorio del informe:** [Report](https://github.com/16518-IoT-PrimeFuel/Report)
 
+**Link del repositorio de la Landing Page:** [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page)
 
-**Link del repositorio de la Landing Page:**  
+**Link del repositorio del frontend:** [frontend](https://github.com/16518-IoT-PrimeFuel/frontend)
 
-**Link del repositorio del frontend:**  
+**Link del repositorio del backend:** [backend](https://github.com/16518-IoT-PrimeFuel/backend)
 
-**Link del repositorio del backend:**  
+**Link de los repositorios de la organización:** [16518-IoT-PrimeFuel](https://github.com/16518-IoT-PrimeFuel)
 
-**Link de los repositorios de la organización:**
+Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report), [Mobile-app](https://github.com/16518-IoT-PrimeFuel/Mobile-app), [frontend](https://github.com/16518-IoT-PrimeFuel/frontend), [backend](https://github.com/16518-IoT-PrimeFuel/backend) y [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page).
 
-https://github.com/16518-IoT-PrimeFuel
+**Link del Figma:** Pendiente de publicación.
 
-**Link del figma:** 
+**Link de Swagger desplegado con Render:** Pendiente de una URL pública verificada.
 
-**Link de Swagger desplegado con render:**
+**Link de frontend desplegado con Vercel:** [FullTank Frontend](https://frontend-dgwsg79ja-bralexcds-projects.vercel.app/iam)
 
-**Link de frontend desplegado con vercel:**
-
-**Link de la Landing Page desplegada con github pages:**
+**Link de la Landing Page desplegada con GitHub Pages:** Pendiente de una URL pública disponible.
 
 Este informe ha sido desarrollado de forma colaborativa mediante GitHub, empleando GitFlow y Conventional Commits. Cada miembro del equipo ha contribuido con commits y ramas durante el desarrollo del proyecto.
 

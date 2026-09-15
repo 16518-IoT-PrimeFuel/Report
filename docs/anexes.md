@@ -120,8 +120,53 @@ Vernon, V. (s.f.). _Domain-Driven Design Reference_. Recuperado de https://domai
   <tbody>
     <tr>
       <td>Report</td>
-      <td>https://github.com/16518-IoT-PrimeFuel/Report</td>
+      <td><a href="https://github.com/16518-IoT-PrimeFuel/Report">https://github.com/16518-IoT-PrimeFuel/Report</a></td>
+    </tr>
+    <tr>
+      <td>Mobile-app</td>
+      <td><a href="https://github.com/16518-IoT-PrimeFuel/Mobile-app">https://github.com/16518-IoT-PrimeFuel/Mobile-app</a></td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td><a href="https://github.com/16518-IoT-PrimeFuel/frontend">https://github.com/16518-IoT-PrimeFuel/frontend</a></td>
+    </tr>
+    <tr>
+      <td>Backend</td>
+      <td><a href="https://github.com/16518-IoT-PrimeFuel/backend">https://github.com/16518-IoT-PrimeFuel/backend</a></td>
+    </tr>
+    <tr>
+      <td>Landing Page</td>
+      <td><a href="https://github.com/16518-IoT-PrimeFuel/landing-page">https://github.com/16518-IoT-PrimeFuel/landing-page</a></td>
     </tr>
   </tbody>
 
+</table>
+
+<h2>Enlaces públicos del proyecto</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Recurso</th>
+      <th>Enlace o estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Frontend desplegado</td>
+      <td><a href="https://frontend-dgwsg79ja-bralexcds-projects.vercel.app/iam">Vercel</a></td>
+    </tr>
+    <tr>
+      <td>Swagger desplegado con Render</td>
+      <td>Pendiente de una URL pública verificada.</td>
+    </tr>
+    <tr>
+      <td>Landing Page desplegada con GitHub Pages</td>
+      <td>Pendiente de una URL pública disponible.</td>
+    </tr>
+    <tr>
+      <td>Diseño en Figma</td>
+      <td>Pendiente de publicación.</td>
+    </tr>
+  </tbody>
 </table>
