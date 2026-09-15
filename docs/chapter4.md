@@ -181,16 +181,78 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se documentan exclusivamente los bounded contexts **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI.
+En este nivel se documentan los bounded contexts **IAM**, **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI.
 
 
-Esta sección documenta únicamente los bounded contexts **Notification** e **Inventory**, con base en la inspección del código fuente, la ejecución local del backend y las pruebas realizadas desde Swagger UI. La aplicación se compiló con Maven usando el JBR de IntelliJ IDEA (Java 25.0.4) y el parámetro maven.compiler.release=25, porque el proyecto declara Java 26 y ese JDK no estaba instalado. Para la evidencia runtime se levantó una instancia MySQL aislada en 127.0.0.1:3307 y el backend en http://localhost:8080; no se modificó el código del backend.
+Esta sección documenta los bounded contexts **IAM**, **Notification** e **Inventory**, con base en la inspección del código fuente, la ejecución local del backend y las pruebas realizadas desde Swagger UI. La aplicación se implementó con Spring Boot, Java y JPA/Hibernate. Para la evidencia runtime se usó el backend local y Swagger UI con autenticación JWT; las figuras y clases se contrastaron directamente con el código fuente actual.
 
-### 4.2.1. Bounded Context: Notification
+### 4.2.1. Bounded Context: IAM
+
+IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios y compañías compradoras o proveedoras, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-bounded-context.png" alt="Bounded context IAM" width="100%"/>
+  <p><em>Figura 4.14: Límites y responsabilidades del Bounded Context IAM.</em></p>
+</div>
+
+#### 4.2.1.1. Domain Layer
+
+El dominio está formado por los agregados User, BuyerCompany y ProviderCompany, además de la entidad Role y el value object Roles. User representa la identidad autenticable, sus roles y el vínculo con una compañía compradora o proveedora. BuyerCompany y ProviderCompany representan los perfiles empresariales que pertenecen al contexto IAM.
+
+Los comandos son SignUpCommand, SignInCommand, CreateBuyerCompanyCommand, CreateProviderCompanyCommand y SeedRolesCommand. Las consultas son GetAllUsersQuery, GetUserByIdQuery, GetUserByUsernameQuery, GetAllBuyerCompaniesQuery, GetBuyerCompanyByIdQuery, GetAllProviderCompaniesQuery y GetProviderCompanyByIdQuery. UserRepository, RoleRepository, BuyerCompanyRepository y ProviderCompanyRepository son puertos de persistencia que mantienen el dominio independiente de JPA.
+
+#### 4.2.1.2. Interface Layer
+
+AuthenticationController transforma los recursos HTTP mediante assemblers y delega en los servicios de aplicación. Expone:
+
+- POST /api/v1/authentication/sign-up
+- POST /api/v1/authentication/sign-in
+- POST /api/v1/authentication/password-reset/request
+- POST /api/v1/authentication/password-reset/confirm
+
+BuyerCompaniesController expone la creación, consulta y actualización de compañías compradoras; ProviderCompaniesController expone las operaciones equivalentes para compañías proveedoras; UsersController expone consultas administrativas y consultas propias. Los resources representan los contratos REST y los assemblers convierten entre recursos y comandos o entidades.
+
+Las reglas de autorización usan `@PreAuthorize`, `CurrentUserAccess` y los roles `ROLE_ADMIN`, `ROLE_BUYER` y `ROLE_PROVIDER`. Los endpoints de autenticación son públicos; las consultas y actualizaciones de recursos requieren JWT y validación de ownership o rol.
+
+#### 4.2.1.3. Application Layer
+
+UserCommandServiceImpl coordina el registro y el inicio de sesión. En el registro valida exactamente un rol de comprador o proveedor, crea el usuario y el perfil empresarial correspondiente dentro de una transacción y devuelve el recurso autenticado. PasswordResetService genera tokens de un solo uso, almacena únicamente el hash, aplica expiración y envía las instrucciones mediante SMTP.
+
+BuyerCompanyCommandServiceImpl, ProviderCompanyCommandServiceImpl y RoleCommandServiceImpl coordinan los comandos específicos de compañías y roles. UserQueryServiceImpl, BuyerCompanyQueryServiceImpl y ProviderCompanyQueryServiceImpl resuelven las consultas del directorio.
+
+Flujo principal: Controller → servicio de aplicación → agregado IAM → puerto de repositorio. La autenticación agrega HashingService y TokenService como puertos de salida para BCrypt y JWT.
+
+#### 4.2.1.4. Infrastructure Layer
+
+UserPersistenceEntity, RolePersistenceEntity, BuyerCompanyPersistenceEntity, ProviderCompanyPersistenceEntity y PasswordResetTokenEntity representan las tablas `users`, `roles`, `user_roles`, `buyer_companies`, `provider_companies`, `provider_company_fuel_types` y `password_reset_tokens`. Los assemblers transforman entre entidades JPA y objetos de dominio; los repositorios Spring Data son implementados por los adaptadores de persistencia.
+
+WebSecurityConfiguration configura Spring Security. BearerAuthorizationRequestFilter valida el token JWT, UserDetailsServiceImpl carga la identidad, CurrentUserAccess aplica las reglas de ownership, BCryptHashingService protege las contraseñas y BearerTokenService gestiona los tokens.
+
+#### 4.2.1.5. Bounded Context Software Architecture Component Level Diagram
+
+La vista de componentes muestra la separación entre Interfaces, Application, Domain e Infrastructure y las dependencias dirigidas hacia el dominio. IAM se integra con el resto de la plataforma mediante la identidad autenticada y la autorización de recursos.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-layer-overview.png" alt="Capas y componentes de IAM" width="100%"/>
+  <p><em>Figura 4.15: Capas y componentes principales de IAM.</em></p>
+</div>
+
+#### 4.2.1.6. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Registro de usuario y compañía | 201 Created |
+| Inicio de sesión y emisión de JWT | 200 OK |
+| Solicitud de recuperación de contraseña | 202 Accepted |
+| Confirmación de recuperación | 204 No Content |
+| Acceso protegido sin token | 401 Unauthorized |
+| Acceso a compañía ajena | 403 Forbidden |
+
+### 4.2.2. Bounded Context: Notification
 
 Notification centraliza las notificaciones internas que reciben compradores y proveedores autenticados ante eventos relevantes. El agregado conserva la referencia del evento, pero mantiene separado el ciclo de vida de órdenes y usuarios.
 
-#### 4.2.1.1. Domain Layer
+#### 4.2.2.1. Domain Layer
 
 El core es el agregado Notification, ubicado en notification.domain.model.aggregates. Conserva userId, type, title, message, read, referenceId y createdAt. El constructor de creación inicializa read=false y markAsRead() cambia el estado a leído. NotificationType restringe el tipo de notificación.
 
@@ -201,7 +263,7 @@ Los comandos son CreateNotificationCommand y MarkNotificationAsReadCommand; las 
   <p><em>Figura 4.4: Agregado raíz Notification.</em></p>
 </div>
 
-#### 4.2.1.2. Interface Layer
+#### 4.2.2.2. Interface Layer
 
 NotificationsController transforma los recursos HTTP mediante assemblers y delega en los servicios de aplicación. Expone:
 
@@ -225,7 +287,7 @@ La autorización mediante @PreAuthorize valida el usuario actual y la creación 
   <p><em>Figura 4.6: Operaciones de Notifications en Swagger UI.</em></p>
 </div>
 
-#### 4.2.1.3. Application Layer
+#### 4.2.2.3. Application Layer
 
 NotificationCommandServiceImpl crea el agregado y lo persiste, o lo recupera para ejecutar markAsRead(). NotificationQueryServiceImpl resuelve las consultas. Las interfaces NotificationCommandService y NotificationQueryService definen los contratos de aplicación.
 
@@ -236,7 +298,7 @@ Flujo: NotificationsController → servicio de aplicación → Notification → 
   <p><em>Figura 4.7: Application de Notification.</em></p>
 </div>
 
-#### 4.2.1.4. Infrastructure Layer
+#### 4.2.2.4. Infrastructure Layer
 
 NotificationPersistenceEntity se mapea a la tabla notifications; type se almacena como texto e is_read representa el estado de lectura. NotificationPersistenceAssembler transforma entre JPA y dominio, NotificationPersistenceRepository encapsula Spring Data y NotificationRepositoryImpl implementa el puerto.
 
@@ -245,7 +307,7 @@ NotificationPersistenceEntity se mapea a la tabla notifications; type se almacen
   <p><em>Figura 4.8: Infrastructure de Notification.</em></p>
 </div>
 
-#### 4.2.1.5. Runtime Evidence
+#### 4.2.2.5. Runtime Evidence
 
 | Operación | Resultado |
 |---|---:|
@@ -256,11 +318,11 @@ NotificationPersistenceEntity se mapea a la tabla notifications; type se almacen
 | Acceso de proveedor al endpoint buyer | 403 Forbidden |
 | Swagger sin token | 401 Unauthorized |
 
-### 4.2.2. Bounded Context: Inventory
+### 4.2.3. Bounded Context: Inventory
 
 Inventory administra productos de combustible ofrecidos por proveedores: nombre, tipo, precio por unidad, unidad, stock, capacidad, proveedor y estado active. El proveedor gestiona sus productos y el comprador consulta los productos visibles. El contexto mantiene su propio modelo y persistencia.
 
-#### 4.2.2.1. Domain Layer
+#### 4.2.3.1. Domain Layer
 
 El core es el agregado raíz FuelProduct, ubicado en inventory.domain.model.aggregates. Encapsula name, fuelType, pricePerUnit, unit, availableStock, capacity, providerId y active. active se habilita por defecto al crear el producto si el comando no lo especifica.
 
@@ -271,7 +333,7 @@ updateStock(newStock) modifica el stock disponible y update(command) actualiza l
   <p><em>Figura 4.9: Agregado raíz FuelProduct.</em></p>
 </div>
 
-#### 4.2.2.2. Interface Layer
+#### 4.2.3.2. Interface Layer
 
 FuelProductsController transforma recursos y expone:
 
@@ -295,7 +357,7 @@ FuelProductsController transforma recursos y expone:
   <p><em>Figura 4.11: Operaciones de Fuel Products en Swagger UI.</em></p>
 </div>
 
-#### 4.2.2.3. Application Layer
+#### 4.2.3.3. Application Layer
 
 FuelProductCommandServiceImpl coordina creación, actualización de stock, actualización general y eliminación. Recupera el agregado antes de actualizar y devuelve not found si no existe; traduce los conflictos de integridad de eliminación a un error de conflicto. El servicio de consultas devuelve productos por id, proveedor o colección.
 
@@ -306,7 +368,7 @@ Flujo: FuelProductsController → servicio de aplicación → FuelProduct → Fu
   <p><em>Figura 4.12: Application de Inventory.</em></p>
 </div>
 
-#### 4.2.2.4. Infrastructure Layer
+#### 4.2.3.4. Infrastructure Layer
 
 FuelProductPersistenceEntity se mapea a fuel_products y conserva proveedor, stock, capacidad y active. FuelProductPersistenceAssembler realiza el mapeo; FuelProductPersistenceRepository provee Spring Data; y FuelProductRepositoryImpl implementa el puerto del dominio.
 
@@ -317,7 +379,7 @@ El directorio físico se llama infraestructure, aunque las declaraciones de paqu
   <p><em>Figura 4.13: Infrastructure de Inventory.</em></p>
 </div>
 
-#### 4.2.2.5. Runtime Evidence
+#### 4.2.3.5. Runtime Evidence
 
 | Operación | Resultado |
 |---|---:|
@@ -331,11 +393,11 @@ El directorio físico se llama infraestructure, aunque las declaraciones de paqu
 
 La evidencia se guarda por módulo en Report/assets/chapter-4/Bounded Context Evidence. El backend y MySQL usados fueron locales y aislados; no se modificó el código fuente.
 
-#### 4.2.X.6. Bounded Context Software Architecture Code Level Diagrams.
+#### 4.2.4. Bounded Context Software Architecture Code Level Diagrams.
 
 Presenta los diagramas que descienden al nivel de código, contrastando el modelo de objetos del dominio con el diseño de la base de datos. Estos diagramas complementan al *Component Diagram* de la API Application y a los contenedores definidos, proporcionando una vista centrada en clases, relaciones y responsabilidades.
 
-##### 4.2.X.6.1. Bounded Context Domain Layer Class Diagrams.
+##### 4.2.4.1. Bounded Context Domain Layer Class Diagrams.
 
 A nivel de clases se modelan, por un lado, las clases del frontend en función de los módulos y vistas que consumen los servicios expuestos por la API y, por otro, las clases del backend que reflejan la implementación detallada de los módulos definidos como componentes dentro de la API.
 
@@ -434,7 +496,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
 - **Identity & Access Backend** — Responsabilidad: gestiona el registro de usuarios, autenticación, autorización y control de acceso.
 
 <div align="center">
-  <img src="../assets/chapter-4/class-diagrams/backend_identity.png" alt="Backend Identity & Access"/>
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-class-layer.png" alt="Backend IAM: capas y clases" width="100%"/>
 </div>
 
 - **Catalog Backend** — Responsabilidad: gestiona el inventario de recursos disponibles, incluyendo stock y características relevantes.
@@ -485,7 +547,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_inventory.png" alt="Backend Inventory"/>
 </div>
 
-##### 4.2.X.6.2. Bounded Context Database Design Diagram.
+##### 4.2.4.2. Bounded Context Database Design Diagram.
 
 La base de datos relacional almacena todos los datos del dominio del sistema. Las tablas se organizan en correspondencia directa con los *bounded contexts* definidos en el diseño orientado a objetos. A continuación, se detalla qué tablas pertenecen a cada contexto y cuál es su responsabilidad dentro del modelo de datos.
 
@@ -496,11 +558,13 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 **Identity & Access — Base de datos**
 
-*Responsabilidad:* almacena la información de usuarios, sesiones y las extensiones de perfil para clientes y proveedores.
+*Responsabilidad:* almacena la identidad autenticable, sus roles, las compañías vinculadas y los tokens de recuperación.
 
-- **USER:** datos base del usuario autenticado (`id_user`, `ruc`, `full_name`, `dni`, `email`, `password_hash`, `phone_number`, `address`, `role`, `is_active`, `created_at`, `updated_at`).
-- **CLIENT:** extensión del perfil para empresas solicitantes (`id_client`, `id_user` FK, `company_name`, `company_ruc`, `industry`, `created_at`).
-- **PROVIDER:** extensión del perfil para empresas proveedoras (`id_provider`, `id_user` FK, `company_name`, `company_ruc`, `description`, `created_at`).
+- **users:** usuario autenticable (`id`, `username`, `password`, `company_id`, `provider_id`, auditoría).
+- **roles:** catálogo de roles (`id`, `name`), relacionado con usuarios mediante **user_roles**.
+- **buyer_companies:** perfil de compañía compradora (`id`, `name`, `ruc`, `sector`, `address`, `contact_email`, `phone`).
+- **provider_companies:** perfil de compañía proveedora (`id`, `name`, `ruc`, `rating`, `address`, `phone`, `description`), con **provider_company_fuel_types** para los tipos ofrecidos.
+- **password_reset_tokens:** hash del token, usuario asociado y fecha de expiración.
 
 <div align="center">
   <img src="../assets/chapter-4/database/baseDatos_identity.png" alt="Tablas de Identity & Access"/>
