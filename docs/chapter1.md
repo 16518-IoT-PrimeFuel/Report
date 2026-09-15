@@ -60,6 +60,16 @@
       <td>Ingeniería de Software</td>
       <td>Estudiante de Ingeniería de Software en la UPC. Cuento con experiencia en desarrollo full-stack: frontend móvil con Flutter y Kotlin/Jetpack Compose, backend con .NET 8 y MySQL, y desarrollo de aplicaciones web con Angular, Node.js/Express y MongoDB. He trabajado en proyectos desplegados en la nube (Azure) usando Docker para la orquestación de servicios, además de diseño de APIs REST y modelado de bases de datos NoSQL.</td>
     </tr>
+    <tr>
+      <td><img src="../assets/chapter-1/members/KatherineMejia.png" alt="Katherine Maryory Mejia Aliaga">
+      </td>
+      <td>Katherine Maryory Mejia Aliaga</td>
+      <td>u20221a118</td>
+      <td>Ingeniería de Software</td>
+      <td>Soy studiante de 7mo ciclo de Ingeniería de Software (21 años), apasionada por el desarrollo de proyectos de Internet de las Cosas (IoT) y con un fuerte interés en
+        aprender a guiar y liderar iniciativas tecnológicas.
+      </td>
+    </tr>
   </tbody>
 </table>
 
