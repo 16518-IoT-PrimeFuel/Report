@@ -185,13 +185,13 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se documentan los bounded contexts **IAM**, **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI. La documentación se basa en la inspección del código fuente, la ejecución local del backend —implementado con Spring Boot, Java y JPA/Hibernate— y las pruebas realizadas desde Swagger UI con autenticación JWT.
+En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Catalog**, **Fulfillment**, **Ordering**, **Payment** y **Reporting**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime disponible. La documentación se basa en los artefactos de diseño y en la evidencia funcional conservada en este repositorio; las secciones sin capturas runtime se identifican explícitamente.
 
 ### 4.2.1. Bounded Context: IAM
 
 IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios y compañías compradoras o proveedoras, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
 
-#### 4.2.X.5. Bounded Context Software Architecture Component Level Diagrams.
+#### Cross-Cutting Bounded Context Software Architecture Component Level Diagrams.
 
 En el nivel de componentes se detalla la descomposición interna de los contenedores, enfocándose principalmente en el contenedor **FullTank API**, donde reside la lógica de negocio del sistema.
 
@@ -258,7 +258,17 @@ La vista de componentes muestra la separación entre Interfaces, Application, Do
   <p><em>Figura 4.15: Capas y componentes principales de IAM.</em></p>
 </div>
 
-#### 4.2.1.6. Runtime Evidence
+#### 4.2.1.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.1.6.1. Bounded Context Domain Layer Class Diagram.
+
+![Domain Layer Class Diagram - IAM Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-class-layer.png)
+
+##### 4.2.1.6.2. Bounded Context Database Design Diagram.
+
+![Database Design Diagram - IAM Bounded Context](../assets/chapter-4/database/baseDatos_identity.png)
+
+#### 4.2.1.7. Runtime Evidence
 
 | Operación | Resultado |
 |---|---:|
@@ -329,6 +339,10 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 #### 4.2.2.6.1. Bounded Context Domain Layer Class Diagram.
 
 ![Domain Layer Class Diagram - Notification Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/notification/notification-domain-uml.png)
+
+##### 4.2.2.6.2. Bounded Context Database Design Diagram.
+
+![Database Design Diagram - Notification Bounded Context](../assets/chapter-4/database/baseDatos_notification.png)
 
 #### 4.2.2.7. Runtime Evidence.
 
@@ -412,6 +426,10 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 ![Domain Layer Class Diagram - Inventory Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/inventory/inventory-domain-uml.png)
 
+##### 4.2.3.6.2. Bounded Context Database Design Diagram.
+
+![Database Design Diagram - Inventory Bounded Context](../assets/chapter-4/database/baseDatos_catalogo.png)
+
 #### 4.2.3.7. Runtime Evidence.
 
 | Operación | Resultado |
@@ -426,13 +444,15 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 ![Swagger - Fuel Products](../assets/chapter-4/Bounded%20Context%20Evidence/inventory/swagger-fuel-products.png)
 
-La evidencia visual se conserva por módulo en `Report/assets/chapter-4/Bounded Context Evidence`. Las capturas de código/GitHub fueron retiradas; permanecen únicamente las capturas de Swagger y los diagramas UML y de componentes generados para estos bounded contexts.
+La evidencia visual disponible se conserva por módulo en `Report/assets/chapter-4` y en sus subdirectorios de diagramas. Cuando no existe un artefacto específico para un bounded context, la sección enlaza la vista global disponible o lo indica expresamente.
 
-### 4.2.4.1 Bounded Context Software Architecture Code Level Diagrams.
+### 4.2.4. Cross-Cutting Software Architecture Views
 
 Presenta los diagramas que descienden al nivel de código, contrastando el modelo de objetos del dominio con el diseño de la base de datos. Estos diagramas complementan al *Component Diagram* de la API Application y a los contenedores definidos, proporcionando una vista centrada en clases, relaciones y responsabilidades.
 
-#### 4.2.4.1.1 Bounded Context Domain Layer Class Diagrams.
+#### 4.2.4.1. Software Architecture Code Level Diagrams.
+
+##### 4.2.4.1.1. Software Architecture Domain Layer Class Diagrams.
 
 A nivel de clases se modelan, por un lado, las clases del frontend en función de los módulos y vistas que consumen los servicios expuestos por la API y, por otro, las clases del backend que reflejan la implementación detallada de los módulos definidos como componentes dentro de la API.
 
@@ -582,7 +602,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_inventory.png" alt="Backend Inventory"/>
 </div>
 
-#### 4.2.4.2. Bounded Context Database Design Diagram.
+#### 4.2.4.2. Software Architecture Database Design Diagram.
 
 La base de datos relacional almacena todos los datos del dominio del sistema. Las tablas se organizan en correspondencia directa con los *bounded contexts* definidos en el diseño orientado a objetos. A continuación, se detalla qué tablas pertenecen a cada contexto y cuál es su responsabilidad dentro del modelo de datos.
 
@@ -641,13 +661,11 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 *Responsabilidad:* almacena los recursos logísticos y su asignación a órdenes.
 
-- **TRANSPORT:** recurso de transporte del proveedor (`id_transport`, `id_provider` FK, `plate`, `vehicle_type`, `capacity_liters`, `is_available`, `created_at`).
-- **DRIVER:** operador asignado al transporte (`id_driver`, `id_provider` FK, `full_name`, `dni`, `license_number`, `phone_number`, `is_available`, `created_at`).
-- **DISPATCH:** asignación de recursos a una orden (`id_dispatch`, `id_order` FK, `id_transport` FK, `id_driver` FK, `assigned_at`, `status`).
+- **deliveries:** entrega asociada a una orden (`id`, `order_id` FK, `provider_id` FK, `driver_id` FK, `vehicle_id` FK, `status`, `scheduled_date`, `dispatched_at`, `delivered_at`, `notes`, auditoría).
+- **vehicles:** vehículo logístico del proveedor (`id`, `provider_id` FK, `license_plate` UNIQUE, `brand`, `model`, `capacity`, `unit`, `status`, auditoría).
+- **drivers:** conductor del proveedor (`id`, `provider_id` FK, `first_name`, `last_name`, `license_number` UNIQUE, `phone_number`, `email`, `status`, auditoría).
 
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_fullfillment.png" alt="Tablas de Fulfillment"/>
-</div>
+La documentación adopta los nombres `deliveries`, `vehicles` y `drivers` usados por el diseño táctico de Fulfillment; no se conserva un diagrama gráfico actualizado de este esquema.
 
 **Notification — Base de datos**
 
@@ -825,11 +843,7 @@ La estructura del dominio puede representarse de la siguiente manera:
 +------------------------------------------------+
 ```
 
-Posteriormente, el diagrama UML gráfico correspondiente puede almacenarse en:
-
-`../assets/chapter-4/Bounded Context Evidence/catalog/catalog-domain-uml.png`
-
-![Domain Layer Class Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-domain-uml.png)
+La representación textual anterior es la evidencia de código disponible para Catalog en este repositorio. No se conserva un archivo UML gráfico específico adicional.
 
 ##### 4.2.5.6.2. Bounded Context Database Design Diagram.
 
@@ -865,11 +879,7 @@ La estructura de persistencia puede representarse de la siguiente manera:
 +--------------------------------------+
 ```
 
-Posteriormente, el diagrama gráfico de base de datos puede almacenarse en:
-
-`../assets/chapter-4/Bounded Context Evidence/catalog/catalog-database-design.png`
-
-![Database Design Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-database-design.png)
+La tabla y el esquema textual anterior constituyen la evidencia de base de datos disponible para Catalog en este repositorio.
 
 #### 4.2.5.7. Runtime Evidence.
 
@@ -893,9 +903,7 @@ Las pruebas permiten verificar tanto los casos exitosos como las principales reg
 | Crear o modificar una valoración para una empresa que no pertenece al usuario autenticado | `403 Forbidden` |
 | Realizar una operación protegida sin autenticación | `401 Unauthorized` |
 
-La evidencia visual debe incluir capturas de Swagger que demuestren la creación de una valoración válida, la consulta de las valoraciones registradas, la actualización de una calificación y una respuesta de error correspondiente a una regla de validación o autorización.
-
-![Swagger - Provider Ratings](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/swagger-provider-ratings.png)
+La evidencia visual de Swagger para Catalog no está incluida en este repositorio; la tabla anterior conserva los escenarios que deben verificarse cuando se disponga del entorno ejecutable.
 
 ### 4.2.6. Bounded Context: Fulfillment
 
@@ -974,13 +982,17 @@ Solo `Delivery` tiene una capa de aplicación explícita, porque es el único ag
 
 #### 4.2.6.5. Bounded Context Software Architecture Component Level Diagrams.
 
-![Component Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-structurizr-components.png)
+![Backend component overview - Fulfillment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> El repositorio no conserva un diagrama de componentes exclusivo de Fulfillment; se enlaza la vista global disponible.
 
 #### 4.2.6.6. Bounded Context Software Architecture Code Level Diagrams.
 
 ##### 4.2.6.6.1. Bounded Context Domain Layer Class Diagram.
 
-![Domain Layer Class Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-domain-uml.png)
+![Backend class overview - Fulfillment](../assets/chapter-4/class-diagrams/backend_fullfilment.png)
+
+> El repositorio conserva la vista backend disponible para Fulfillment, no un UML de dominio separado.
 
 ##### 4.2.6.6.2. Bounded Context Database Design Diagram.
 
@@ -990,7 +1002,7 @@ Solo `Delivery` tiene una capa de aplicación explícita, porque es el único ag
 - **vehicles:** `id` (PK), `provider_id` (FK → providers), `license_plate` (único), `brand`, `model`, `capacity`, `unit`, `status`, `created_at`, `updated_at`.
 - **drivers:** `id` (PK), `provider_id` (FK → providers), `first_name`, `last_name`, `license_number` (único), `phone_number`, `email`, `status`, `created_at`, `updated_at`.
 
-![Database Design Diagram - Fulfillment Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/fulfillment/fulfillment-database-design.png)
+> La tabla anterior es la especificación textual del diseño de base de datos de Fulfillment. No se conserva un diagrama gráfico específico de este modelo.
 
 #### 4.2.6.7. Runtime Evidence.
 
@@ -1033,7 +1045,7 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 | `GetFuelOrdersByProviderIdQuery` | Domain Query | Define la consulta de órdenes de un proveedor. |
 | `FuelOrderRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `FuelOrder` sin depender de JPA o Spring Data. |
 
-> Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.X.3 y 4.2.X.4).
+> Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.7.3 y 4.2.7.4).
 
 #### 4.2.7.2. Interface Layer
 
@@ -1087,6 +1099,10 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 <img src="../assets/chapter-4/bc/ordering/BoundedContextDomainLayerClassDiagram.png" alt="Bounded Context Code Level Diagrams"/>
 
+##### 4.2.7.6.2. Bounded Context Database Design Diagram.
+
+![Database Design Diagram - Ordering Bounded Context](../assets/chapter-4/database/baseDatos_ordering.png)
+
 #### 4.2.7.7. Runtime Evidence.
 
 | Operación | Resultado |
@@ -1113,7 +1129,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 ### 4.2.8. Bounded Context: Payment
 
-### 4.2.8.1. Domain Layer.
+#### 4.2.8.1. Domain Layer.
 
 |     Clase     |      Tipo      |                                  Propósito                                 |
 |:-------------:|:--------------:|:--------------------------------------------------------------------------:|
@@ -1121,7 +1137,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | PaymentStatus |  Value Object  |                 Representar los estados posibles del pago.                 |
 | PaymentMethod |  Value Object  |           Identificar el método utilizado para realizar el pago.           |
 
-### 4.2.8.2. Interface Layer.
+#### 4.2.8.2. Interface Layer.
 
 |          Clase          |       Tipo      |                                                     Propósito                                                    |
 |:-----------------------:|:---------------:|:----------------------------------------------------------------------------------------------------------------:|
@@ -1130,7 +1146,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | CreatePaymentResource   | DTO (Record)    | Representar el dato enviado por el cliente necesario para marcar un pago como completado.                        |
 | PaymentResource         | DTO (Record)    | Representar los datos de salida con la información detallada del pago que se devuelve como respuesta al cliente. |
 
-### 4.2.8.3. Application Layer.
+#### 4.2.8.3. Application Layer.
 
 |           Clase           |       Tipo      |                                                     Propósito                                                     |
 |:-------------------------:|:---------------:|:-----------------------------------------------------------------------------------------------------------------:|
@@ -1139,7 +1155,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | PaymentQueryService       | Interface       | Definir los casos de uso para las operaciones de solo lectura.                                                    |
 | PaymentQueryServiceImpl   | Command Handler | Implementar la lógica para ejecutar las consultas y devolver la información de los pagos sin alterar ningún dato. |
 
-### 4.2.8.4. Infrastructure Layer.
+#### 4.2.8.4. Infrastructure Layer.
 
 |             Clase            |            Tipo            |                                                              Propósito                                                             |
 |:----------------------------:|:--------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
@@ -1148,23 +1164,25 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | PaymentPersistenceEntity     | JPA Entity                 | Representa la estructura de la tabla payments en la base de datos relacional.                                                      |
 | PaymentPersistenceRepository | Spring Data JPA Repository | Encargada de ejecutar las consultas SQL automáticas y personalizadas directamente sobre la base de datos.                          |
 
-### 4.2.8.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.8.5. Bounded Context Software Architecture Component Level Diagrams.
 
-![](/assets/chapter4/bounded/payment1.png)
+![Backend component overview - Payment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
 
-### 4.2.8.6. Bounded Context Software Architecture Code Level Diagrams.
+> No se conserva un diagrama de componentes exclusivo de Payment; se enlaza la vista global disponible.
 
-### 4.2.8.6.1. Bounded Context Domain Layer Class Diagrams.
+#### 4.2.8.6. Bounded Context Software Architecture Code Level Diagrams.
 
-![](/assets/chapter4/bounded/payment3.png)
+##### 4.2.8.6.1. Bounded Context Domain Layer Class Diagrams.
 
-### 4.2.8.6.2. Bounded Context Database Design Diagram.
+![Backend class overview - Payment](../assets/chapter-4/class-diagrams/backend_payment.png)
 
-![](/assets/chapter4/bounded/payment4.png)
+##### 4.2.8.6.2. Bounded Context Database Design Diagram.
+
+![Database Design Diagram - Payment](../assets/chapter-4/database/baseDatosPayment.png)
 
 ### 4.2.9. Bounded Context: Reporting
 
-### 4.2.9.1. Domain Layer.
+#### 4.2.9.1. Domain Layer.
 
 |           Clase           |     Tipo     |                                             Propósito                                             |
 |:-------------------------:|:------------:|:-------------------------------------------------------------------------------------------------:|
@@ -1176,7 +1194,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | PlatformSummary           | Value Object | Modela los indicadores y datos globales que componen el resumen general de la plataforma.         |
 | ProviderAnalytics         | Value Object | Modela los datos de valor inmutables que representan las analíticas y métricas de un proveedor.   |
 
-### 4.2.9.2. Interface Layer.
+#### 4.2.9.2. Interface Layer.
 
 |                       Clase                       |       Tipo      |                                                       Propósito                                                      |
 |:-------------------------------------------------:|:---------------:|:--------------------------------------------------------------------------------------------------------------------:|
@@ -1188,17 +1206,27 @@ Domain Layer Class Diagram - Ordering Bounded Context
 |  PlatformSummaryResourceFromValueObjectAssembler  |    Assembler    |   Convierte el objeto de valor del dominio (PlatformSummary) al recurso de presentación (PlatformSummaryResource).   |
 | ProviderAnalyticsResourceFromValueObjectAssembler |    Assembler    | Convierte el objeto de valor del dominio (ProviderAnalytics) al recurso de presentación (ProviderAnalyticsResource). |
 
-### 4.2.9.3. Application Layer.
+#### 4.2.9.3. Application Layer.
 
 |           Clase           |             Tipo             |                                                           Propósito                                                          |
 |:-------------------------:|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------------:|
 |   AnalyticsQueryService   |         Query Service        | Define el contrato de los servicios de consulta para coordinar el procesamiento de las solicitudes de reportes y analíticas. |
 | AnalyticsQueryServiceImpl | Query Service Implementation | Implementa la lógica de negocio descrita por el contrato para procesar y resolver las consultas de analíticas en el sistema. |
 
-### 4.2.9.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.9.4. Infrastructure Layer.
 
-![](/assets/chapter4/bounded/reporting1.png)
+La infraestructura de Reporting consume los datos persistidos de órdenes y pagos para construir las consultas analíticas y generar los reportes descritos por `AnalyticsQueryService`. El diagrama backend disponible documenta este módulo como parte de la infraestructura de Reporting.
 
-### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
-### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
-![](/assets/chapter4/bounded/reporting2.png)
+![Backend class overview - Reporting](../assets/chapter-4/class-diagrams/backend_reporting.png)
+
+#### 4.2.9.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Backend component overview - Reporting](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> No se conserva un diagrama de componentes exclusivo de Reporting; se enlaza la vista global disponible.
+
+#### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
+##### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
+![Backend class overview - Reporting](../assets/chapter-4/class-diagrams/backend_reporting.png)
+##### 4.2.9.6.2. Bounded Context Database Design Diagram.
+![Database Design Diagram - Reporting](../assets/chapter-4/database/baseDatos_analysis.png)

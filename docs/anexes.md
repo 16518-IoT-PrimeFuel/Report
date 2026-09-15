@@ -4,19 +4,19 @@
 
 # Video App Validation
 
-![App Validation](assets/anexes/app-validation.png)
+> Evidencia audiovisual de validación de la aplicación: pendiente de incorporar al repositorio.
 
 Link: -
 
 # Video About The Product
 
-![About The Product](assets/anexes/about-the-product.png)
+> Evidencia audiovisual del producto: pendiente de incorporar al repositorio.
 
 Link: -
 
 # Video About The Team
 
-![About The Team](assets/anexes/about-the-team.png)
+> Evidencia audiovisual del equipo: pendiente de incorporar al repositorio.
 
 Link: -
 
