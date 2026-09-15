@@ -609,17 +609,17 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 ### 4.2.8.5. Bounded Context Software Architecture Component Level Diagrams.
 
-![](/assets/chapter4/bounded/payment1.png)
+![](/assets/chapter-4/bounded/payment1.png)
 
 ### 4.2.8.6. Bounded Context Software Architecture Code Level Diagrams.
 
 ### 4.2.8.6.1. Bounded Context Domain Layer Class Diagrams.
 
-![](/assets/chapter4/bounded/payment3.png)
+![](/assets/chapter-4/bounded/payment3.png)
 
 ### 4.2.8.6.2. Bounded Context Database Design Diagram.
 
-![](/assets/chapter4/bounded/payment4.png)
+![](/assets/chapter-4/bounded/payment4.png)
 
 ### 4.2.9. Bounded Context: Reporting
 
@@ -656,7 +656,7 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 ### 4.2.9.5. Bounded Context Software Architecture Component Level Diagrams.
 
-![](/assets/chapter4/bounded/reporting1.png)
+![](/assets/chapter-4/bounded/reporting1.png)
 
 ### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
 ### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
