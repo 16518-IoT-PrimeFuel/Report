@@ -39,7 +39,7 @@
       <td>Estudiante de la carrera de Ingenieria de Software en 7mo ciclo. He ido descubriendo a lo largo de mi carrera, nuevas tecnologias y forjando mis conocimientos en el rubro. Tengo conocimientos solidos en programacion en Javascript y C#.</td>
     </tr>
     <tr>
-      <td></td>
+      <td><img src="../assets/chapter-1/members/FotoAlberto.png" alt="Alberto Alejandro Ponce Perales"></td>
       <td>Alberto Alejandro Ponce Perales</td>
       <td>u202320684</td>
       <td>Ingeniería de Software</td>

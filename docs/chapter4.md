@@ -183,27 +183,109 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 En este nivel se detalla el diseño interno de cada *bounded context* identificado en la sección 4.1, aplicando los patrones tácticos de DDD. Para cada contexto se describen sus cuatro capas —**Domain**, **Interface**, **Application** e **Infrastructure**— y se presentan sus diagramas de componentes y de código.
 
-### 4.2.X. Bounded Context: \<Bounded Context Name\>
+### 4.2.5. Bounded Context: Ordering
 
-> *por completar.*
+| Elemento | Descripción |
+|---|---|
+| Propósito | Gestionar la solicitud y la orden de combustible entre una empresa compradora y un proveedor, desde la solicitud inicial hasta su confirmación o cancelación. |
+| Actores | Compradores que crean solicitudes y confirman/cancelan órdenes; proveedores que aceptan o rechazan solicitudes. |
+| Relación con otros contextos | Consulta Inventory (`FuelProductQueryService`) para validar el producto y calcular el precio total; referencia `equipmentId` de Equipment y es consumido por Payment, Fulfillment y Reporting mediante el `orderId`, sin bus de eventos ni transacción distribuida entre módulos. |
 
-Breve descripción del contexto delimitado: su propósito de negocio dentro de FullTank, los actores que interactúan con él y los contextos con los que se relaciona según el *Context Mapping* de la Sección 4.1.2.
+#### 4.2.5.1. Domain Layer
 
-#### 4.2.X.1. Domain Layer.
+El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal reside en el value object `OrderStatus`: cada método del agregado protege las transiciones válidas del ciclo de vida, por ejemplo `dispatch()` lanza excepción si el estado no es `PENDING`, y `receive()` exige que la orden esté `DISPATCHED`. `confirm()` y `cancel()`, en cambio, no validan el estado previo antes de aplicarse.
 
-Contiene las entidades, agregados, value objects, así como comandos, consultas e interfaces que definen el comportamiento del dominio.
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `FuelOrder` | Aggregate Root | Gestiona compañía, proveedor, producto, equipo, cantidad, precio total, dirección y fecha programada. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()` como comportamiento del dominio. |
+| `OrderStatus` | Value Object | Restringe los estados de la orden: `PENDING`, `CONFIRMED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED`, `CANCELLED`. |
+| `RequestStatus` | Value Object | Restringe los estados de la solicitud: `PENDING`, `APPROVED`, `REJECTED`. |
+| `CreateFuelOrderCommand` | Domain Command | Define los datos necesarios para crear una orden (comprador, proveedor, producto, equipo, cantidad, dirección, fecha). |
+| `ConfirmFuelOrderCommand` | Domain Command | Identifica la orden que debe confirmarse. |
+| `CancelFuelOrderCommand` | Domain Command | Identifica la orden que debe cancelarse. |
+| `GetAllFuelOrdersQuery` | Domain Query | Define la consulta de todas las órdenes. |
+| `GetFuelOrderByIdQuery` | Domain Query | Define la consulta de una orden por identificador. |
+| `GetFuelOrdersByCompanyIdQuery` | Domain Query | Define la consulta de órdenes de una empresa compradora. |
+| `GetFuelOrdersByProviderIdQuery` | Domain Query | Define la consulta de órdenes de un proveedor. |
+| `FuelOrderRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `FuelOrder` sin depender de JPA o Spring Data. |
 
-#### 4.2.X.2. Interface Layer.
+> Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.X.3 y 4.2.X.4).
 
-Expone los endpoints del sistema (controladores REST) y componentes encargados de transformar datos entre modelos externos e internos.
+#### 4.2.5.2. Interface Layer
 
-#### 4.2.X.3. Application Layer.
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrdersController` | REST Controller | Expone la API `/api/v1/fuel-orders`: creación, confirmación, cancelación y consulta por id, compañía o proveedor. Valida propiedad de compañía/proveedor mediante `CurrentUserAccess`. |
+| `FuelRequestsController` | REST Controller | Expone la API `/api/v1/fuel-requests`: creación, listado, consulta por id, aceptación y rechazo. |
+| `OrderingController` | REST Controller (placeholder) | Clase vacía, usada solo como marcador de documentación/diagrama; no define endpoints. |
+| `CreateFuelOrderResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una orden directamente. |
+| `FuelOrderResource` | REST Resource (DTO) | Define la representación JSON de una orden para la respuesta HTTP. |
+| `CreateFuelRequestResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una solicitud. |
+| `FuelRequestResource` | REST Resource (DTO) | Define la representación JSON de una solicitud para la respuesta HTTP. |
+| `RejectFuelRequestResource` | REST Resource (DTO) | Define el motivo de rechazo enviado por el proveedor. |
+| `CreateFuelOrderCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de creación en `CreateFuelOrderCommand`. |
+| `FuelOrderResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado `FuelOrder` en `FuelOrderResource` para la respuesta HTTP. |
 
-Implementa la lógica de negocio mediante servicios que ejecutan comandos y consultas.
+> Nota: a diferencia de `FuelOrderResource`, la conversión de `FuelRequestPersistenceEntity` a `FuelRequestResource` no tiene un assembler dedicado; se resuelve con un método estático privado dentro de `FuelRequestsController`.
 
-#### 4.2.X.4. Infrastructure Layer.
+#### 4.2.5.3. Application Layer
 
-Define los mecanismos de persistencia y comunicación con sistemas externos, incluyendo repositorios y servicios de integración.
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrderCommandService` | Command Service (Interface) | Define el contrato para crear, confirmar y cancelar órdenes. |
+| `FuelOrderCommandServiceImpl` | Command Service Implementation | Consulta `FuelProductQueryService` de Inventory para calcular el precio, construye el agregado, lo persiste y delega las transiciones de estado al propio `FuelOrder`. Devuelve `Result<FuelOrder, ApplicationError>`. |
+| `FuelOrderQueryService` | Query Service (Interface) | Define el contrato para consultar por id, compañía, proveedor o colección completa. |
+| `FuelOrderQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega la recuperación al puerto `FuelOrderRepository`. |
+| `FuelRequestService` | Command/Query Service (clase concreta, sin interfaz) | Concentra `create`, `accept`, `reject` y `findAll`/`findById` de las solicitudes. `accept` construye un `CreateFuelOrderCommand`, crea la `FuelOrder` vinculada por `requestId` y actualiza la solicitud a `APPROVED`, todo en una única transacción. |
+
+> Nota: a diferencia de `FuelOrderCommandService`/`FuelOrderQueryService`, `FuelRequestService` no sigue el patrón interfaz + implementación; es una única clase concreta anotada con `@Service`.
+
+#### 4.2.5.4. Infrastructure Layer
+
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrderPersistenceEntity` | JPA Entity | Representa la tabla `fuel_orders`; persiste `status` como `OrderStatus` en formato `VARCHAR`. |
+| `FuelRequestPersistenceEntity` | JPA Entity | Representa la tabla `fuel_requests`; actúa como modelo único (sin contraparte de dominio) consumido directamente por `FuelRequestService`. |
+| `FuelOrderPersistenceAssembler` | Assembler / Mapper | Convierte entre `FuelOrder` y `FuelOrderPersistenceEntity`, manteniendo el dominio libre de anotaciones JPA. |
+| `FuelOrderPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `companyId` y `providerId`. |
+| `FuelRequestPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `buyerCompanyId` y `providerId`; se usa directamente, sin puerto de dominio intermedio. |
+| `FuelOrderRepositoryImpl` | Repository Adapter | Implementa el puerto `FuelOrderRepository` y adapta sus operaciones a Spring Data JPA. |
+
+#### 4.2.5.5. Bounded Context Software Architecture Component Level Diagrams.
+Component Diagram - Ordering Bounded Context
+
+<img src="../assets/chapter-4/bc/ordering/Ordering-Components-dark.png" alt="Component Level Diagrams"/>
+
+#### 4.2.5.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.5.6.1. Bounded Context Domain Layer Class Diagram.
+Domain Layer Class Diagram - Ordering Bounded Context
+
+<img src="../assets/chapter-4/bc/ordering/BoundedContextDomainLayerClassDiagram.png" alt="Bounded Context Code Level Diagrams"/>
+
+#### 4.2.5.7. Runtime Evidence.
+
+| Operación | Resultado |
+|---|---|
+| Registrar usuario proveedor (sign-up) | 201 Created |
+| Registrar usuario comprador (sign-up) | 201 Created |
+| Crear producto de combustible (Inventory, como proveedor) | 201 Created |
+| Crear solicitud (`fuel-requests`), estado inicial | 201 Created, `PENDING` |
+| Aceptar solicitud (`accept`), genera orden automáticamente | 200 OK, orden `PENDING` con `totalPrice` calculado |
+| Confirmar orden (`confirm`) | 200 OK, `CONFIRMED` |
+| Consultar orden por id | 200 OK |
+| Consultar órdenes por compañía | 200 OK |
+| Consultar órdenes por proveedor | 200 OK |
+| Crear orden directa (sin solicitud previa) | 201 Created, `requestId: null` |
+| Cancelar orden ya confirmada | 200 OK, `CANCELLED` (sin validación de estado previo) |
+| Token JWT con firma inválida (secreto distinto al del servidor) | 401 Unauthorized |
+
+<img src="../assets/chapter-4/bc/ordering/GET_companyID.png" alt="Get Company ID"/>
+<img src="../assets/chapter-4/bc/ordering/GET_orderID.png" alt="Get Order ID"/>
+<img src="../assets/chapter-4/bc/ordering/GET_providerID.png.png" alt="Get Provider ID"/>
+<img src="../assets/chapter-4/bc/ordering/POST_FuelOrders.png" alt="Post Fuel Orders"/>
+<img src="../assets/chapter-4/bc/ordering/POST_Confirm.png" alt="Post Confirm"/>
+<img src="../assets/chapter-4/bc/ordering/POST_Cancel.png" alt="Post Cancel"/>
 
 #### 4.2.X.5. Bounded Context Software Architecture Component Level Diagrams.
 
