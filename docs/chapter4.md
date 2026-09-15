@@ -191,6 +191,26 @@ En este nivel se documentan los bounded contexts **IAM**, **Notification** e **I
 
 IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios y compañías compradoras o proveedoras, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
 
+#### 4.2.X.5. Bounded Context Software Architecture Component Level Diagrams.
+
+En el nivel de componentes se detalla la descomposición interna de los contenedores, enfocándose principalmente en el contenedor **FullTank API**, donde reside la lógica de negocio del sistema.
+
+El *component diagram* organiza la arquitectura interna siguiendo los *bounded contexts* definidos en el dominio. Cada uno representa un módulo backend con responsabilidades específicas:
+
+- **Identity & Access BC:** gestiona el registro de usuarios (clientes y proveedores), autenticación mediante credenciales de correo electrónico y contraseña, autorización basada en roles, emisión de tokens JWT, recuperación de contraseñas y administración de perfiles. Redirige al usuario según su rol tras el inicio de sesión.
+- **Catalog BC:** *bounded context* orientado al cliente que permite explorar los proveedores disponibles en la plataforma, consultar el catálogo de productos (tipos de combustible, precios por litro) que ofrece cada proveedor y asignar productos seleccionados a los equipos registrados del cliente. Consume datos del *Inventory BC* para obtener disponibilidad y del *Equipment BC* para validar compatibilidad de tipo de combustible.
+- **Equipment BC:** gestiona los equipos del cliente, tales como vehículos, generadores y maquinaria. Cada equipo registra su tipo, marca, modelo, tipo de combustible requerido, capacidad del tanque y estado operativo. Permite al cliente agregar, actualizar, eliminar y listar sus equipos, así como asignar o cambiar el tipo de combustible asociado.
+- **Inventory BC:** *bounded context* orientado al proveedor que administra el inventario de combustible, incluyendo niveles de stock disponible y precio por litro según tipo de combustible. Valida la información de los ítems al momento de registro o actualización y notifica al administrador ante cambios relevantes.
+- **Ordering BC:** orquesta el ciclo de vida completo de las órdenes, desde la creación de solicitudes por parte del cliente hasta su cierre por parte del proveedor. Incluye las operaciones de creación de solicitud, cancelación, aceptación, rechazo, despacho, confirmación de entrega y cierre. Valida la información de cada solicitud, notifica al proveedor o cliente según corresponda y, al cerrar una orden, descuenta el inventario correspondiente.
+- **Payment BC:** gestiona el registro de pagos mediante comprobantes (vouchers), valida que el monto total coincida con el precio del combustible solicitado y habilita la aprobación de órdenes una vez verificado el respaldo financiero.
+- **Fulfillment BC:** administra los recursos logísticos del proveedor, incluyendo el registro de transportes (vehículos de distribución) y conductores. Permite asignar un transporte y un conductor a una orden aprobada para su despacho, y libera ambos recursos cuando la orden es cerrada.
+- **Notification BC:** genera notificaciones dentro del sistema en respuesta a eventos relevantes del dominio, como cambios en el estado de las órdenes (creación, aprobación, rechazo, despacho, entrega, cierre). Permite a los usuarios visualizar su historial de notificaciones y marcarlas como leídas.
+- **Reporting & Analytics BC:** procesa información histórica de órdenes cerradas para generar reportes de consumo (perspectiva del cliente) y ventas (perspectiva del proveedor), incluyendo gráficos de tendencias y la generación de archivos PDF descargables.
+
+En el diagrama se refleja cómo la Web Application consume los servicios de cada componente backend mediante endpoints REST organizados por contexto. Cada *bounded context* accede a la base de datos para gestionar la información correspondiente a su dominio. Existen interacciones relevantes entre contextos: *Ordering* depende de *Payment* para validar pagos antes de aprobar órdenes; *Ordering* interactúa con *Fulfillment* para coordinar la asignación de flota y su liberación al cerrar órdenes; *Ordering* actualiza el stock en *Inventory* al cerrar órdenes; *Catalog* lee datos de *Inventory* para mostrar disponibilidad de productos y valida contra *Equipment* la compatibilidad de tipos de combustible; *Notification* reacciona a cambios de estado en órdenes; y *Reporting* consume datos de órdenes cerradas para generar agregados analíticos. Algunos componentes se integran con sistemas externos: *Identity & Access* con el servicio de correo electrónico, *Payment* con almacenamiento en la nube para comprobantes y *Reporting & Analytics* con el generador de PDFs.
+
+De esta manera, los *component diagrams* permiten entender cómo la arquitectura se organiza internamente en módulos coherentes con el dominio, cómo se relacionan entre sí y cómo colaboran para implementar la funcionalidad completa de FullTank.
+
 <div align="center">
   <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-bounded-context.png" alt="Bounded context IAM" width="100%"/>
   <p><em>Figura 4.14: Límites y responsabilidades del Bounded Context IAM.</em></p>
@@ -408,11 +428,11 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 La evidencia visual se conserva por módulo en `Report/assets/chapter-4/Bounded Context Evidence`. Las capturas de código/GitHub fueron retiradas; permanecen únicamente las capturas de Swagger y los diagramas UML y de componentes generados para estos bounded contexts.
 
-### 4.2.4. Bounded Context Software Architecture Code Level Diagrams.
+### 4.2.4.1 Bounded Context Software Architecture Code Level Diagrams.
 
 Presenta los diagramas que descienden al nivel de código, contrastando el modelo de objetos del dominio con el diseño de la base de datos. Estos diagramas complementan al *Component Diagram* de la API Application y a los contenedores definidos, proporcionando una vista centrada en clases, relaciones y responsabilidades.
 
-#### 4.2.4.1. Bounded Context Domain Layer Class Diagrams.
+#### 4.2.4.1.1 Bounded Context Domain Layer Class Diagrams.
 
 A nivel de clases se modelan, por un lado, las clases del frontend en función de los módulos y vistas que consumen los servicios expuestos por la API y, por otro, las clases del backend que reflejan la implementación detallada de los módulos definidos como componentes dentro de la API.
 
@@ -877,6 +897,109 @@ La evidencia visual debe incluir capturas de Swagger que demuestren la creación
 
 ![Swagger - Provider Ratings](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/swagger-provider-ratings.png)
 
+### 4.2.6. Bounded Context: Ordering
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Gestionar la solicitud y la orden de combustible entre una empresa compradora y un proveedor, desde la solicitud inicial hasta su confirmación o cancelación. |
+| Actores | Compradores que crean solicitudes y confirman/cancelan órdenes; proveedores que aceptan o rechazan solicitudes. |
+| Relación con otros contextos | Consulta Inventory (`FuelProductQueryService`) para validar el producto y calcular el precio total; referencia `equipmentId` de Equipment y es consumido por Payment, Fulfillment y Reporting mediante el `orderId`, sin bus de eventos ni transacción distribuida entre módulos. |
+
+#### 4.2.6.1. Domain Layer
+
+El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal reside en el value object `OrderStatus`: cada método del agregado protege las transiciones válidas del ciclo de vida, por ejemplo `dispatch()` lanza excepción si el estado no es `PENDING`, y `receive()` exige que la orden esté `DISPATCHED`. `confirm()` y `cancel()`, en cambio, no validan el estado previo antes de aplicarse.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `FuelOrder` | Aggregate Root | Gestiona compañía, proveedor, producto, equipo, cantidad, precio total, dirección y fecha programada. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()` como comportamiento del dominio. |
+| `OrderStatus` | Value Object | Restringe los estados de la orden: `PENDING`, `CONFIRMED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED`, `CANCELLED`. |
+| `RequestStatus` | Value Object | Restringe los estados de la solicitud: `PENDING`, `APPROVED`, `REJECTED`. |
+| `CreateFuelOrderCommand` | Domain Command | Define los datos necesarios para crear una orden (comprador, proveedor, producto, equipo, cantidad, dirección, fecha). |
+| `ConfirmFuelOrderCommand` | Domain Command | Identifica la orden que debe confirmarse. |
+| `CancelFuelOrderCommand` | Domain Command | Identifica la orden que debe cancelarse. |
+| `GetAllFuelOrdersQuery` | Domain Query | Define la consulta de todas las órdenes. |
+| `GetFuelOrderByIdQuery` | Domain Query | Define la consulta de una orden por identificador. |
+| `GetFuelOrdersByCompanyIdQuery` | Domain Query | Define la consulta de órdenes de una empresa compradora. |
+| `GetFuelOrdersByProviderIdQuery` | Domain Query | Define la consulta de órdenes de un proveedor. |
+| `FuelOrderRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `FuelOrder` sin depender de JPA o Spring Data. |
+
+> Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.X.3 y 4.2.X.4).
+
+#### 4.2.6.2. Interface Layer
+
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrdersController` | REST Controller | Expone la API `/api/v1/fuel-orders`: creación, confirmación, cancelación y consulta por id, compañía o proveedor. Valida propiedad de compañía/proveedor mediante `CurrentUserAccess`. |
+| `FuelRequestsController` | REST Controller | Expone la API `/api/v1/fuel-requests`: creación, listado, consulta por id, aceptación y rechazo. |
+| `OrderingController` | REST Controller (placeholder) | Clase vacía, usada solo como marcador de documentación/diagrama; no define endpoints. |
+| `CreateFuelOrderResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una orden directamente. |
+| `FuelOrderResource` | REST Resource (DTO) | Define la representación JSON de una orden para la respuesta HTTP. |
+| `CreateFuelRequestResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una solicitud. |
+| `FuelRequestResource` | REST Resource (DTO) | Define la representación JSON de una solicitud para la respuesta HTTP. |
+| `RejectFuelRequestResource` | REST Resource (DTO) | Define el motivo de rechazo enviado por el proveedor. |
+| `CreateFuelOrderCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de creación en `CreateFuelOrderCommand`. |
+| `FuelOrderResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado `FuelOrder` en `FuelOrderResource` para la respuesta HTTP. |
+
+> Nota: a diferencia de `FuelOrderResource`, la conversión de `FuelRequestPersistenceEntity` a `FuelRequestResource` no tiene un assembler dedicado; se resuelve con un método estático privado dentro de `FuelRequestsController`.
+
+#### 4.2.6.3. Application Layer
+
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrderCommandService` | Command Service (Interface) | Define el contrato para crear, confirmar y cancelar órdenes. |
+| `FuelOrderCommandServiceImpl` | Command Service Implementation | Consulta `FuelProductQueryService` de Inventory para calcular el precio, construye el agregado, lo persiste y delega las transiciones de estado al propio `FuelOrder`. Devuelve `Result<FuelOrder, ApplicationError>`. |
+| `FuelOrderQueryService` | Query Service (Interface) | Define el contrato para consultar por id, compañía, proveedor o colección completa. |
+| `FuelOrderQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega la recuperación al puerto `FuelOrderRepository`. |
+| `FuelRequestService` | Command/Query Service (clase concreta, sin interfaz) | Concentra `create`, `accept`, `reject` y `findAll`/`findById` de las solicitudes. `accept` construye un `CreateFuelOrderCommand`, crea la `FuelOrder` vinculada por `requestId` y actualiza la solicitud a `APPROVED`, todo en una única transacción. |
+
+> Nota: a diferencia de `FuelOrderCommandService`/`FuelOrderQueryService`, `FuelRequestService` no sigue el patrón interfaz + implementación; es una única clase concreta anotada con `@Service`.
+
+#### 4.2.6.4. Infrastructure Layer
+
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `FuelOrderPersistenceEntity` | JPA Entity | Representa la tabla `fuel_orders`; persiste `status` como `OrderStatus` en formato `VARCHAR`. |
+| `FuelRequestPersistenceEntity` | JPA Entity | Representa la tabla `fuel_requests`; actúa como modelo único (sin contraparte de dominio) consumido directamente por `FuelRequestService`. |
+| `FuelOrderPersistenceAssembler` | Assembler / Mapper | Convierte entre `FuelOrder` y `FuelOrderPersistenceEntity`, manteniendo el dominio libre de anotaciones JPA. |
+| `FuelOrderPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `companyId` y `providerId`. |
+| `FuelRequestPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `buyerCompanyId` y `providerId`; se usa directamente, sin puerto de dominio intermedio. |
+| `FuelOrderRepositoryImpl` | Repository Adapter | Implementa el puerto `FuelOrderRepository` y adapta sus operaciones a Spring Data JPA. |
+
+#### 4.2.6.5. Bounded Context Software Architecture Component Level Diagrams.
+Component Diagram - Ordering Bounded Context
+
+<img src="../assets/chapter-4/bc/ordering/Ordering-Components-dark.png" alt="Component Level Diagrams"/>
+
+#### 4.2.6.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.6.6.1. Bounded Context Domain Layer Class Diagram.
+Domain Layer Class Diagram - Ordering Bounded Context
+
+<img src="../assets/chapter-4/bc/ordering/BoundedContextDomainLayerClassDiagram.png" alt="Bounded Context Code Level Diagrams"/>
+
+#### 4.2.6.7. Runtime Evidence.
+
+| Operación | Resultado |
+|---|---|
+| Registrar usuario proveedor (sign-up) | 201 Created |
+| Registrar usuario comprador (sign-up) | 201 Created |
+| Crear producto de combustible (Inventory, como proveedor) | 201 Created |
+| Crear solicitud (`fuel-requests`), estado inicial | 201 Created, `PENDING` |
+| Aceptar solicitud (`accept`), genera orden automáticamente | 200 OK, orden `PENDING` con `totalPrice` calculado |
+| Confirmar orden (`confirm`) | 200 OK, `CONFIRMED` |
+| Consultar orden por id | 200 OK |
+| Consultar órdenes por compañía | 200 OK |
+| Consultar órdenes por proveedor | 200 OK |
+| Crear orden directa (sin solicitud previa) | 201 Created, `requestId: null` |
+| Cancelar orden ya confirmada | 200 OK, `CANCELLED` (sin validación de estado previo) |
+| Token JWT con firma inválida (secreto distinto al del servidor) | 401 Unauthorized |
+
+<img src="../assets/chapter-4/bc/ordering/GET_companyID.png" alt="Get Company ID"/>
+<img src="../assets/chapter-4/bc/ordering/GET_orderID.png" alt="Get Order ID"/>
+<img src="../assets/chapter-4/bc/ordering/GET_providerID.png.png" alt="Get Provider ID"/>
+<img src="../assets/chapter-4/bc/ordering/POST_FuelOrders.png" alt="Post Fuel Orders"/>
+<img src="../assets/chapter-4/bc/ordering/POST_Confirm.png" alt="Post Confirm"/>
+<img src="../assets/chapter-4/bc/ordering/POST_Cancel.png" alt="Post Cancel"/>
 
 ### 4.2.8. Bounded Context: Payment
 
