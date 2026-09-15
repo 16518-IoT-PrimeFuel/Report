@@ -185,9 +185,71 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-Esta sección documenta los bounded contexts **Notification** e **Inventory** con el formato utilizado en la rama `katherine`: tablas por capa, diagramas separados y evidencia runtime obtenida desde Swagger UI. La inspección se realizó sobre el código fuente existente, sin modificar el backend.
+En este nivel se documentan los bounded contexts **IAM**, **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI. La documentación se basa en la inspección del código fuente, la ejecución local del backend —implementado con Spring Boot, Java y JPA/Hibernate— y las pruebas realizadas desde Swagger UI con autenticación JWT.
 
-### 4.2.1. Bounded Context: Notification
+### 4.2.1. Bounded Context: IAM
+
+IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios y compañías compradoras o proveedoras, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-bounded-context.png" alt="Bounded context IAM" width="100%"/>
+  <p><em>Figura 4.14: Límites y responsabilidades del Bounded Context IAM.</em></p>
+</div>
+
+#### 4.2.1.1. Domain Layer
+
+El dominio está formado por los agregados User, BuyerCompany y ProviderCompany, además de la entidad Role y el value object Roles. User representa la identidad autenticable, sus roles y el vínculo con una compañía compradora o proveedora. BuyerCompany y ProviderCompany representan los perfiles empresariales que pertenecen al contexto IAM.
+
+Los comandos son SignUpCommand, SignInCommand, CreateBuyerCompanyCommand, CreateProviderCompanyCommand y SeedRolesCommand. Las consultas son GetAllUsersQuery, GetUserByIdQuery, GetUserByUsernameQuery, GetAllBuyerCompaniesQuery, GetBuyerCompanyByIdQuery, GetAllProviderCompaniesQuery y GetProviderCompanyByIdQuery. UserRepository, RoleRepository, BuyerCompanyRepository y ProviderCompanyRepository son puertos de persistencia que mantienen el dominio independiente de JPA.
+
+#### 4.2.1.2. Interface Layer
+
+AuthenticationController transforma los recursos HTTP mediante assemblers y delega en los servicios de aplicación. Expone:
+
+- POST /api/v1/authentication/sign-up
+- POST /api/v1/authentication/sign-in
+- POST /api/v1/authentication/password-reset/request
+- POST /api/v1/authentication/password-reset/confirm
+
+BuyerCompaniesController expone la creación, consulta y actualización de compañías compradoras; ProviderCompaniesController expone las operaciones equivalentes para compañías proveedoras; UsersController expone consultas administrativas y consultas propias. Los resources representan los contratos REST y los assemblers convierten entre recursos y comandos o entidades.
+
+Las reglas de autorización usan `@PreAuthorize`, `CurrentUserAccess` y los roles `ROLE_ADMIN`, `ROLE_BUYER` y `ROLE_PROVIDER`. Los endpoints de autenticación son públicos; las consultas y actualizaciones de recursos requieren JWT y validación de ownership o rol.
+
+#### 4.2.1.3. Application Layer
+
+UserCommandServiceImpl coordina el registro y el inicio de sesión. En el registro valida exactamente un rol de comprador o proveedor, crea el usuario y el perfil empresarial correspondiente dentro de una transacción y devuelve el recurso autenticado. PasswordResetService genera tokens de un solo uso, almacena únicamente el hash, aplica expiración y envía las instrucciones mediante SMTP.
+
+BuyerCompanyCommandServiceImpl, ProviderCompanyCommandServiceImpl y RoleCommandServiceImpl coordinan los comandos específicos de compañías y roles. UserQueryServiceImpl, BuyerCompanyQueryServiceImpl y ProviderCompanyQueryServiceImpl resuelven las consultas del directorio.
+
+Flujo principal: Controller → servicio de aplicación → agregado IAM → puerto de repositorio. La autenticación agrega HashingService y TokenService como puertos de salida para BCrypt y JWT.
+
+#### 4.2.1.4. Infrastructure Layer
+
+UserPersistenceEntity, RolePersistenceEntity, BuyerCompanyPersistenceEntity, ProviderCompanyPersistenceEntity y PasswordResetTokenEntity representan las tablas `users`, `roles`, `user_roles`, `buyer_companies`, `provider_companies`, `provider_company_fuel_types` y `password_reset_tokens`. Los assemblers transforman entre entidades JPA y objetos de dominio; los repositorios Spring Data son implementados por los adaptadores de persistencia.
+
+WebSecurityConfiguration configura Spring Security. BearerAuthorizationRequestFilter valida el token JWT, UserDetailsServiceImpl carga la identidad, CurrentUserAccess aplica las reglas de ownership, BCryptHashingService protege las contraseñas y BearerTokenService gestiona los tokens.
+
+#### 4.2.1.5. Bounded Context Software Architecture Component Level Diagram
+
+La vista de componentes muestra la separación entre Interfaces, Application, Domain e Infrastructure y las dependencias dirigidas hacia el dominio. IAM se integra con el resto de la plataforma mediante la identidad autenticada y la autorización de recursos.
+
+<div align="center">
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-layer-overview.png" alt="Capas y componentes de IAM" width="100%"/>
+  <p><em>Figura 4.15: Capas y componentes principales de IAM.</em></p>
+</div>
+
+#### 4.2.1.6. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Registro de usuario y compañía | 201 Created |
+| Inicio de sesión y emisión de JWT | 200 OK |
+| Solicitud de recuperación de contraseña | 202 Accepted |
+| Confirmación de recuperación | 204 No Content |
+| Acceso protegido sin token | 401 Unauthorized |
+| Acceso a compañía ajena | 403 Forbidden |
+
+### 4.2.2. Bounded Context: Notification
 
 | Elemento | Descripción |
 | :------: | :---------: |
@@ -195,7 +257,7 @@ Esta sección documenta los bounded contexts **Notification** e **Inventory** co
 | Actores | Compradores, proveedores y componentes autenticados que crean o consultan notificaciones. |
 | Relación con otros contextos | Consulta la identidad del destinatario mediante IAM y conserva `referenceId` como referencia al evento externo, sin asumir el ciclo de vida de órdenes o usuarios. |
 
-### 4.2.1.1. Domain Layer.
+#### 4.2.2.1. Domain Layer
 
 El core de Notification es el agregado raíz `Notification`. Su invariantes principal es que toda notificación nace como no leída (`read = false`) y solo el agregado puede cambiar ese estado mediante `markAsRead()`. El agregado recibe un comando de creación, conserva el destinatario, el tipo, el contenido y la referencia opcional al evento que originó la notificación.
 
@@ -210,7 +272,7 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 | `GetUnreadNotificationsByUserIdQuery` | Domain Query | Define la consulta de las notificaciones pendientes de lectura de un usuario. |
 | `NotificationRepository` | Domain Repository | Expone el puerto de persistencia que utiliza el dominio sin depender de JPA o Spring Data. |
 
-### 4.2.1.2. Interface Layer.
+#### 4.2.2.2. Interface Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
@@ -220,7 +282,7 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 | `CreateNotificationCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de creación en `CreateNotificationCommand`. |
 | `NotificationResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado de dominio en `NotificationResource` para la respuesta HTTP. |
 
-### 4.2.1.3. Application Layer.
+#### 4.2.2.3. Application Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
@@ -229,7 +291,7 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 | `NotificationQueryService` | Query Service (Interface) | Define el contrato para consultar por id, usuario y estado de lectura. |
 | `NotificationQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega el acceso de datos al puerto `NotificationRepository`. |
 
-### 4.2.1.4. Infrastructure Layer.
+#### 4.2.2.4. Infrastructure Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
@@ -238,17 +300,17 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 | `NotificationPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por usuario y por estado no leído. |
 | `NotificationRepositoryImpl` | Repository Adapter | Implementa el puerto del dominio y conecta sus operaciones con Spring Data JPA. |
 
-### 4.2.1.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.2.5. Bounded Context Software Architecture Component Level Diagrams.
 
 ![Component Diagram - Notification Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/notification/notification-structurizr-components.png)
 
-### 4.2.1.6. Bounded Context Software Architecture Code Level Diagrams.
+#### 4.2.2.6. Bounded Context Software Architecture Code Level Diagrams.
 
-#### 4.2.1.6.1. Bounded Context Domain Layer Class Diagram.
+#### 4.2.2.6.1. Bounded Context Domain Layer Class Diagram.
 
 ![Domain Layer Class Diagram - Notification Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/notification/notification-domain-uml.png)
 
-### 4.2.1.7. Runtime Evidence.
+#### 4.2.2.7. Runtime Evidence.
 
 | Operación | Resultado |
 | :-------: | :-------: |
@@ -263,7 +325,7 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 
 ![Swagger - Notifications Unauthorized Response](../assets/chapter-4/Bounded%20Context%20Evidence/notification/swagger-notification-401.png)
 
-### 4.2.2. Bounded Context: Inventory
+### 4.2.3. Bounded Context: Inventory
 
 | Elemento | Descripción |
 | :------: | :---------: |
@@ -271,7 +333,7 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 | Actores | Proveedores que crean y actualizan productos, y compradores que consultan el catálogo. |
 | Relación con otros contextos | Valida identidad y propiedad mediante IAM; conserva `providerId` y puede ser referenciado por solicitudes u órdenes sin incorporar su lógica al agregado. |
 
-### 4.2.2.1. Domain Layer.
+#### 4.2.3.1. Domain Layer
 
 El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra los datos comerciales del producto y las operaciones que modifican su estado: creación, actualización general y actualización de stock. `active` se inicializa en `true` cuando el comando no lo especifica, de modo que el producto queda publicado por defecto; `update()` conserva su valor si la actualización no lo incluye.
 
@@ -288,7 +350,7 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 | `GetFuelProductsByProviderIdQuery` | Domain Query | Define la consulta de productos pertenecientes a un proveedor. |
 | `FuelProductRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `FuelProduct` sin depender de la implementación JPA. |
 
-### 4.2.2.2. Interface Layer.
+#### 4.2.3.2. Interface Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
@@ -302,7 +364,7 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 | `UpdateFuelProductStockCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de stock en `UpdateFuelProductStockCommand`. |
 | `FuelProductResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado de dominio en el recurso de respuesta. |
 
-### 4.2.2.3. Application Layer.
+#### 4.2.3.3. Application Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
@@ -311,7 +373,7 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 | `FuelProductQueryService` | Query Service (Interface) | Define el contrato para consultar por id, proveedor o colección completa. |
 | `FuelProductQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega la recuperación al puerto `FuelProductRepository`. |
 
-### 4.2.2.4. Infrastructure Layer.
+#### 4.2.3.4. Infrastructure Layer
 
 | Clase / Componente | Tipo | Propósito |
 |:--|:--|:--|
@@ -320,17 +382,17 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 | `FuelProductPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y la consulta de productos por `providerId`. |
 | `FuelProductRepositoryImpl` | Repository Adapter | Implementa el puerto del dominio y adapta sus operaciones a Spring Data JPA. |
 
-### 4.2.2.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.3.5. Bounded Context Software Architecture Component Level Diagrams.
 
 ![Component Diagram - Inventory Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/inventory/inventory-structurizr-components.png)
 
-### 4.2.2.6. Bounded Context Software Architecture Code Level Diagrams.
+#### 4.2.3.6. Bounded Context Software Architecture Code Level Diagrams.
 
-#### 4.2.2.6.1. Bounded Context Domain Layer Class Diagram.
+#### 4.2.3.6.1. Bounded Context Domain Layer Class Diagram.
 
 ![Domain Layer Class Diagram - Inventory Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/inventory/inventory-domain-uml.png)
 
-### 4.2.2.7. Runtime Evidence.
+#### 4.2.3.7. Runtime Evidence.
 
 | Operación | Resultado |
 | :-------: | :-------: |
@@ -346,11 +408,11 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 La evidencia visual se conserva por módulo en `Report/assets/chapter-4/Bounded Context Evidence`. Las capturas de código/GitHub fueron retiradas; permanecen únicamente las capturas de Swagger y los diagramas UML y de componentes generados para estos bounded contexts.
 
-#### 4.2.2.6. Bounded Context Software Architecture Code Level Diagrams.
+### 4.2.4. Bounded Context Software Architecture Code Level Diagrams.
 
 Presenta los diagramas que descienden al nivel de código, contrastando el modelo de objetos del dominio con el diseño de la base de datos. Estos diagramas complementan al *Component Diagram* de la API Application y a los contenedores definidos, proporcionando una vista centrada en clases, relaciones y responsabilidades.
 
-##### 4.2.2.6.1. Bounded Context Domain Layer Class Diagrams.
+#### 4.2.4.1. Bounded Context Domain Layer Class Diagrams.
 
 A nivel de clases se modelan, por un lado, las clases del frontend en función de los módulos y vistas que consumen los servicios expuestos por la API y, por otro, las clases del backend que reflejan la implementación detallada de los módulos definidos como componentes dentro de la API.
 
@@ -449,7 +511,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
 - **Identity & Access Backend** — Responsabilidad: gestiona el registro de usuarios, autenticación, autorización y control de acceso.
 
 <div align="center">
-  <img src="../assets/chapter-4/class-diagrams/backend_identity.png" alt="Backend Identity & Access"/>
+  <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-class-layer.png" alt="Backend IAM: capas y clases" width="100%"/>
 </div>
 
 - **Catalog Backend** — Responsabilidad: gestiona el inventario de recursos disponibles, incluyendo stock y características relevantes.
@@ -500,7 +562,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_inventory.png" alt="Backend Inventory"/>
 </div>
 
-##### 4.2.2.6.2. Bounded Context Database Design Diagram.
+#### 4.2.4.2. Bounded Context Database Design Diagram.
 
 La base de datos relacional almacena todos los datos del dominio del sistema. Las tablas se organizan en correspondencia directa con los *bounded contexts* definidos en el diseño orientado a objetos. A continuación, se detalla qué tablas pertenecen a cada contexto y cuál es su responsabilidad dentro del modelo de datos.
 
@@ -511,11 +573,13 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 **Identity & Access — Base de datos**
 
-*Responsabilidad:* almacena la información de usuarios, sesiones y las extensiones de perfil para clientes y proveedores.
+*Responsabilidad:* almacena la identidad autenticable, sus roles, las compañías vinculadas y los tokens de recuperación.
 
-- **USER:** datos base del usuario autenticado (`id_user`, `ruc`, `full_name`, `dni`, `email`, `password_hash`, `phone_number`, `address`, `role`, `is_active`, `created_at`, `updated_at`).
-- **CLIENT:** extensión del perfil para empresas solicitantes (`id_client`, `id_user` FK, `company_name`, `company_ruc`, `industry`, `created_at`).
-- **PROVIDER:** extensión del perfil para empresas proveedoras (`id_provider`, `id_user` FK, `company_name`, `company_ruc`, `description`, `created_at`).
+- **users:** usuario autenticable (`id`, `username`, `password`, `company_id`, `provider_id`, auditoría).
+- **roles:** catálogo de roles (`id`, `name`), relacionado con usuarios mediante **user_roles**.
+- **buyer_companies:** perfil de compañía compradora (`id`, `name`, `ruc`, `sector`, `address`, `contact_email`, `phone`).
+- **provider_companies:** perfil de compañía proveedora (`id`, `name`, `ruc`, `rating`, `address`, `phone`, `description`), con **provider_company_fuel_types** para los tipos ofrecidos.
+- **password_reset_tokens:** hash del token, usuario asociado y fecha de expiración.
 
 <div align="center">
   <img src="../assets/chapter-4/database/baseDatos_identity.png" alt="Tablas de Identity & Access"/>
@@ -585,7 +649,7 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
   <img src="../assets/chapter-4/database/baseDatos_analysis.png" alt="Tablas de Reporting & Analytics"/>
 </div>
 
-### 4.2.3. Bounded Context: Catalog
+### 4.2.5. Bounded Context: Catalog
 
 | Elemento | Descripción |
 | :------: | :---------: |
@@ -595,7 +659,7 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
 
 El alcance táctico implementado actualmente para **Catalog** se concentra en la valoración de proveedores. Aunque a nivel estratégico el contexto participa en la experiencia de consulta y evaluación de proveedores, la persistencia propia del módulo `catalog` está representada por las calificaciones realizadas por las empresas compradoras. La información de productos ofrecidos por cada proveedor se obtiene de otros contextos, principalmente **Inventory**, evitando duplicar responsabilidades dentro del modelo.
 
-### 4.2.3.1. Domain Layer.
+#### 4.2.5.1. Domain Layer.
 
 El núcleo del bounded context **Catalog** está representado por el agregado raíz `ProviderRating`. Este agregado modela la valoración que una empresa compradora asigna a una empresa proveedora y mantiene los identificadores de ambas organizaciones junto con el valor de la calificación.
 
@@ -610,7 +674,7 @@ El dominio también define `ProviderRatingRepository` como puerto de persistenci
 
 Una característica importante de este agregado es que no incorpora directamente objetos pertenecientes a IAM. En lugar de mantener referencias a `BuyerCompany` o `ProviderCompany`, almacena únicamente sus identificadores. Esto mantiene el límite del bounded context y evita trasladar al dominio de Catalog responsabilidades relacionadas con la administración de empresas o usuarios.
 
-### 4.2.3.2. Interface Layer.
+#### 4.2.5.2. Interface Layer.
 
 La capa de interfaces expone las funcionalidades del bounded context mediante `ProviderRatingsController`, disponible a través de la ruta base `/api/v1/provider-ratings`.
 
@@ -635,7 +699,7 @@ Antes de registrar o actualizar una valoración, el controlador valida que `comp
 
 Durante la creación se verifica adicionalmente que la misma empresa compradora no haya calificado previamente al mismo proveedor. Si dicha combinación ya existe, la API rechaza la creación para conservar una única valoración por relación comprador-proveedor.
 
-### 4.2.3.3. Application Layer.
+#### 4.2.5.3. Application Layer.
 
 En la implementación actual del bounded context **Catalog** no existe una capa Application materializada mediante Command Services o Query Services independientes.
 
@@ -650,7 +714,7 @@ Esta decisión representa una implementación simplificada del patrón por capas
 
 Como evolución de la arquitectura, la coordinación realizada actualmente por el controlador podría trasladarse a servicios de aplicación específicos, por ejemplo un `ProviderRatingCommandService` y un `ProviderRatingQueryService`. Sin embargo, dichos componentes no forman parte de la implementación actual, por lo que no se incluyen como elementos existentes del diseño.
 
-### 4.2.3.4. Infrastructure Layer.
+#### 4.2.5.4. Infrastructure Layer.
 
 La capa de infraestructura implementa la persistencia del bounded context utilizando **Spring Data JPA** y una base de datos MySQL.
 
@@ -668,7 +732,7 @@ La tabla establece una restricción de unicidad sobre la combinación `company_i
 
 Las consultas soportadas por la infraestructura permiten recuperar todas las valoraciones registradas, las valoraciones realizadas por una empresa compradora, las valoraciones recibidas por un proveedor y una valoración específica correspondiente a una combinación comprador-proveedor.
 
-### 4.2.3.5. Bounded Context Software Architecture Component Level Diagrams.
+#### 4.2.5.5. Bounded Context Software Architecture Component Level Diagrams.
 
 A nivel de componentes, el bounded context **Catalog** recibe solicitudes HTTP mediante `ProviderRatingsController`. El controlador utiliza `ProviderRatingRepository`, definido en el dominio, para consultar y persistir las valoraciones.
 
@@ -702,11 +766,11 @@ ProviderRatingPersistenceRepository
       MySQL
 ```
 
-### 4.2.3.6. Bounded Context Software Architecture Code Level Diagrams.
+#### 4.2.5.6. Bounded Context Software Architecture Code Level Diagrams.
 
 Los diagramas a nivel de código del bounded context **Catalog** representan las clases que conforman su modelo de dominio y la estructura de persistencia utilizada para almacenar las valoraciones.
 
-#### 4.2.3.6.1. Bounded Context Domain Layer Class Diagram.
+##### 4.2.5.6.1. Bounded Context Domain Layer Class Diagram.
 
 El modelo de dominio de Catalog está compuesto principalmente por el agregado `ProviderRating` y el puerto `ProviderRatingRepository`.
 
@@ -747,7 +811,7 @@ Posteriormente, el diagrama UML gráfico correspondiente puede almacenarse en:
 
 ![Domain Layer Class Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-domain-uml.png)
 
-#### 4.2.3.6.2. Bounded Context Database Design Diagram.
+##### 4.2.5.6.2. Bounded Context Database Design Diagram.
 
 La persistencia propia de Catalog se concentra en la tabla `provider_ratings`.
 
@@ -787,7 +851,7 @@ Posteriormente, el diagrama gráfico de base de datos puede almacenarse en:
 
 ![Database Design Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-database-design.png)
 
-### 4.2.3.7. Runtime Evidence.
+#### 4.2.5.7. Runtime Evidence.
 
 La validación en tiempo de ejecución del bounded context Catalog se realiza desde **Swagger UI** mediante los endpoints disponibles en `/api/v1/provider-ratings`.
 
