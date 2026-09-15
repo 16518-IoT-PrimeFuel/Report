@@ -585,6 +585,235 @@ La base de datos relacional almacena todos los datos del dominio del sistema. La
   <img src="../assets/chapter-4/database/baseDatos_analysis.png" alt="Tablas de Reporting & Analytics"/>
 </div>
 
+### 4.2.3. Bounded Context: Catalog
+
+| Elemento | Descripción |
+| :------: | :---------: |
+| Propósito | Gestionar las valoraciones que las empresas compradoras asignan a los proveedores de combustible, permitiendo registrar, consultar y actualizar la calificación de cada proveedor. |
+| Actores | Empresas compradoras que califican a los proveedores, proveedores que reciben las valoraciones y usuarios autenticados que consultan la información disponible. |
+| Relación con otros contextos | Se integra con **IAM** para comprobar la existencia de las empresas compradoras y proveedoras, así como para validar que la empresa compradora pertenezca al usuario autenticado. En la implementación actual, la información comercial de productos, stock y precios se administra en **Inventory**, mientras Catalog conserva la valoración del proveedor mediante `companyId`, `providerId` y `rating`. |
+
+El alcance táctico implementado actualmente para **Catalog** se concentra en la valoración de proveedores. Aunque a nivel estratégico el contexto participa en la experiencia de consulta y evaluación de proveedores, la persistencia propia del módulo `catalog` está representada por las calificaciones realizadas por las empresas compradoras. La información de productos ofrecidos por cada proveedor se obtiene de otros contextos, principalmente **Inventory**, evitando duplicar responsabilidades dentro del modelo.
+
+### 4.2.3.1. Domain Layer.
+
+El núcleo del bounded context **Catalog** está representado por el agregado raíz `ProviderRating`. Este agregado modela la valoración que una empresa compradora asigna a una empresa proveedora y mantiene los identificadores de ambas organizaciones junto con el valor de la calificación.
+
+La principal invariante del dominio establece que una valoración únicamente puede encontrarse dentro del rango de **1 a 5**. Esta regla se controla mediante el método `changeRating()`, utilizado tanto durante la creación del agregado como durante la modificación posterior de una calificación existente. De esta manera, la validez de la valoración permanece protegida por el propio modelo de dominio y no depende exclusivamente de la validación realizada en la capa REST.
+
+El dominio también define `ProviderRatingRepository` como puerto de persistencia. Esta interfaz permite recuperar una valoración mediante su identificador, localizar la calificación asociada a una combinación específica de empresa compradora y proveedor, realizar consultas filtradas y persistir el agregado sin introducir dependencias hacia Spring Data JPA.
+
+| Clase | Tipo | Propósito |
+| :---: | :--: | :-------- |
+| `ProviderRating` | Aggregate Root | Representa la valoración realizada por una empresa compradora hacia un proveedor. Gestiona `companyId`, `providerId` y `rating`, y protege el rango permitido de 1 a 5 mediante `changeRating()`. |
+| `ProviderRatingRepository` | Domain Repository | Define el puerto de persistencia utilizado por Catalog. Permite consultar por identificador, por combinación comprador-proveedor, realizar búsquedas filtradas y persistir las valoraciones. |
+
+Una característica importante de este agregado es que no incorpora directamente objetos pertenecientes a IAM. En lugar de mantener referencias a `BuyerCompany` o `ProviderCompany`, almacena únicamente sus identificadores. Esto mantiene el límite del bounded context y evita trasladar al dominio de Catalog responsabilidades relacionadas con la administración de empresas o usuarios.
+
+### 4.2.3.2. Interface Layer.
+
+La capa de interfaces expone las funcionalidades del bounded context mediante `ProviderRatingsController`, disponible a través de la ruta base `/api/v1/provider-ratings`.
+
+El controlador permite consultar valoraciones utilizando filtros opcionales por empresa compradora o proveedor, crear nuevas calificaciones y actualizar el valor de una calificación existente. Durante las operaciones de escritura también realiza validaciones relacionadas con IAM para comprobar que las empresas involucradas existan.
+
+Adicionalmente, las operaciones de creación y actualización utilizan `CurrentUserAccess` mediante `@PreAuthorize`, garantizando que el usuario autenticado únicamente pueda registrar o modificar valoraciones en nombre de una empresa compradora que le pertenezca.
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------- |
+| `ProviderRatingsController` | REST Controller | Expone la API `/api/v1/provider-ratings`. Gestiona la consulta, creación y actualización de valoraciones, además de validar la existencia de comprador y proveedor y aplicar las reglas de autorización. |
+| `ProviderRatingResource` | REST Resource (DTO) | Representa los datos intercambiados mediante HTTP: `id`, `companyId`, `providerId` y `rating`. Es utilizado como recurso de entrada y salida de la API. |
+
+Las operaciones implementadas actualmente son:
+
+| Método | Endpoint | Descripción |
+| :----: | :------- | :---------- |
+| `GET` | `/api/v1/provider-ratings` | Obtiene las valoraciones registradas. Acepta opcionalmente `companyId` y `providerId` como parámetros de filtrado. |
+| `POST` | `/api/v1/provider-ratings` | Registra una nueva valoración de una empresa compradora hacia un proveedor. |
+| `PUT` | `/api/v1/provider-ratings/{id}` | Modifica únicamente el valor de una calificación existente. La empresa compradora y el proveedor asociados no pueden ser modificados. |
+
+Antes de registrar o actualizar una valoración, el controlador valida que `companyId`, `providerId` y `rating` hayan sido proporcionados y que el valor de `rating` se encuentre entre 1 y 5. También comprueba mediante `BuyerCompanyRepository` y `ProviderCompanyRepository` que las empresas involucradas realmente existan.
+
+Durante la creación se verifica adicionalmente que la misma empresa compradora no haya calificado previamente al mismo proveedor. Si dicha combinación ya existe, la API rechaza la creación para conservar una única valoración por relación comprador-proveedor.
+
+### 4.2.3.3. Application Layer.
+
+En la implementación actual del bounded context **Catalog** no existe una capa Application materializada mediante Command Services o Query Services independientes.
+
+A diferencia de otros contextos como Notification o Inventory, los casos de uso de Catalog son coordinados directamente por `ProviderRatingsController`, que utiliza el puerto de dominio `ProviderRatingRepository` y los repositorios de IAM necesarios para realizar las validaciones de las empresas involucradas.
+
+Esta decisión representa una implementación simplificada del patrón por capas. El dominio continúa aislado de la infraestructura gracias a `ProviderRatingRepository`, pero la coordinación de los casos de uso permanece actualmente en el controlador.
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------- |
+| `ProviderRatingsController` | Use Case Coordinator | Coordina actualmente los casos de uso de consulta, creación y actualización de valoraciones y delega la persistencia al puerto `ProviderRatingRepository`. |
+| `ProviderRatingRepository` | Domain Port | Proporciona al coordinador las operaciones necesarias para consultar y persistir el agregado sin depender directamente de Spring Data JPA. |
+
+Como evolución de la arquitectura, la coordinación realizada actualmente por el controlador podría trasladarse a servicios de aplicación específicos, por ejemplo un `ProviderRatingCommandService` y un `ProviderRatingQueryService`. Sin embargo, dichos componentes no forman parte de la implementación actual, por lo que no se incluyen como elementos existentes del diseño.
+
+### 4.2.3.4. Infrastructure Layer.
+
+La capa de infraestructura implementa la persistencia del bounded context utilizando **Spring Data JPA** y una base de datos MySQL.
+
+`ProviderRatingPersistenceEntity` representa la información almacenada en la tabla `provider_ratings`. La entidad conserva los identificadores de la empresa compradora y del proveedor junto con la calificación asignada. Asimismo, hereda los campos de auditoría utilizados por la plataforma para registrar las fechas de creación y modificación.
+
+La tabla establece una restricción de unicidad sobre la combinación `company_id` y `provider_id`. Como consecuencia, una empresa compradora puede mantener una sola valoración para un proveedor determinado. Si desea cambiar su evaluación, debe actualizar la valoración existente en lugar de crear una nueva.
+
+`ProviderRatingRepositoryImpl` funciona como adaptador entre el dominio y Spring Data JPA. Este componente implementa `ProviderRatingRepository`, transforma las entidades persistentes en agregados de dominio y realiza el proceso inverso al momento de almacenar cambios.
+
+| Clase / Componente | Tipo | Propósito |
+| :----------------: | :--: | :-------- |
+| `ProviderRatingPersistenceEntity` | JPA Entity | Representa la tabla `provider_ratings`. Persiste `companyId`, `providerId` y `rating`, además de los campos de auditoría heredados. |
+| `ProviderRatingPersistenceRepository` | Spring Data JPA Repository | Extiende `JpaRepository` y proporciona consultas por empresa compradora, proveedor y combinación comprador-proveedor. |
+| `ProviderRatingRepositoryImpl` | Repository Adapter | Implementa el puerto `ProviderRatingRepository`, adapta las operaciones del dominio hacia Spring Data JPA y transforma entre el agregado y la entidad persistente. |
+
+Las consultas soportadas por la infraestructura permiten recuperar todas las valoraciones registradas, las valoraciones realizadas por una empresa compradora, las valoraciones recibidas por un proveedor y una valoración específica correspondiente a una combinación comprador-proveedor.
+
+### 4.2.3.5. Bounded Context Software Architecture Component Level Diagrams.
+
+A nivel de componentes, el bounded context **Catalog** recibe solicitudes HTTP mediante `ProviderRatingsController`. El controlador utiliza `ProviderRatingRepository`, definido en el dominio, para consultar y persistir las valoraciones.
+
+La implementación de dicho puerto corresponde a `ProviderRatingRepositoryImpl`, que delega las operaciones de persistencia en `ProviderRatingPersistenceRepository`. Este último utiliza Spring Data JPA para comunicarse con la base de datos MySQL.
+
+Catalog también mantiene una integración con **IAM** mediante `BuyerCompanyRepository` y `ProviderCompanyRepository`. Esta interacción se utiliza únicamente para validar la existencia de las empresas involucradas. La autorización de las operaciones de escritura se complementa mediante `CurrentUserAccess`.
+
+El flujo principal de componentes puede representarse de la siguiente manera:
+
+```text
+Cliente / Swagger UI
+        |
+        v
+ProviderRatingsController
+        |
+        +-----------------------> IAM
+        |                         |- BuyerCompanyRepository
+        |                         |- ProviderCompanyRepository
+        |                         `- CurrentUserAccess
+        |
+        v
+ProviderRatingRepository
+        |
+        v
+ProviderRatingRepositoryImpl
+        |
+        v
+ProviderRatingPersistenceRepository
+        |
+        v
+      MySQL
+```
+
+### 4.2.3.6. Bounded Context Software Architecture Code Level Diagrams.
+
+Los diagramas a nivel de código del bounded context **Catalog** representan las clases que conforman su modelo de dominio y la estructura de persistencia utilizada para almacenar las valoraciones.
+
+#### 4.2.3.6.1. Bounded Context Domain Layer Class Diagram.
+
+El modelo de dominio de Catalog está compuesto principalmente por el agregado `ProviderRating` y el puerto `ProviderRatingRepository`.
+
+`ProviderRating` contiene los atributos `id`, `companyId`, `providerId` y `rating`. Su operación de dominio `changeRating()` garantiza que el valor asignado permanezca entre 1 y 5.
+
+`ProviderRatingRepository` actúa como contrato entre el dominio y la infraestructura, ofreciendo operaciones de consulta y persistencia sin exponer detalles relacionados con JPA.
+
+La estructura del dominio puede representarse de la siguiente manera:
+
+```text
++------------------------------------------------+
+|                ProviderRating                  |
++------------------------------------------------+
+| - id: Long                                     |
+| - companyId: Long                              |
+| - providerId: Long                             |
+| - rating: Integer                              |
++------------------------------------------------+
+| + ProviderRating(companyId, providerId, rating)|
+| + changeRating(rating): void                   |
++------------------------------------------------+
+                      |
+                      | utiliza
+                      v
++------------------------------------------------+
+|           ProviderRatingRepository             |
++------------------------------------------------+
+| + findById(id)                                 |
+| + findByCompanyIdAndProviderId(...)            |
+| + findAll(companyId, providerId)               |
+| + save(rating)                                 |
++------------------------------------------------+
+```
+
+Posteriormente, el diagrama UML gráfico correspondiente puede almacenarse en:
+
+`../assets/chapter-4/Bounded Context Evidence/catalog/catalog-domain-uml.png`
+
+![Domain Layer Class Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-domain-uml.png)
+
+#### 4.2.3.6.2. Bounded Context Database Design Diagram.
+
+La persistencia propia de Catalog se concentra en la tabla `provider_ratings`.
+
+Esta tabla almacena la relación entre la empresa compradora y el proveedor evaluado. No almacena directamente datos personales o empresariales pertenecientes a IAM, sino únicamente sus identificadores. Del mismo modo, tampoco almacena los productos o niveles de stock del proveedor, debido a que estos pertenecen al bounded context Inventory.
+
+| Campo | Descripción |
+| :---: | :---------- |
+| `id` | Identificador único de la valoración y clave primaria. |
+| `company_id` | Identificador de la empresa compradora que realiza la valoración. |
+| `provider_id` | Identificador del proveedor evaluado. |
+| `rating` | Valor numérico de la calificación, restringido por el dominio al rango de 1 a 5. |
+| `created_at` | Fecha y hora en que se creó el registro. |
+| `updated_at` | Fecha y hora de la última modificación del registro. |
+
+Existe una restricción única para la combinación `company_id` y `provider_id`. Esto garantiza que una empresa compradora no registre más de una valoración independiente para el mismo proveedor.
+
+La estructura de persistencia puede representarse de la siguiente manera:
+
+```text
++--------------------------------------+
+|           provider_ratings           |
++--------------------------------------+
+| PK  id                               |
+|     company_id                       |
+|     provider_id                      |
+|     rating                           |
+|     created_at                       |
+|     updated_at                       |
++--------------------------------------+
+| UNIQUE(company_id, provider_id)      |
++--------------------------------------+
+```
+
+Posteriormente, el diagrama gráfico de base de datos puede almacenarse en:
+
+`../assets/chapter-4/Bounded Context Evidence/catalog/catalog-database-design.png`
+
+![Database Design Diagram - Catalog Bounded Context](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/catalog-database-design.png)
+
+### 4.2.3.7. Runtime Evidence.
+
+La validación en tiempo de ejecución del bounded context Catalog se realiza desde **Swagger UI** mediante los endpoints disponibles en `/api/v1/provider-ratings`.
+
+Las pruebas permiten verificar tanto los casos exitosos como las principales reglas de validación, autorización y consistencia implementadas en el backend.
+
+| Operación | Resultado esperado |
+| :-------: | :----------------: |
+| Consultar todas las valoraciones | `200 OK` |
+| Consultar valoraciones filtradas por `companyId` | `200 OK` |
+| Consultar valoraciones filtradas por `providerId` | `200 OK` |
+| Consultar por `companyId` y `providerId` simultáneamente | `200 OK` |
+| Crear una valoración válida entre 1 y 5 | `201 Created` |
+| Crear nuevamente una valoración para la misma combinación comprador-proveedor | `409 Conflict` |
+| Crear una valoración menor que 1 o mayor que 5 | `400 Bad Request` |
+| Crear una valoración con comprador o proveedor inexistente | `400 Bad Request` |
+| Actualizar correctamente el valor de una valoración | `200 OK` |
+| Intentar cambiar `companyId` o `providerId` durante una actualización | `400 Bad Request` |
+| Actualizar una valoración inexistente | `404 Not Found` |
+| Crear o modificar una valoración para una empresa que no pertenece al usuario autenticado | `403 Forbidden` |
+| Realizar una operación protegida sin autenticación | `401 Unauthorized` |
+
+La evidencia visual debe incluir capturas de Swagger que demuestren la creación de una valoración válida, la consulta de las valoraciones registradas, la actualización de una calificación y una respuesta de error correspondiente a una regla de validación o autorización.
+
+![Swagger - Provider Ratings](../assets/chapter-4/Bounded%20Context%20Evidence/catalog/swagger-provider-ratings.png)
+
+
 ### 4.2.8. Bounded Context: Payment
 
 ### 4.2.8.1. Domain Layer.
