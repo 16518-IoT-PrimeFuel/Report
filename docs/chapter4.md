@@ -996,7 +996,7 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 <img src="../assets/chapter-4/bc/ordering/GET_companyID.png" alt="Get Company ID"/>
 <img src="../assets/chapter-4/bc/ordering/GET_orderID.png" alt="Get Order ID"/>
-<img src="../assets/chapter-4/bc/ordering/GET_providerID.png.png" alt="Get Provider ID"/>
+<img src="../assets/chapter-4/bc/ordering/GET_providerID.png" alt="Get Provider ID"/>
 <img src="../assets/chapter-4/bc/ordering/POST_FuelOrders.png" alt="Post Fuel Orders"/>
 <img src="../assets/chapter-4/bc/ordering/POST_Confirm.png" alt="Post Confirm"/>
 <img src="../assets/chapter-4/bc/ordering/POST_Cancel.png" alt="Post Cancel"/>
