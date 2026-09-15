@@ -181,10 +181,10 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se documentan los bounded contexts **IAM**, **Notification** e **Inventory**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI.
+En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Payment** y **Reporting & Analytics**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime obtenida desde Swagger UI.
 
 
-Esta sección documenta los bounded contexts **IAM**, **Notification** e **Inventory**, con base en la inspección del código fuente, la ejecución local del backend y las pruebas realizadas desde Swagger UI. La aplicación se implementó con Spring Boot, Java y JPA/Hibernate. Para la evidencia runtime se usó el backend local y Swagger UI con autenticación JWT; las figuras y clases se contrastaron directamente con el código fuente actual.
+Esta sección documenta los bounded contexts **IAM**, **Notification**, **Inventory**, **Payment** y **Reporting & Analytics**, con base en la inspección del código fuente, la ejecución local del backend y las pruebas realizadas desde Swagger UI. La aplicación se implementó con Spring Boot, Java y JPA/Hibernate. Para la evidencia runtime se usó el backend local y Swagger UI con autenticación JWT; las figuras y clases se contrastaron directamente con el código fuente actual.
 
 ### 4.2.1. Bounded Context: IAM
 
@@ -393,11 +393,104 @@ El directorio físico se llama infraestructure, aunque las declaraciones de paqu
 
 La evidencia se guarda por módulo en Report/assets/chapter-4/Bounded Context Evidence. El backend y MySQL usados fueron locales y aislados; no se modificó el código fuente.
 
-#### 4.2.4. Bounded Context Software Architecture Code Level Diagrams.
+### 4.2.4. Bounded Context: Payment
+
+Payment gestiona los pagos asociados a las órdenes de combustible. Registra un pago para una orden, valida que el monto coincida con el total de la orden, permite completar o reembolsar el pago y restringe el acceso según la compañía compradora o el proveedor relacionado con la orden.
+
+#### 4.2.4.1. Domain Layer
+
+El agregado raíz es Payment, ubicado en payment.domain.model.aggregates. Conserva orderId, companyId, amount, status, paymentMethod, transactionReference y paidAt. PaymentStatus y PaymentMethod son value objects que restringen el estado y el medio de pago.
+
+Los comandos son CreatePaymentCommand, CompletePaymentCommand y RefundPaymentCommand. Las consultas son GetAllPaymentsQuery, GetPaymentByIdQuery, GetPaymentByOrderIdQuery y GetPaymentsByCompanyIdQuery. PaymentRepository es el puerto de persistencia del dominio.
+
+#### 4.2.4.2. Interface Layer
+
+PaymentsController transforma los resources mediante assemblers y expone:
+
+- POST /api/v1/payments
+- POST /api/v1/payments/{paymentId}/complete
+- POST /api/v1/payments/{paymentId}/refund
+- GET /api/v1/payments
+- GET /api/v1/payments/{paymentId}
+- GET /api/v1/payments/order/{orderId}
+- GET /api/v1/payments/company/{companyId}
+
+CreatePaymentResource, CompletePaymentResource y PaymentResource definen los contratos REST. El controlador valida la compañía propietaria, la relación con la orden y el acceso del proveedor antes de completar o reembolsar un pago. PaymentController permanece como clase vacía; el controlador operativo es PaymentsController.
+
+#### 4.2.4.3. Application Layer
+
+PaymentCommandServiceImpl evita pagos duplicados por orden, crea el agregado y coordina la persistencia. Al completar un pago actualiza también la orden relacionada mediante FuelOrderRepository; al reembolsar cambia el estado a REFUNDED. PaymentQueryServiceImpl resuelve búsquedas por id, orden, compañía o colección.
+
+Flujo: PaymentsController → servicio de aplicación → Payment → PaymentRepository. La consulta de la orden se realiza mediante los puertos de Ordering para validar el monto y actualizar su estado.
+
+#### 4.2.4.4. Infrastructure Layer
+
+PaymentPersistenceEntity se mapea a la tabla `payments` y conserva la orden, compañía, monto, estado, método de pago, referencia de transacción y fecha de pago. PaymentPersistenceAssembler transforma entre JPA y dominio; PaymentPersistenceRepository provee Spring Data; y PaymentRepositoryImpl implementa el puerto PaymentRepository.
+
+#### 4.2.4.5. Bounded Context Software Architecture Component Level Diagram
+
+Payment se integra con Ordering para validar y actualizar el ciclo de vida de la orden. IAM aporta la identidad y ownership de la compañía; Reporting consume los pagos completados para calcular ingresos y gastos.
+
+#### 4.2.4.6. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Crear pago con monto de la orden | 201 Created |
+| Rechazar monto distinto al total | 400 Bad Request |
+| Completar pago | 200 OK |
+| Reembolsar pago | 200 OK |
+| Consultar pago propio | 200 OK |
+| Consultar pago sin ownership | 404 Not Found |
+
+### 4.2.5. Bounded Context: Reporting & Analytics
+
+Reporting & Analytics genera indicadores de la plataforma a partir de órdenes, pagos y entregas. No mantiene un agregado persistente propio: calcula vistas de lectura para administradores, compradores y proveedores usando los servicios de consulta de Ordering, Payment y Fulfillment.
+
+#### 4.2.5.1. Domain Layer
+
+El dominio está representado por los value objects PlatformSummary, BuyerAnalytics, ProviderAnalytics y MonthlyAmount. PlatformSummary resume órdenes, entregas, pagos, ingresos y pendientes; BuyerAnalytics resume gasto y pagos de una compañía compradora; ProviderAnalytics resume órdenes, cancelaciones e ingresos de un proveedor; MonthlyAmount agrupa importes por mes.
+
+Las consultas son GetPlatformSummaryQuery, GetBuyerAnalyticsQuery y GetProviderAnalyticsQuery. AnalyticsQueryService es el contrato de aplicación para resolverlas.
+
+#### 4.2.5.2. Interface Layer
+
+AnalyticsController expone:
+
+- GET /api/v1/analytics/platform
+- GET /api/v1/analytics/providers/{providerId}
+- GET /api/v1/analytics/buyers/{companyId}
+
+PlatformSummaryResource, BuyerAnalyticsResource y ProviderAnalyticsResource representan las respuestas. El resumen de plataforma requiere ROLE_ADMIN; las vistas de proveedor y comprador validan ownership con CurrentUserAccess.
+
+#### 4.2.5.3. Application Layer
+
+AnalyticsQueryServiceImpl coordina FuelOrderQueryService, PaymentQueryService y DeliveryQueryService. Calcula totales, ingresos de pagos completados, estados de órdenes y entregas, y agrupaciones mensuales mediante YearMonth.
+
+Flujo: AnalyticsController → AnalyticsQueryService → consultas de Ordering, Payment y Fulfillment → value objects de analytics.
+
+#### 4.2.5.4. Infrastructure Layer
+
+Reporting no tiene entidades JPA, repositorios ni tablas propias. Su infraestructura está formada por los servicios de consulta de los contextos que proveen los datos y por los assemblers que convierten los value objects en resources REST. Esta decisión mantiene los reportes como una vista derivada del estado operativo.
+
+#### 4.2.5.5. Bounded Context Software Architecture Component Level Diagram
+
+Reporting actúa como consumidor de información de Ordering, Payment y Fulfillment. IAM protege cada consulta mediante roles y ownership; el contexto no modifica los agregados de los contextos consultados.
+
+#### 4.2.5.6. Runtime Evidence
+
+| Operación | Resultado |
+|---|---:|
+| Consultar resumen de plataforma como administrador | 200 OK |
+| Consultar resumen de plataforma sin rol admin | 403 Forbidden |
+| Consultar analytics de proveedor propio | 200 OK |
+| Consultar analytics de otro proveedor | 403 Forbidden |
+| Consultar analytics de compañía propia | 200 OK |
+
+#### 4.2.6. Bounded Context Software Architecture Code Level Diagrams.
 
 Presenta los diagramas que descienden al nivel de código, contrastando el modelo de objetos del dominio con el diseño de la base de datos. Estos diagramas complementan al *Component Diagram* de la API Application y a los contenedores definidos, proporcionando una vista centrada en clases, relaciones y responsabilidades.
 
-##### 4.2.4.1. Bounded Context Domain Layer Class Diagrams.
+##### 4.2.6.1. Bounded Context Domain Layer Class Diagrams.
 
 A nivel de clases se modelan, por un lado, las clases del frontend en función de los módulos y vistas que consumen los servicios expuestos por la API y, por otro, las clases del backend que reflejan la implementación detallada de los módulos definidos como componentes dentro de la API.
 
@@ -547,7 +640,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_inventory.png" alt="Backend Inventory"/>
 </div>
 
-##### 4.2.4.2. Bounded Context Database Design Diagram.
+##### 4.2.6.2. Bounded Context Database Design Diagram.
 
 La base de datos relacional almacena todos los datos del dominio del sistema. Las tablas se organizan en correspondencia directa con los *bounded contexts* definidos en el diseño orientado a objetos. A continuación, se detalla qué tablas pertenecen a cada contexto y cuál es su responsabilidad dentro del modelo de datos.
 
