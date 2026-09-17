@@ -1,6 +1,6 @@
 # Capítulo IV: Solution Software Design
 
-El presente capítulo describe el diseño de la solución de software de **FullTank**, elaborado por la startup **PrimeFuel**, aplicando los principios de **Domain-Driven Design (DDD)** y el modelo **C4** para la documentación de la arquitectura. El diseño se organiza en dos niveles complementarios: un nivel **estratégico**, donde se delimita el dominio, se descubren los *bounded contexts* y se establecen sus relaciones; y un nivel **táctico**, donde cada contexto se detalla en sus capas de dominio, interfaz, aplicación e infraestructura, junto con sus diagramas de componentes y de código.
+El presente capítulo describe el diseño de la solución de software de **FullTank**, elaborado por la startup **PrimeFuel**, aplicando los principios de **Domain-Driven Design (DDD)** y el modelo **C4** para la documentación de la arquitectura. El cliente principal del sistema es el **Distribuidor Logístico de Combustible**; el comprador asociado participa mediante un dispositivo IoT instalado en su tanque. Por ello, el flujo arquitectónico inicia en una lectura de nivel bajo y continúa con la generación idempotente del pedido, la aceptación del distribuidor, la asignación automática de conductor y cisterna, el despacho, la telemetría, el control de válvulas y el cierre de la entrega. El diseño se organiza en dos niveles complementarios: un nivel **estratégico**, donde se delimita el dominio, se descubren los *bounded contexts* y se establecen sus relaciones; y un nivel **táctico**, donde cada contexto se detalla en sus capas de dominio, interfaz, aplicación e infraestructura, junto con sus diagramas de componentes y de código.
 
 ## 4.1. Strategic-Level Domain-Driven Design
 
@@ -23,11 +23,11 @@ A partir de la sesión de Event Storming se identificaron los siguientes context
 
 1. **IAM (Identity and Access Management):** autenticación, autorización y gestión de credenciales dentro del sistema. Administra procesos como el registro de clientes y proveedores, inicio de sesión, recuperación de contraseñas y asignación de permisos según el rol. Su propósito es garantizar accesos seguros y controlados, asegurando que cada usuario interactúe únicamente con las funcionalidades que le corresponden dentro de la plataforma.
 
-2. **Catalog:** gestión de la visualización y consulta de empresas proveedoras y los productos de combustible que ofrecen dentro del sistema. Su propósito es permitir que los solicitantes puedan explorar, comparar y evaluar diferentes opciones de combustible según disponibilidad, características y oferta de cada proveedor, facilitando así la toma de decisiones para seleccionar el producto más adecuado para sus equipos y operaciones.
+2. **Catalog:** gestión de los productos y condiciones de abastecimiento que el distribuidor ofrece a sus compradores asociados. Su propósito es validar el tipo de combustible, las unidades de medida y las condiciones que debe cumplir una solicitud generada por el tanque IoT.
 
-3. **Ordering:** gestión del ciclo de vida de las solicitudes y órdenes realizadas por los clientes. Administra procesos como la creación de solicitudes, validación, aceptación o rechazo por parte del proveedor, generación de órdenes, despacho, confirmación de entrega y cierre del pedido. Su propósito es orquestar el flujo principal del negocio, asegurando que cada pedido siga un proceso claro, trazable y consistente desde su inicio hasta su finalización.
+3. **Ordering:** gestión del ciclo de vida de las solicitudes y órdenes iniciadas por eventos IoT o por una operación de contingencia. Administra la validación del nivel, la generación idempotente de solicitudes, la aceptación o rechazo por parte del distribuidor, la creación de órdenes, el despacho, la confirmación y el cierre. Su propósito es orquestar el flujo principal del negocio desde el evento `LowFuelLevelDetected` hasta la entrega.
 
-4. **Fulfillment:** gestión logística necesaria para cumplir con las órdenes generadas. Administra procesos como el registro de transportes y conductores, asignación de recursos a pedidos y ejecución del despacho. Su propósito es garantizar que la entrega del combustible se realice de manera eficiente, coordinando los recursos logísticos involucrados en la distribución.
+4. **Fulfillment:** gestión logística necesaria para cumplir con las órdenes generadas. Administra el registro de cisternas y conductores, la validación de capacidad, compatibilidad, habilitación y disponibilidad, la recomendación automática de recursos y la ejecución del despacho. Su propósito es garantizar que cada pedido sea asignado a recursos válidos antes de iniciar la entrega.
 
 5. **Payment:** gestión de los pagos asociados a las órdenes. Administra procesos como la solicitud de pago, registro de transacciones y aprobación del pago. Su propósito es asegurar que las operaciones económicas se realicen de manera confiable, validando que los pedidos cuenten con el respaldo financiero necesario antes de su ejecución o finalización.
 
@@ -35,20 +35,25 @@ A partir de la sesión de Event Storming se identificaron los siguientes context
 
 7. **Reporting & Analytics:** generación y visualización de reportes basados en la información del sistema. Administra procesos como la elaboración de reportes de ventas, consumo y métricas operativas. Su propósito es proporcionar información clave para la toma de decisiones, permitiendo analizar el comportamiento del negocio y optimizar sus procesos.
 
-8. **Inventory:** gestión de los productos de combustible ofrecidos por los proveedores dentro del sistema. Administra procesos como el registro, actualización y eliminación de productos, así como la modificación de información relacionada con precios, disponibilidad y características del combustible. Su propósito es permitir que los proveedores mantengan actualizado su inventario, asegurando que los solicitantes puedan consultar ofertas vigentes y seleccionar el producto más adecuado para sus necesidades operativas.
+8. **Inventory:** gestión de los productos de combustible ofrecidos por los distribuidores dentro del sistema. Administra procesos como el registro, actualización y eliminación de productos, así como la disponibilidad que debe validar el distribuidor antes de aceptar una solicitud IoT.
 
-9. **Equipment:** gestión y monitoreo de los equipos pertenecientes a los clientes o solicitantes dentro del sistema. Administra procesos como el registro y actualización de equipos, así como la visualización de su estado operativo y el nivel de combustible disponible en cada uno. Su propósito es permitir a los solicitantes supervisar sus hornos, maquinarias, tanques y otros equipos relacionados, facilitando el control del consumo de combustible y la planificación eficiente de sus operaciones.
+9. **Equipment e IoT Tank Monitoring:** gestión de los tanques asociados y de los dispositivos IoT instalados en ellos. Administra el registro del dispositivo, la configuración del umbral, la recepción de lecturas, la validación de la asociación tanque-comprador y la emisión del evento `LowFuelLevelDetected`. Su propósito es iniciar de forma confiable el pedido automático que será procesado por Ordering.
+
+La delimitación estratégica establece que **Equipment e IoT Tank Monitoring** es el contexto iniciador, **Ordering** es el núcleo transaccional, **Fulfillment** resuelve la asignación de recursos y el despacho, y **Notification**, **Reporting & Analytics** y **IAM** actúan como capacidades transversales. La telemetría de la cisterna y el control de válvulas se consideran capacidades de seguridad y trazabilidad vinculadas a Fulfillment, no funcionalidades aisladas de seguimiento GPS.
 
 #### 4.1.1.2. Domain Message Flows Modeling
 
 Una vez definidos los contextos candidatos, el equipo modeló los flujos de mensajes del dominio que los conectan. Para cada flujo se identifican el comando que inicia la interacción, el evento de dominio que produce el contexto receptor y la política que reacciona a dicho evento, incluyendo los eventos de integración que cruzan los límites de cada contexto.
 
-- **Registro y acceso:** un visitante registra su empresa (solicitante o proveedora) en *IAM*, que habilita la creación de pedidos en *Ordering*.
-- **Ciclo de vida del pedido:** *Ordering* orquesta la creación de la solicitud, la aprobación o rechazo del pedido, el despacho, la confirmación de entrega y el cierre, coordinando al resto de contextos.
+- **Asociación del tanque:** un distribuidor registra al comprador asociado, el tanque y el dispositivo en *IAM* y *Equipment e IoT Tank Monitoring*. La configuración del umbral queda vinculada al dispositivo y al producto.
+- **Inicio automático:** el dispositivo publica una lectura; cuando el nivel es igual o inferior al umbral, *Equipment e IoT Tank Monitoring* emite `LowFuelLevelDetected`. Una política de integración solicita a *Ordering* crear una solicitud idempotente.
+- **Ciclo de vida del pedido:** *Ordering* valida comprador, producto, volumen, punto de entrega y distribuidor asociado; notifica la solicitud, registra la aceptación o rechazo y crea la orden atendible.
+- **Asignación de recursos:** *Fulfillment* recibe `OrderAccepted`, consulta la capacidad y disponibilidad de cisternas y conductores y devuelve una recomendación válida. La confirmación de la asignación publica `ResourcesAssigned`.
+- **Despacho seguro:** *Fulfillment* inicia el viaje y correlaciona telemetría, geocerca y estado de válvula. Una política permite o bloquea la descarga y publica `DeliveryDispatched`, `ValveOpeningAuthorized` o `ValveOpeningBlocked`.
+- **Cierre y trazabilidad:** la recepción publica `CargoReceived`; *Ordering* cierra la orden, *Notification* informa a las partes y *Reporting & Analytics* conserva los indicadores de tiempo, volumen, capacidad y excepciones.
 - **Validación financiera:** *Payment* valida que el monto total coincida con el precio del combustible solicitado antes de habilitar la aprobación de la orden en *Ordering*.
-- **Logística y despacho:** *Fulfillment* asigna transporte y conductor a una orden aprobada y libera ambos recursos cuando la orden se cierra.
 - **Actualización de inventario:** *Ordering* descuenta el stock en *Inventory* al cerrar las órdenes, y *Catalog* consume datos de *Inventory* para mostrar disponibilidad.
-- **Comunicación transversal:** *Notification* reacciona a los cambios de estado de las órdenes, y *Reporting & Analytics* consume datos de órdenes cerradas para generar agregados analíticos.
+- **Comunicación transversal:** *Notification* reacciona a eventos de nivel, aceptación, asignación, alerta y entrega; *Reporting & Analytics* consume la bitácora completa para generar indicadores operativos y de trazabilidad.
 
 #### 4.1.1.3. Bounded Context Canvases
 
@@ -110,16 +115,17 @@ A continuación se presenta el diagrama de cada *bounded context* identificado, 
 
 ### 4.1.2. Context Mapping
 
-El *Context Mapping* describe cómo se relacionan los *bounded contexts* identificados y qué dependencias existen entre ellos. El diagrama completo del backend muestra la organización de todos los *bounded contexts* como módulos independientes dentro del sistema, donde el *bounded context* de **Ordering** actúa como núcleo del sistema y coordina a los demás contextos mediante interfaces.
+El *Context Mapping* describe cómo se relacionan los *bounded contexts* identificados y qué dependencias existen entre ellos. El diagrama completo del backend muestra la organización de todos los *bounded contexts* como módulos independientes dentro del sistema. En el flujo actualizado, **Equipment e IoT Tank Monitoring** inicia la interacción mediante eventos de nivel, **Ordering** actúa como núcleo transaccional y **Fulfillment** determina los recursos de transporte y ejecuta el despacho.
 
 Las principales dependencias entre contextos incluyen:
 
-- Verificación de pagos antes de aprobar órdenes (*Payment* → *Ordering*).
-- Gestión y liberación de recursos logísticos (*Ordering* → *Fulfillment*).
-- Validación y actualización de inventario (*Ordering* → *Inventory*).
-- Lectura de disponibilidad y validación de compatibilidad de productos (*Catalog* → *Inventory* y *Equipment*).
-- Generación de notificaciones ante cambios de estado (*Ordering* / *Fulfillment* → *Notification*).
-- Alimentación de datos para reportes y análisis (*Ordering* → *Reporting & Analytics*).
+- Publicación de lecturas y eventos de nivel bajo (*Equipment e IoT Tank Monitoring* → *Ordering*).
+- Validación de comprador, producto, volumen y distribuidor asociado (*Ordering* → *Catalog* / *Inventory*).
+- Solicitud de aceptación y emisión de `OrderAccepted` o `OrderRejected` (*Ordering* → *Notification*).
+- Recomendación y confirmación de conductor y cisterna (*Ordering* → *Fulfillment*).
+- Telemetría de cisterna, geocerca y autorización de válvula (*Fulfillment* → *Notification* / *Reporting & Analytics*).
+- Verificación de pagos antes de liberar la orden cuando el modelo comercial lo requiera (*Payment* → *Ordering*).
+- Alimentación de datos de pedidos, asignaciones, lecturas y entregas para reportes (*Ordering* / *Fulfillment* → *Reporting & Analytics*).
 
 Todas las interacciones entre *bounded contexts* se realizan a través de interfaces, evitando dependencias directas de implementación y favoreciendo el desacoplamiento.
 
@@ -129,7 +135,7 @@ La arquitectura de software de FullTank se documenta mediante el **modelo C4**, 
 
 #### 4.1.3.1. Software Architecture System Landscape Diagram
 
-El **System Landscape Diagram** muestra el panorama general en el que se inserta FullTank, incluyendo a sus usuarios (empresas solicitantes y proveedores de combustible) y los sistemas externos con los que interactúa, como la plataforma de sensores IoT, la pasarela de pagos y el servicio de correo electrónico.
+El **System Landscape Diagram** muestra el panorama general en el que se inserta FullTank, incluyendo al Distribuidor Logístico de Combustible como cliente principal, al comprador asociado como usuario del tanque instrumentado y los sistemas externos con los que interactúa, como el dispositivo IoT, la pasarela de pagos y el servicio de correo electrónico.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/landspace-diagram.png" alt="Landspace Diagram" width="500"/>
@@ -142,8 +148,9 @@ En este nivel se presenta una vista de alto nivel de la arquitectura, donde el f
 El *context diagram* muestra al FullTank Platform como un recuadro central, rodeado por los principales actores y sistemas con los que se comunica:
 
 - **Visitor:** usuario anónimo que navega la landing page para conocer la plataforma, revisar sus beneficios y registrarse en el sistema.
-- **Client (Requester):** representante de una empresa que requiere combustible. Interactúa con la plataforma para explorar el catálogo de proveedores y sus productos, gestionar sus equipos (vehículos, generadores, maquinaria), crear solicitudes de abastecimiento, registrar pagos, hacer seguimiento de pedidos y confirmar entregas.
-- **Provider:** representante de una empresa proveedora de combustible. Gestiona su inventario de productos, evalúa solicitudes entrantes, aprueba o rechaza pedidos, asigna recursos logísticos (transporte y conductores) y ejecuta despachos.
+- **Associated Buyer:** representante de la empresa compradora cuyo tanque tiene instalado el dispositivo IoT. Consulta el nivel, el pedido generado y el estado de la entrega, y puede confirmar la recepción.
+- **Fuel Distributor:** representante del Distribuidor Logístico de Combustible. Administra compradores asociados, acepta o rechaza solicitudes, mantiene la flota, revisa recomendaciones de conductor y cisterna, supervisa el despacho y consulta la trazabilidad.
+- **Tank IoT Device:** dispositivo externo que transmite el nivel del tanque y otros datos configurados. Su evento `LowFuelLevelDetected` inicia el flujo de solicitud en FullTank.
 - **Email Service:** sistema externo encargado de enviar correos electrónicos, principalmente para la recuperación de contraseñas y notificaciones relacionadas a autenticación.
 - **Cloud Storage:** sistema externo utilizado para almacenar comprobantes de pago (vouchers) cargados por los clientes.
 - **PDF Generator Service:** sistema externo encargado de generar reportes en formato PDF, como resúmenes de consumo y ventas.
@@ -162,11 +169,12 @@ En el nivel de contenedores, la atención se centra en cómo se organiza interna
 La arquitectura lógica de FullTank se estructura en los siguientes contenedores:
 
 - **Landing Page:** aplicación web estática que presenta la propuesta de valor del sistema, incluyendo secciones como descripción del servicio, beneficios, testimonios, precios, preguntas frecuentes y contacto. Está desarrollada con HTML, CSS y JavaScript, y orientada a usuarios no autenticados.
-- **FullTank Web Application (SPA):** aplicación web principal desarrollada en Vue.js 3 con Pinia como gestor de estado y Vue Router para navegación protegida por roles. Es utilizada por clientes y proveedores para interactuar con el sistema. Del lado del cliente contiene módulos como catálogo de proveedores, gestión de equipos, solicitudes, pagos, reportes de consumo y notificaciones. Del lado del proveedor incluye módulos de inventario, gestión de órdenes, flota y despacho, reportes de ventas y listado de clientes.
-- **FullTank API:** backend desarrollado en ASP.NET Core 8 con Entity Framework Core que expone una API REST. Centraliza la lógica de negocio, reglas de validación y orquestación de procesos, organizados en nueve *bounded contexts* del dominio: Identity & Access, Catalog, Equipment, Inventory, Ordering, Payment, Fulfillment, Notification y Reporting & Analytics.
-- **MySQL Database:** base de datos relacional donde se almacena toda la información estructurada del sistema, incluyendo usuarios, proveedores, productos, equipos, solicitudes, órdenes, pagos, inventario, flota, despachos, notificaciones y reportes.
+- **FullTank Web Application (SPA):** aplicación web principal desarrollada en Vue.js 3 con Pinia como gestor de estado y Vue Router para navegación protegida por roles. El distribuidor utiliza módulos de tanques asociados, solicitudes IoT, aceptación, asignación de flota, despachos, telemetría, alertas y reportes; el comprador asociado consulta el nivel, el estado del pedido y la entrega.
+- **FullTank API:** backend desarrollado en ASP.NET Core 8 con Entity Framework Core que expone una API REST. Centraliza la lógica de negocio, reglas de validación y orquestación de procesos, organizados en los *bounded contexts* de IAM, Equipment e IoT Tank Monitoring, Ordering, Inventory, Catalog, Fulfillment, Notification, Payment y Reporting & Analytics.
+- **IoT Gateway and Device Ingestion:** componente encargado de recibir lecturas del dispositivo del tanque, validar identidad, normalizar unidades, almacenar temporalmente los mensajes y publicar eventos idempotentes como `LowFuelLevelDetected` hacia la API o el broker de mensajería.
+- **MySQL Database and Telemetry Store:** la base relacional conserva usuarios, compradores, tanques, pedidos, órdenes, asignaciones, flota, despachos, notificaciones y reportes. Las lecturas de nivel, ubicación, válvulas y eventos de entrega se conservan en un almacenamiento de telemetría o en tablas particionadas por dispositivo y viaje.
 
-En el diagrama se observa que los usuarios acceden inicialmente a la Landing Page, desde donde pueden registrarse o ingresar a la aplicación principal. La Web Application (SPA) se comunica exclusivamente con la API mediante peticiones HTTPS utilizando formato JSON a través de un cliente HTTP centralizado (Axios) con interceptor JWT. La API persiste y consulta datos en la base de datos MySQL mediante Entity Framework Core. Adicionalmente, la API se integra con sistemas externos: Email Service para correos de recuperación de contraseña, Cloud Storage para almacenamiento de comprobantes de pago y PDF Generator Service para la generación de reportes descargables.
+En el diagrama se observa que los usuarios acceden inicialmente a la Landing Page, desde donde pueden registrarse o ingresar a la aplicación principal. La Web Application (SPA) se comunica con la API mediante HTTPS y JSON a través de Axios con interceptor JWT. El dispositivo IoT del tanque transmite a través del gateway y un canal seguro; la API valida la identidad del dispositivo y procesa `LowFuelLevelDetected` de forma idempotente antes de crear la solicitud en Ordering. La API persiste datos transaccionales en MySQL y telemetría en el almacenamiento de eventos. Adicionalmente, se integra con Email Service, Cloud Storage, PDF Generator Service y, cuando corresponda, un broker MQTT sobre TLS.
 
 Esta vista permite entender la distribución de responsabilidades entre la capa de presentación (Landing Page y SPA), la capa de lógica de negocio (API) y la capa de persistencia (Database), así como las principales decisiones tecnológicas adoptadas.
 
@@ -177,7 +185,7 @@ Esta vista permite entender la distribución de responsabilidades entre la capa 
 
 #### 4.1.3.4. Software Architecture Deployment Diagrams
 
-El **Deployment Diagram** describe la distribución física de los contenedores en la infraestructura de despliegue, incluyendo los entornos de producción y desarrollo, los servicios de hosting de frontend y backend, la base de datos y los dispositivos IoT instalados en las instalaciones de las empresas solicitantes.
+El **Deployment Diagram** describe la distribución física de los contenedores en la infraestructura de despliegue, incluyendo los entornos de producción y desarrollo, los servicios de hosting de frontend y backend, la base de datos, el gateway de ingestión y los dispositivos IoT instalados en los tanques de los compradores asociados. El dispositivo debe poder almacenar lecturas durante una interrupción temporal y reenviarlas de manera idempotente cuando recupere la conectividad.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/deploy-diagram.png" alt="Deploy Diagrams" width="500"/>
@@ -185,11 +193,11 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Catalog**, **Fulfillment**, **Ordering**, **Payment** y **Reporting**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime disponible. La documentación se basa en los artefactos de diseño y en la evidencia funcional conservada en este repositorio; las secciones sin capturas runtime se identifican explícitamente.
+En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Catalog**, **Equipment e IoT Tank Monitoring**, **Fulfillment**, **Ordering**, **Payment** y **Reporting**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime disponible. La documentación se basa en los artefactos de diseño y en la evidencia funcional conservada en este repositorio; las capacidades IoT, de asignación automática y de control de válvulas que todavía no cuenten con evidencia runtime se identifican explícitamente como evolución arquitectónica propuesta.
 
 ### 4.2.1. Bounded Context: IAM
 
-IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios y compañías compradoras o proveedoras, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
+IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios, compradores asociados y Distribuidores Logísticos de Combustible, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
 
 #### Cross-Cutting Bounded Context Software Architecture Component Level Diagrams.
 
@@ -197,17 +205,17 @@ En el nivel de componentes se detalla la descomposición interna de los contened
 
 El *component diagram* organiza la arquitectura interna siguiendo los *bounded contexts* definidos en el dominio. Cada uno representa un módulo backend con responsabilidades específicas:
 
-- **Identity & Access BC:** gestiona el registro de usuarios (clientes y proveedores), autenticación mediante credenciales de correo electrónico y contraseña, autorización basada en roles, emisión de tokens JWT, recuperación de contraseñas y administración de perfiles. Redirige al usuario según su rol tras el inicio de sesión.
-- **Catalog BC:** *bounded context* orientado al cliente que permite explorar los proveedores disponibles en la plataforma, consultar el catálogo de productos (tipos de combustible, precios por litro) que ofrece cada proveedor y asignar productos seleccionados a los equipos registrados del cliente. Consume datos del *Inventory BC* para obtener disponibilidad y del *Equipment BC* para validar compatibilidad de tipo de combustible.
-- **Equipment BC:** gestiona los equipos del cliente, tales como vehículos, generadores y maquinaria. Cada equipo registra su tipo, marca, modelo, tipo de combustible requerido, capacidad del tanque y estado operativo. Permite al cliente agregar, actualizar, eliminar y listar sus equipos, así como asignar o cambiar el tipo de combustible asociado.
+- **Identity & Access BC:** gestiona el registro de usuarios (compradores asociados y distribuidores), autenticación mediante credenciales de correo electrónico y contraseña, autorización basada en roles, emisión de tokens JWT, recuperación de contraseñas y administración de perfiles. Redirige al usuario según su rol tras el inicio de sesión.
+- **Catalog BC:** *bounded context* que permite gestionar los productos y las condiciones de abastecimiento ofrecidas por el distribuidor. Consume datos de *Inventory* para validar disponibilidad y de *Equipment e IoT Tank Monitoring* para comprobar que el producto sea compatible con el tanque asociado.
+- **Equipment e IoT Tank Monitoring BC:** gestiona compradores asociados, tanques, dispositivos, umbrales y lecturas. Valida la identidad del dispositivo, normaliza la medición y publica `LowFuelLevelDetected` sin crear directamente la orden, manteniendo la responsabilidad transaccional en *Ordering*.
 - **Inventory BC:** *bounded context* orientado al proveedor que administra el inventario de combustible, incluyendo niveles de stock disponible y precio por litro según tipo de combustible. Valida la información de los ítems al momento de registro o actualización y notifica al administrador ante cambios relevantes.
-- **Ordering BC:** orquesta el ciclo de vida completo de las órdenes, desde la creación de solicitudes por parte del cliente hasta su cierre por parte del proveedor. Incluye las operaciones de creación de solicitud, cancelación, aceptación, rechazo, despacho, confirmación de entrega y cierre. Valida la información de cada solicitud, notifica al proveedor o cliente según corresponda y, al cerrar una orden, descuenta el inventario correspondiente.
+- **Ordering BC:** orquesta el ciclo de vida completo de las solicitudes y órdenes, desde `LowFuelLevelDetected` o una solicitud manual de contingencia hasta su aceptación, rechazo, despacho, confirmación y cierre. Garantiza la idempotencia del pedido generado por IoT, valida producto, volumen y distribuidor asociado y notifica a los actores según corresponda.
 - **Payment BC:** gestiona el registro de pagos mediante comprobantes (vouchers), valida que el monto total coincida con el precio del combustible solicitado y habilita la aprobación de órdenes una vez verificado el respaldo financiero.
-- **Fulfillment BC:** administra los recursos logísticos del proveedor, incluyendo el registro de transportes (vehículos de distribución) y conductores. Permite asignar un transporte y un conductor a una orden aprobada para su despacho, y libera ambos recursos cuando la orden es cerrada.
+- **Fulfillment BC:** administra los recursos logísticos del distribuidor, incluyendo cisternas y conductores. Recomienda o confirma la asignación según capacidad, producto, disponibilidad, habilitación y ruta; controla el ciclo de la entrega y libera los recursos cuando la orden se cierra.
 - **Notification BC:** genera notificaciones dentro del sistema en respuesta a eventos relevantes del dominio, como cambios en el estado de las órdenes (creación, aprobación, rechazo, despacho, entrega, cierre). Permite a los usuarios visualizar su historial de notificaciones y marcarlas como leídas.
-- **Reporting & Analytics BC:** procesa información histórica de órdenes cerradas para generar reportes de consumo (perspectiva del cliente) y ventas (perspectiva del proveedor), incluyendo gráficos de tendencias y la generación de archivos PDF descargables.
+- **Reporting & Analytics BC:** procesa la bitácora de eventos IoT, pedidos, asignaciones, telemetría, válvulas y entregas para generar indicadores de tiempo de atención, utilización de flota, trazabilidad, excepciones y cumplimiento, además de los reportes descargables.
 
-En el diagrama se refleja cómo la Web Application consume los servicios de cada componente backend mediante endpoints REST organizados por contexto. Cada *bounded context* accede a la base de datos para gestionar la información correspondiente a su dominio. Existen interacciones relevantes entre contextos: *Ordering* depende de *Payment* para validar pagos antes de aprobar órdenes; *Ordering* interactúa con *Fulfillment* para coordinar la asignación de flota y su liberación al cerrar órdenes; *Ordering* actualiza el stock en *Inventory* al cerrar órdenes; *Catalog* lee datos de *Inventory* para mostrar disponibilidad de productos y valida contra *Equipment* la compatibilidad de tipos de combustible; *Notification* reacciona a cambios de estado en órdenes; y *Reporting* consume datos de órdenes cerradas para generar agregados analíticos. Algunos componentes se integran con sistemas externos: *Identity & Access* con el servicio de correo electrónico, *Payment* con almacenamiento en la nube para comprobantes y *Reporting & Analytics* con el generador de PDFs.
+En el diagrama se refleja cómo la Web Application consume los servicios de cada componente backend mediante endpoints REST organizados por contexto. Cada *bounded context* accede a la base de datos para gestionar la información correspondiente a su dominio. En el flujo actualizado, *Equipment e IoT Tank Monitoring* publica eventos de nivel bajo hacia *Ordering*; *Ordering* solicita aceptación y coordina con *Fulfillment* la recomendación de recursos; *Fulfillment* consume telemetría de la cisterna, aplica las políticas de válvulas y publica eventos de entrega; *Notification* reacciona a los cambios de estado y alertas; y *Reporting* consume la bitácora completa para generar agregados analíticos. Algunos componentes se integran con sistemas externos: el gateway IoT o broker MQTT, el servicio de correo, el almacenamiento de evidencias y el generador de PDFs.
 
 De esta manera, los *component diagrams* permiten entender cómo la arquitectura se organiza internamente en módulos coherentes con el dominio, cómo se relacionan entre sí y cómo colaboran para implementar la funcionalidad completa de FullTank.
 
@@ -283,8 +291,8 @@ La vista de componentes muestra la separación entre Interfaces, Application, Do
 
 | Elemento | Descripción |
 | :------: | :---------: |
-| Propósito | Centralizar las notificaciones internas que reciben los usuarios ante eventos relevantes de órdenes, entregas o pagos. |
-| Actores | Compradores, proveedores y componentes autenticados que crean o consultan notificaciones. |
+| Propósito | Centralizar las notificaciones internas que reciben los usuarios ante eventos relevantes de solicitudes IoT, órdenes, entregas o pagos. |
+| Actores | Compradores asociados, distribuidores y componentes autenticados que crean o consultan notificaciones. |
 | Relación con otros contextos | Consulta la identidad del destinatario mediante IAM y conserva `referenceId` como referencia al evento externo, sin asumir el ciclo de vida de órdenes o usuarios. |
 
 #### 4.2.2.1. Domain Layer
@@ -363,9 +371,9 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 
 | Elemento | Descripción |
 | :------: | :---------: |
-| Propósito | Administrar el catálogo de productos de combustible ofrecidos por proveedores y publicados para compradores. |
-| Actores | Proveedores que crean y actualizan productos, y compradores que consultan el catálogo. |
-| Relación con otros contextos | Valida identidad y propiedad mediante IAM; conserva `providerId` y puede ser referenciado por solicitudes u órdenes sin incorporar su lógica al agregado. |
+| Propósito | Administrar el catálogo de productos de combustible ofrecidos por distribuidores y publicados para compradores asociados. |
+| Actores | Distribuidores que crean y actualizan productos, y compradores asociados que consultan el catálogo. |
+| Relación con otros contextos | Valida identidad y propiedad mediante IAM; conserva el identificador del distribuidor y puede ser referenciado por solicitudes u órdenes sin incorporar su lógica al agregado. |
 
 #### 4.2.3.1. Domain Layer
 
@@ -487,7 +495,7 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_catalog.png" alt="Frontend Catalog"/>
 </div>
 
-- **Ordering Frontend** — Responsabilidad: maneja las vistas del ciclo de vida completo de pedidos: creación de solicitudes, aprobación, rechazo, despacho, confirmación de entrega y cierre.
+- **Ordering Frontend** — Responsabilidad: maneja las vistas del ciclo de vida completo de pedidos: recepción de solicitudes IoT, aceptación, rechazo, asignación, despacho, confirmación de entrega y cierre.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_ordering.png" alt="Frontend Ordering"/>
@@ -499,7 +507,7 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_payment.png" alt="Frontend Payment"/>
 </div>
 
-- **Fulfillment Frontend** — Responsabilidad: maneja las vistas de gestión de recursos logísticos (por ejemplo, vehículos y operadores) y la asignación de despacho a órdenes aprobadas.
+- **Fulfillment Frontend** — Responsabilidad: maneja las vistas de gestión de cisternas y conductores, las recomendaciones automáticas de recursos, la telemetría del viaje y la asignación de despacho a órdenes aceptadas.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_fullfillment.png" alt="Frontend Fulfillment"/>
@@ -517,7 +525,7 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_reporting.png" alt="Frontend Reporting & Analytics"/>
 </div>
 
-- **Equipment Frontend** — Responsabilidad: maneja las vistas para que el cliente registre, actualice, elimine y visualice sus equipos (vehículos, generadores, maquinaria), incluyendo el tipo de combustible requerido y el estado operativo de cada uno.
+- **Equipment e IoT Tank Monitoring Frontend** — Responsabilidad: maneja las vistas para asociar compradores y tanques, configurar umbrales, consultar lecturas IoT y visualizar el estado del pedido generado automáticamente.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_equipment.png" alt="Frontend Equipment"/>
@@ -560,7 +568,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_catalog.png" alt="Backend Catalog"/>
 </div>
 
-- **Ordering Backend** — Responsabilidad: orquesta el ciclo de vida completo del pedido. Es el *bounded context* central que coordina la interacción con los demás contextos.
+- **Ordering Backend** — Responsabilidad: orquesta el ciclo de vida completo de la solicitud y el pedido, incluyendo la creación idempotente iniciada por IoT, la aceptación, el rechazo y la coordinación con Fulfillment.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_ordering.png" alt="Backend Ordering"/>
@@ -572,7 +580,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_payment.png" alt="Backend Payment"/>
 </div>
 
-- **Fulfillment Backend** — Responsabilidad: gestiona los recursos necesarios para la ejecución de entregas y su asignación a órdenes.
+- **Fulfillment Backend** — Responsabilidad: gestiona cisternas, conductores, reglas de capacidad y disponibilidad, asignación de recursos, telemetría del viaje y seguridad contextual de válvulas.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_fullfilment.png" alt="Backend Fulfillment"/>
@@ -590,7 +598,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_reporting.png" alt="Backend Reporting & Analytics"/>
 </div>
 
-- **Equipment Backend** — Responsabilidad: gestiona el registro, actualización, eliminación y consulta de los equipos del cliente, así como la asignación del tipo de combustible requerido por cada equipo.
+- **Equipment e IoT Tank Monitoring Backend** — Responsabilidad: gestiona la asociación del dispositivo al tanque del comprador, los umbrales, las lecturas, la validación de identidad y la publicación de `LowFuelLevelDetected` hacia Ordering.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_equipment.png" alt="Backend Equipment"/>
@@ -909,9 +917,9 @@ La evidencia visual de Swagger para Catalog no está incluida en este repositori
 
 | Elemento | Descripción |
 | :------: | :---------: |
-| Propósito | Coordinar los recursos logísticos del proveedor (vehículos y conductores) y gestionar el ciclo de vida de la entrega física del combustible desde que la orden es despachada hasta que se confirma su recepción o su fallo. |
-| Actores | Proveedores, que administran su flota (vehículos y conductores) y ejecutan las entregas; compradores, que consultan el estado de su entrega; administradores, que consultan el total de entregas de la plataforma. |
-| Relación con otros contextos | Al crear una entrega valida la propiedad del proveedor contra IAM, consulta la orden en **Ordering** para confirmar que pertenece a ese proveedor y la despacha (`order.dispatch()`), descuenta el stock reservado en **Inventory** (`product.updateStock()`) y, al completarla, acredita el combustible recibido en **Equipment** (`equipment.receiveFuel()`) y marca la orden como recibida (`order.receive()`). No existe un bus de eventos: la coordinación entre contextos ocurre por llamadas directas a los repositorios de esos otros dominios dentro del mismo command service, un acoplamiento fuerte característico del monolito modular.
+| Propósito | Coordinar los recursos logísticos del distribuidor (cisternas y conductores) y gestionar el ciclo de vida de la entrega física del combustible desde que la orden es despachada hasta que se confirma su recepción o su fallo. |
+| Actores | Distribuidores, que administran su flota y ejecutan las entregas; compradores asociados, que consultan el estado de su entrega; administradores, que consultan el total de entregas de la plataforma. |
+| Relación con otros contextos | Al crear una entrega valida la propiedad del distribuidor contra IAM, consulta la orden en **Ordering**, valida la capacidad y disponibilidad de la cisterna y del conductor, y registra la asignación. Durante el viaje consume telemetría, geocercas y estado de válvula; al completarla, conserva la evidencia de recepción y publica el evento para que Ordering cierre la orden, Inventory actualice el stock y Notification informe a los actores. La implementación actual utiliza llamadas directas del monolito modular; la evolución propuesta introduce eventos idempotentes para la ingestión IoT.
 
 #### 4.2.6.1. Domain Layer.
 
@@ -959,7 +967,7 @@ Solo `Delivery` tiene una capa de aplicación explícita, porque es el único ag
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
 | `DeliveryCommandService` | Command Service (Interface) | Define el contrato para crear, despachar, completar y fallar una entrega. |
-| `DeliveryCommandServiceImpl` | Command Service Implementation | Orquesta la creación de la entrega: valida que conductor y vehículo pertenezcan al proveedor y estén disponibles, valida capacidad del vehículo contra la cantidad solicitada, valida stock disponible en Inventory, evita entregas duplicadas por orden, y al completar libera conductor/vehículo, acredita combustible en Equipment y marca la orden como recibida. |
+| `DeliveryCommandServiceImpl` | Command Service Implementation | Orquesta la creación de la entrega: valida que conductor y cisterna pertenezcan al distribuidor y estén disponibles, valida capacidad y compatibilidad contra la cantidad y producto solicitados, evita entregas duplicadas por orden, registra la recomendación o asignación y al completar libera los recursos y publica la evidencia de recepción. |
 | `DeliveryQueryService` | Query Service (Interface) | Define el contrato para consultar por id, por orden y el listado completo. |
 | `DeliveryQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas delegando en `DeliveryRepository`. |
 
@@ -1023,9 +1031,9 @@ Solo `Delivery` tiene una capa de aplicación explícita, porque es el único ag
 
 | Elemento | Descripción |
 |---|---|
-| Propósito | Gestionar la solicitud y la orden de combustible entre una empresa compradora y un proveedor, desde la solicitud inicial hasta su confirmación o cancelación. |
-| Actores | Compradores que crean solicitudes y confirman/cancelan órdenes; proveedores que aceptan o rechazan solicitudes. |
-| Relación con otros contextos | Consulta Inventory (`FuelProductQueryService`) para validar el producto y calcular el precio total; referencia `equipmentId` de Equipment y es consumido por Payment, Fulfillment y Reporting mediante el `orderId`, sin bus de eventos ni transacción distribuida entre módulos. |
+| Propósito | Gestionar la solicitud y la orden de combustible desde el evento IoT de nivel bajo o una operación manual de contingencia hasta su aceptación, asignación, despacho, confirmación y cierre. |
+| Actores | Dispositivo IoT y comprador asociado que originan la solicitud; distribuidores que aceptan o rechazan; Fulfillment que asigna recursos y ejecuta el despacho. |
+| Relación con otros contextos | Consume `LowFuelLevelDetected` desde Equipment e IoT Tank Monitoring, consulta Inventory para validar producto y disponibilidad, solicita recursos a Fulfillment, notifica estados mediante Notification y es consumido por Payment y Reporting mediante el `orderId` y el `tripId`. La evolución propuesta utiliza eventos idempotentes en lugar de crear solicitudes duplicadas. |
 
 #### 4.2.7.1. Domain Layer
 
@@ -1033,10 +1041,10 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 
 | Clase | Tipo | Propósito |
 |---|---|---|
-| `FuelOrder` | Aggregate Root | Gestiona compañía, proveedor, producto, equipo, cantidad, precio total, dirección y fecha programada. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()` como comportamiento del dominio. |
-| `OrderStatus` | Value Object | Restringe los estados de la orden: `PENDING`, `CONFIRMED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED`, `CANCELLED`. |
-| `RequestStatus` | Value Object | Restringe los estados de la solicitud: `PENDING`, `APPROVED`, `REJECTED`. |
-| `CreateFuelOrderCommand` | Domain Command | Define los datos necesarios para crear una orden (comprador, proveedor, producto, equipo, cantidad, dirección, fecha). |
+| `FuelOrder` | Aggregate Root | Gestiona comprador asociado, distribuidor, tanque, dispositivo de origen, producto, volumen requerido, precio total, dirección, fecha, origen IoT y estado de asignación. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()` como comportamiento del dominio. |
+| `OrderStatus` | Value Object | Restringe los estados de la orden: `PENDING_ACCEPTANCE`, `ACCEPTED`, `RESOURCE_ASSIGNED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED`, `CANCELLED`. |
+| `RequestStatus` | Value Object | Restringe los estados de la solicitud: `PENDING`, `ACCEPTED`, `REJECTED`, `DUPLICATE`, `EXPIRED`. |
+| `CreateFuelOrderCommand` | Domain Command | Define los datos necesarios para crear una orden (comprador, distribuidor, tanque, dispositivo, producto, cantidad, dirección, fecha y `sourceEventId`). |
 | `ConfirmFuelOrderCommand` | Domain Command | Identifica la orden que debe confirmarse. |
 | `CancelFuelOrderCommand` | Domain Command | Identifica la orden que debe cancelarse. |
 | `GetAllFuelOrdersQuery` | Domain Query | Define la consulta de todas las órdenes. |
@@ -1072,7 +1080,7 @@ El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal re
 | `FuelOrderCommandServiceImpl` | Command Service Implementation | Consulta `FuelProductQueryService` de Inventory para calcular el precio, construye el agregado, lo persiste y delega las transiciones de estado al propio `FuelOrder`. Devuelve `Result<FuelOrder, ApplicationError>`. |
 | `FuelOrderQueryService` | Query Service (Interface) | Define el contrato para consultar por id, compañía, proveedor o colección completa. |
 | `FuelOrderQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega la recuperación al puerto `FuelOrderRepository`. |
-| `FuelRequestService` | Command/Query Service (clase concreta, sin interfaz) | Concentra `create`, `accept`, `reject` y `findAll`/`findById` de las solicitudes. `accept` construye un `CreateFuelOrderCommand`, crea la `FuelOrder` vinculada por `requestId` y actualiza la solicitud a `APPROVED`, todo en una única transacción. |
+| `FuelRequestService` | Command/Query Service (clase concreta, sin interfaz) | Concentra `create`, `accept`, `reject` y `findAll`/`findById` de las solicitudes. La creación debe aceptar eventos IoT idempotentes mediante `sourceEventId`; `accept` construye un `CreateFuelOrderCommand`, crea la `FuelOrder` vinculada por `requestId` y actualiza la solicitud a `APPROVED`, todo en una única transacción. |
 
 > Nota: a diferencia de `FuelOrderCommandService`/`FuelOrderQueryService`, `FuelRequestService` no sigue el patrón interfaz + implementación; es una única clase concreta anotada con `@Service`.
 
@@ -1110,6 +1118,8 @@ Domain Layer Class Diagram - Ordering Bounded Context
 | Registrar usuario proveedor (sign-up) | 201 Created |
 | Registrar usuario comprador (sign-up) | 201 Created |
 | Crear producto de combustible (Inventory, como proveedor) | 201 Created |
+| Procesar `LowFuelLevelDetected` con tanque y distribuidor asociados | 201 Created, solicitud `PENDING` |
+| Reprocesar el mismo `sourceEventId` IoT | 200 OK o solicitud existente, sin duplicar pedido |
 | Crear solicitud (`fuel-requests`), estado inicial | 201 Created, `PENDING` |
 | Aceptar solicitud (`accept`), genera orden automáticamente | 200 OK, orden `PENDING` con `totalPrice` calculado |
 | Confirmar orden (`confirm`) | 200 OK, `CONFIRMED` |

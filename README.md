@@ -133,7 +133,7 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
       - 1.2.2.2. Lean UX Assumptions.
       - 1.2.2.3. Lean UX Hypothesis Statements.
       - 1.2.2.4. Lean UX Canvas.
-  - 1.3. Segmentos objetivo.
+  - 1.3. Segmentos objetivos.
 - Capítulo II: Requirements Elicitation & Analysis
   - 2.1. Competidores.
     - 2.1.1. Análisis competitivo.
