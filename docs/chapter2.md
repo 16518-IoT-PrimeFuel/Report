@@ -172,34 +172,11 @@ La evidencia se conserva en las dos perspectivas entrevistadas dentro de un úni
 14. ¿Qué condiciones serían necesarias para que la empresa adopte una plataforma de este tipo?
 15. Si un cliente de confianza tuviera configurada la reposición automática, ¿qué necesitarían ver en la solicitud para poder aceptarla o rechazarla con seguridad?
 
----
-
-**B. Compradores asociados**
-
-**Preguntas:**
-
-1. ¿Cuál es su cargo y qué responsabilidades tiene relacionadas con el combustible?
-2. ¿Para qué operaciones utiliza combustible la empresa?
-3. ¿La empresa cuenta con tanques de almacenamiento? ¿Qué capacidad aproximada tienen?
-4. ¿Cómo revisan actualmente el nivel de combustible de los tanques?
-5. ¿Con qué frecuencia realizan esa revisión?
-6. ¿Cómo identifican que es necesario solicitar una reposición?
-7. Cuénteme sobre la última vez que realizaron un pedido de combustible. ¿Cómo fue el proceso?
-8. ¿Por qué medio contactan actualmente al proveedor?
-9. ¿Qué problemas suelen presentarse al realizar o dar seguimiento a un pedido?
-10. ¿Alguna vez han tenido retrasos o desabastecimiento? ¿Qué consecuencias tuvo para sus operaciones?
-11. ¿Qué información necesitan consultar durante el proceso: nivel del tanque, cantidad solicitada, fecha de entrega o estado del despacho?
-12. ¿Qué herramientas utilizan actualmente, como Excel, llamadas, correos o WhatsApp?
-13. ¿Qué información les gustaría recibir automáticamente?
-14. ¿Qué dificultades podrían tener para implementar un sensor o una plataforma digital?
-15. ¿Confiarían en que la plataforma genere automáticamente la solicitud de pedido con un proveedor de su elección cuando el tanque llegue a un nivel crítico, o preferirían aprobar cada solicitud manualmente antes de que se envíe?
-
-Al finalizar cada entrevista, se puede presentar brevemente la propuesta de FullTank y preguntar cómo se adapta al proceso descrito por el entrevistado. Esta explicación debe realizarse después de las preguntas principales para evitar influir en las respuestas.
 
 ### 2.2.2 Registro de entrevistas
 
 
-**1. Perspectiva del comprador asociado dentro del segmento objetivo**
+**1. Perspectiva del Distribuidor Logístico de Combustible**
 
 - Entrevista 1:
 
@@ -315,9 +292,8 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 | **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
 | **Resumen**           | Renzo Aguilar, responsable de logística en una empresa constructora, revisa el nivel de sus tanques de forma manual y coordina pedidos por llamadas y WhatsApp sin registro centralizado. Ha sufrido paralización de maquinaria por desabastecimiento. Prefiere aprobar manualmente cada solicitud automática al menos al inicio, hasta ganar confianza en la plataforma. |
 
-**2. Perspectiva del Distribuidor Logístico de Combustible**
 
-- Entrevista 1:
+- Entrevista 4:
 
 <table>
   <thead>
@@ -374,7 +350,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 <br>
 
 
-- Entrevista 2:
+- Entrevista 5:
 
 <table>
   <thead>
@@ -420,7 +396,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 </table>
 
 
-- Entrevista 3:
+- Entrevista 6:
 
 | Campo                    | Detalle |
 |-------------------------|---------|
@@ -480,7 +456,7 @@ Basado en el análisis de las entrevistas, se definen los siguientes perfiles de
 
 ## 2.3 Needfinding
 ### 2.3.1 User Personas
-- **Segmento objetivo único: Distribuidores Logísticos de Combustible.**
+- **Segmento objetivo: Distribuidores Logísticos de Combustible.**
   - Perfil operativo asociado: comprador cuyo tanque activa el servicio IoT.
   <img src="../assets/chapter-2/mapping/userCarlos.png" alt="Captura entrevistado Carlos Ramirez"/>
 
