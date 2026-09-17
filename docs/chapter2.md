@@ -125,9 +125,9 @@ Una de las principales estrategias de **PrimeFuel** es la **especialización en 
 
 #### b. Innovación en la interfaz de usuario y experiencia
 
-El sistema de **PrimeFuel** está diseñado para ofrecer una **experiencia de usuario optimizada**, algo que **Wialon**, **FuelCloud** y la propia **OSINERGMIN** no abordan en sus plataformas. Al ser una solución especializada y dirigida a una tarea específica, podemos dedicar más recursos en crear una interfaz intuitiva y procesos bien definidos brindando comodidad y seguridad a nuestros usuarios.
+El sistema de **PrimeFuel** está diseñado para ofrecer una **experiencia de usuario optimizada**, algo que **Wialon** y **FuelCloud** no abordan en sus plataformas. Al ser una solución especializada y dirigida a una tarea específica, podemos dedicar más recursos en crear una interfaz intuitiva y procesos bien definidos, brindando comodidad y seguridad a nuestros usuarios.
 
-- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita a los usuarios acceder a reportes de consumo, validar pedidos y coordinar logística con facilidad, incluyendo una visualización clara del nivel del tanque en tiempo real y del estado de cada solicitud (pendiente, aceptada o rechazada). Además, ofrecer **soporte y formación continua** para asegurar que los usuarios aprovechen al máximo todas las funcionalidades del sistema.
+- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita al distribuidor acceder a reportes de consumo, aceptar o rechazar solicitudes y coordinar la asignación de conductor y cisterna con facilidad, incluyendo una visualización clara del nivel del tanque del comprador asociado y del estado de cada solicitud (pendiente, aceptada o rechazada). Además, ofrecer **soporte y formación continua** para asegurar que el distribuidor aproveche al máximo todas las funcionalidades del sistema.
 
 #### c. Flexibilidad en precios y modelo SaaS escalable
 El modelo de precios de **PrimeFuel** ofrece **planes escalables basados en suscripción**, lo que hace que sea más accesible para medianas y grandes empresas. Esto es más competitivo frente a **Wialon**, que puede no ser una opción viable para empresas que solo requieren una solución de pedidos de combustible. También es más asequible que **FuelCloud**, que requiere una inversión considerable en hardware, instalación y mantenimiento.
@@ -148,11 +148,11 @@ Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo
 
 ### 2.2.1. Diseño de entrevistas.
 
-Las entrevistas buscan comprender el proceso actual de abastecimiento antes de presentar la propuesta de FullTank. Por ese motivo, las preguntas se formulan de manera abierta y se enfocan en experiencias concretas, especialmente en la revisión del nivel de los tanques, la creación de pedidos y la coordinación de los despachos.
+Las entrevistas buscan comprender el proceso actual de abastecimiento antes de presentar la propuesta de FullTank. Por ese motivo, las preguntas se formulan de manera abierta y se enfocan en experiencias concretas, especialmente en la revisión del nivel de los tanques de los compradores asociados, la generación y aceptación de pedidos, la asignación de recursos y la coordinación de los despachos.
 
-La evidencia se conserva en las dos perspectivas entrevistadas dentro de un único segmento objetivo: los **Distribuidores Logísticos de Combustible**. La perspectiva del comprador asociado se utiliza para especificar el tanque, el umbral de reposición y la visibilidad que el distribuidor debe ofrecer como parte de su servicio; la perspectiva del distribuidor valida la generación automática del pedido, la aceptación de la solicitud y la selección de recursos según volumen y capacidad.
+La evidencia se conserva en un único segmento objetivo entrevistado: los **Distribuidores Logísticos de Combustible**. Las preguntas cubren tanto la operación interna del distribuidor (recepción, aceptación y asignación de pedidos) como su relación con los compradores asociados, en particular el tanque, el umbral de reposición y la visibilidad que el distribuidor debe ofrecerles como parte de su servicio integral.
 
-**A. Distribuidores Logísticos de Combustible**
+**Distribuidores Logísticos de Combustible**
 
 **Preguntas:**
 
@@ -171,6 +171,11 @@ La evidencia se conserva en las dos perspectivas entrevistadas dentro de un úni
 13. ¿Con qué sistemas tendría que integrarse una nueva plataforma?
 14. ¿Qué condiciones serían necesarias para que la empresa adopte una plataforma de este tipo?
 15. Si un cliente de confianza tuviera configurada la reposición automática, ¿qué necesitarían ver en la solicitud para poder aceptarla o rechazarla con seguridad?
+16. ¿Cómo deciden qué conductor y qué cisterna asignar a cada pedido? ¿Qué información revisan antes de asignarlos (disponibilidad, capacidad, ubicación)?
+17. ¿Con qué frecuencia ocurre que la cisterna asignada no tiene capacidad suficiente para el volumen solicitado, y cómo lo resuelven cuando sucede?
+18. ¿Qué criterios utilizan para rechazar una solicitud de un cliente, y cómo comunican ese rechazo?
+19. Una vez que la cisterna sale a despachar, ¿cómo hacen seguimiento del estado de la entrega hasta que se confirma la descarga?
+20. ¿Cuántos conductores y cisternas maneja la empresa en promedio, y cómo llevan el registro de su disponibilidad actual?
 
 
 ### 2.2.2 Registro de entrevistas
@@ -411,46 +416,47 @@ La evidencia se conserva en las dos perspectivas entrevistadas dentro de un úni
 
 
 ### 2.2.3 Análisis de entrevistas
-En esta sección se presenta el análisis detallado de la información recolectada. Las entrevistas registradas se conservan como evidencia del proceso de abastecimiento y se reinterpretan dentro de un único segmento objetivo: el **Distribuidor Logístico de Combustible**. La empresa compradora no constituye un segundo segmento; es un actor asociado cuyo tanque inicia el flujo mediante un dispositivo IoT que el distribuidor ofrece y administra como parte de su servicio.
 
-### Perspectiva del comprador asociado
-
-**Análisis de Características Objetivas y Subjetivas:** El análisis evidencia que los compradores asociados detectan la necesidad de combustible mediante revisiones manuales o comunicaciones al proveedor. El 100% de los entrevistados utiliza canales informales y registros separados, por lo que el distribuidor recibe la necesidad sin una estructura uniforme de nivel, volumen requerido, producto, ubicación y fecha de entrega. El problema del comprador se incorpora como una entrada IoT para que el distribuidor pueda anticipar y procesar la reposición.
-
-A nivel subjetivo, los entrevistados priorizan la continuidad operativa y la confiabilidad del proveedor. Estos hallazgos justifican que el dispositivo IoT registre el nivel del tanque y que el comprador pueda consultar el estado de la solicitud sin convertirse en el responsable de crear manualmente cada pedido.
+En esta sección se presenta el análisis de la información recolectada durante las entrevistas, realizadas únicamente al segmento objetivo del proyecto: el **Distribuidor Logístico de Combustible**. La empresa compradora no fue entrevistada como segmento independiente; es un actor asociado cuyo tanque, mediante el dispositivo IoT que el distribuidor instala y administra, origina la señal que activa el flujo de abastecimiento. La información sobre su comportamiento y necesidades proviene de lo reportado por los propios distribuidores entrevistados, no de una entrevista directa.
 
 ### Perspectiva del Distribuidor Logístico de Combustible
 
-**Análisis de Características Objetivas y Subjetivas:** El análisis revela una operación fragmentada y dependiente de procesos manuales. El 100% de los distribuidores entrevistados recibe pedidos mediante WhatsApp, llamadas o correo y utiliza Excel u otras herramientas separadas para registrar pedidos, contratos y despachos. La información del comprador no se transforma automáticamente en una solicitud estructurada y la aceptación del servicio depende de una revisión individual.
+**Análisis de Características Objetivas y Subjetivas:**
 
-Desde una perspectiva subjetiva, el 100% identifica errores por información incompleta, duplicidad de confirmaciones y pérdida de tiempo en validaciones. También se observa la necesidad de automatizar la selección de conductores y cisternas, evitando asignar vehículos con capacidad insuficiente o no disponibles. Por ello, la propuesta de valor para este segmento es ofrecer un paquete integral: sensor IoT en el tanque del comprador, pedido automático, aceptación digital, asignación de recursos, seguimiento y evidencia de entrega.
+El análisis revela una operación fragmentada y dependiente de procesos manuales. El 100 % de los distribuidores entrevistados recibe las solicitudes de sus compradores asociados mediante WhatsApp, llamadas o correo, y utiliza Excel u otras herramientas separadas para registrar pedidos, contratos y despachos. La información del comprador no se transforma automáticamente en una solicitud estructurada (producto, volumen, ubicación, fecha), y la decisión de aceptar o rechazar cada solicitud depende de una revisión individual sin un canal centralizado.
 
-### Análisis Comparativo
+Respecto a la asignación de recursos, el 100 % reporta que la elección de conductor y cisterna se hace de forma manual, según disponibilidad conocida informalmente por el encargado de despacho, sin verificar de forma sistemática que la capacidad de la cisterna cubra el volumen solicitado; varios mencionan haber asignado, al menos una vez, una cisterna con capacidad insuficiente para el pedido. El criterio de rechazo de una solicitud tampoco está estandarizado: depende de la disponibilidad de flota al momento de recibirla, más que de una regla explícita.
 
-**Contrastación de roles:**
+Sobre el seguimiento de la entrega, el 100 % indica que el estado del pedido se confirma únicamente cuando el conductor informa manualmente la descarga, generalmente por llamada o mensaje, por lo que el distribuidor no cuenta con visibilidad del avance de la entrega mientras la cisterna está en ruta.
 
-Las dos perspectivas describen un único flujo de negocio dentro del segmento objetivo. El comprador asociado origina la necesidad mediante el nivel del tanque y requiere continuidad operativa; el distribuidor recibe esa señal, acepta o rechaza el servicio, asigna los recursos y ejecuta la entrega. La necesidad prioritaria del segmento es que el distribuidor pueda convertir la señal IoT en una operación atendible y rentable.
+Desde una perspectiva subjetiva, el 100 % identifica errores por información incompleta, duplicidad de confirmaciones y pérdida de tiempo en validaciones manuales. También se observa la necesidad de automatizar la selección de conductores y cisternas, evitando asignar vehículos con capacidad insuficiente o no disponibles, y de contar con un registro centralizado del estado de cada entrega sin depender de la comunicación telefónica con el conductor. Respecto al comprador asociado, los distribuidores coinciden en que sus clientes priorizan la continuidad operativa y la confiabilidad del abastecimiento por encima de cualquier otra característica del servicio.
 
-Las perspectivas producen dos resultados complementarios dentro del mismo segmento: continuidad de abastecimiento para el comprador atendido y eficiencia, control y escalabilidad para el distribuidor. Las historias de usuario y las épicas del Capítulo III se derivan de la necesidad del distribuidor, sin perder la señal IoT que la habilita.
+Por ello, la propuesta de valor para este segmento es ofrecer un paquete integral: sensor IoT en el tanque del comprador, generación automática del pedido, aceptación o rechazo centralizado, asignación de conductor y cisterna por capacidad, y registro del estado de la entrega hasta su confirmación final.
+
+### Síntesis del segmento
+
+El flujo de negocio se sostiene en un único segmento objetivo, activado por una señal externa: el nivel del tanque del comprador asociado origina la necesidad, y el distribuidor es quien recibe, decide, asigna y ejecuta la entrega. La necesidad prioritaria del segmento es convertir esa señal IoT en una operación que el distribuidor pueda atender de forma rentable y sin fricción, sin que la gestión del comprador se convierta en un segmento comercial aparte.
 
 Esta relación define la propuesta de valor:
 
-- Para el comprador asociado: reposición oportuna y visibilidad del pedido.
-- Para el distribuidor: automatización del pedido, aceptación, asignación de recursos, seguridad y trazabilidad.
+- Para el distribuidor (segmento objetivo): automatización de la recepción del pedido, aceptación o rechazo, asignación de conductor y cisterna por capacidad, y trazabilidad del estado de la entrega.
+- Para el comprador asociado (actor secundario): reposición oportuna y visibilidad del estado de su pedido, sin tener que iniciar el contacto manualmente.
+
+Las historias de usuario y las épicas del Capítulo III se derivan de la necesidad del distribuidor, sin perder de vista que el nivel del tanque del comprador es la señal que habilita todo el flujo.
 
 ### Conclusiones y Definición de Arquetipos
 
-Basado en el análisis de las entrevistas, se definen los siguientes perfiles de usuario:
-
-**Perfil operativo asociado: comprador atendido ("El Operador Crítico")**
-- Rasgo clave: Prioriza la continuidad operativa y la confiabilidad del abastecimiento.
-- Sustento: Las entrevistas identifican el desabastecimiento y la falta de trazabilidad como riesgos para la operación.
-- Necesidad principal: Mantener el tanque por encima del nivel crítico y conocer el estado del pedido generado por el dispositivo IoT.
+Basado en el análisis de las entrevistas, se define el siguiente arquetipo para el segmento objetivo, junto con un perfil de referencia del actor secundario que no fue entrevistado directamente:
 
 **User Persona principal: Distribuidor Logístico de Combustible ("El Gestor Saturado")**
-- Rasgo clave: Busca automatizar la operación para reducir carga manual y escalar sus despachos.
-- Sustento: El 100% reporta desorganización, errores, duplicidad de confirmaciones y procesos manuales intensivos.
-- Necesidad principal: Convertir el evento de nivel bajo en un pedido aceptable y asignar automáticamente un conductor y una cisterna compatibles.
+- Rasgo clave: Busca automatizar la operación para reducir carga manual y escalar sus despachos con la flota disponible.
+- Sustento: El 100 % reporta desorganización, errores, duplicidad de confirmaciones, asignación manual de conductor/cisterna sin verificación de capacidad, y ausencia de seguimiento del estado de la entrega.
+- Necesidad principal: Convertir el evento de nivel bajo del tanque de un comprador asociado en un pedido aceptable, asignar automáticamente un conductor y una cisterna compatibles, y mantener trazabilidad del estado de la entrega hasta su confirmación.
+
+**Perfil de referencia (no entrevistado): comprador asociado ("El Operador Crítico")**
+- Rasgo clave: Prioriza la continuidad operativa y la confiabilidad del abastecimiento, según lo reportado por los distribuidores.
+- Sustento: Los distribuidores entrevistados identifican el desabastecimiento y la falta de trazabilidad de sus compradores como riesgos recurrentes de la relación comercial.
+- Necesidad principal (inferida): Mantener el tanque por encima del nivel crítico y conocer el estado del pedido generado por el dispositivo IoT, sin participar activamente en su creación.
 
 
 

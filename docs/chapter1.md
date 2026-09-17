@@ -5,11 +5,13 @@
 
 ### 1.1.1 Descripción de la Startup
 
-**Prime Fuel**: Startup dedicada a digitalizar y automatizar el flujo comercial y operativo de los Distribuidores Logísticos de Combustible. La solución combina una plataforma web con un dispositivo IoT instalado en el tanque del comprador asociado. Cuando el dispositivo detecta un nivel bajo, inicia automáticamente la solicitud de abastecimiento al distribuidor, quien puede aceptar el servicio y asignar de forma automática el conductor y la cisterna adecuados según el volumen requerido, la capacidad disponible y las condiciones del despacho. La plataforma también incorpora telemetría de la carga, seguridad de válvulas y trazabilidad de la entrega. Fue fundada por estudiantes de la Universidad Peruana de Ciencias Aplicadas.
+**Prime Fuel**: Startup dedicada a digitalizar la operación logística de los distribuidores de combustible que atienden a clientes corporativos e industriales mediante flotas de unidades cisterna. La plataforma es contratada por el distribuidor y le permite instalar un dispositivo IoT en el tanque de cada comprador asociado, generar automáticamente el pedido cuando el nivel alcanza un umbral crítico, aceptar o rechazar cada solicitud, asignar un conductor habilitado y una cisterna con capacidad suficiente, y mantener actualizado el estado de la entrega hasta su confirmación final. Fue fundada por estudiantes de la Universidad Peruana de Ciencias Aplicadas.
 
-**Misión**: Nuestra misión es ayudar a los Distribuidores Logísticos de Combustible a ofrecer un servicio integral de abastecimiento, conectando el nivel del tanque del comprador con la generación automática del pedido, la aceptación del distribuidor, la asignación de recursos de transporte y la entrega segura y trazable.
+**Misión**: Nuestra misión es digitalizar la operación de distribución de combustible de las empresas transportistas, mediante una plataforma que conecte el monitoreo IoT del nivel de tanque de sus compradores con la generación automática de pedidos, la asignación de conductor y cisterna, y el seguimiento del estado de cada entrega, reduciendo la dependencia de procesos manuales y mejorando la trazabilidad de toda la operación.
 
-**Visión**: Nuestra visión es consolidarnos como una solución de referencia para que los distribuidores automaticen el abastecimiento de sus clientes asociados, optimicen el uso de conductores y cisternas y fortalezcan la seguridad y trazabilidad del transporte de combustible mediante datos IoT confiables y oportunos.
+**Visión**: Nuestra visión es consolidarnos como la plataforma de referencia para distribuidores logísticos de combustible, ayudándolos a operar su flota de forma más eficiente, anticipando la demanda de sus compradores mediante datos de nivel de tanque en tiempo real y automatizando cada etapa del ciclo de pedido, asignación y entrega.
+
+---
 
 ### 1.1.2 Perfiles de integrantes del equipo
 
@@ -85,99 +87,99 @@
 
 ### 1.2.1 Antecedentes y problemática
 
-  - **What (¿Qué?)**
-  En este documento, la unidad operativa es el flujo de abastecimiento que se inicia cuando el dispositivo IoT instalado en el tanque del comprador asociado detecta que el nivel de combustible alcanzó el umbral configurado. A partir de esta lectura, la plataforma genera automáticamente una solicitud al Distribuidor Logístico de Combustible, registra su aceptación y selecciona los recursos de transporte que cumplen con los requerimientos del pedido.
+- **What (¿Qué?)**
+  En este documento, un pedido de combustible es la solicitud que un comprador asociado genera automáticamente cuando el nivel de su tanque de almacenamiento alcanza un umbral crítico, y que el distribuidor logístico debe aceptar o rechazar, asignar a un conductor y una cisterna, y hacer seguimiento hasta su confirmación final de entrega. No se trata de la alerta del tanque de un vehículo particular, sino de la operación de abastecimiento que un distribuidor con flota de cisternas ejecuta para sus clientes corporativos o industriales.
 
-  La problemática se concentra en que los distribuidores todavía dependen de llamadas, mensajes, registros manuales y decisiones individuales para recibir la necesidad de abastecimiento, aceptar la solicitud, elegir al conductor y asignar una cisterna. La falta de integración entre el tanque del comprador, el pedido y la disponibilidad de la flota provoca demoras, asignaciones inadecuadas y poca trazabilidad desde la detección del nivel bajo hasta la entrega.
+  La problemática tiene tres partes relacionadas. Primero, el distribuidor no cuenta con visibilidad en tiempo real del nivel de los tanques de sus compradores, por lo que las solicitudes de abastecimiento le llegan de forma reactiva, mediante llamadas, correos o mensajería, en lugar de generarse automáticamente al cruzar un umbral. Segundo, una vez recibida la solicitud, el distribuidor asigna manualmente un conductor y una cisterna disponible, sin verificar de forma sistemática que la capacidad de la cisterna sea suficiente para el volumen solicitado. Tercero, una vez que la cisterna sale a ruta, el distribuidor no cuenta con un registro centralizado del estado de la entrega hasta que el conductor confirma manualmente la descarga, lo que dificulta la trazabilidad completa del pedido dentro de la plataforma.
 
 - **When (¿Cuándo?)**
-  El problema se presenta cuando el tanque del comprador llega al nivel mínimo, cuando el distribuidor debe revisar y aceptar la solicitud, cuando se asignan el conductor y la cisterna, y durante la carga, el tránsito, la descarga y el cierre de la entrega. Las decisiones manuales en cada etapa aumentan el tiempo de respuesta y pueden provocar que se asigne una cisterna con capacidad insuficiente o que no se encuentre disponible el conductor adecuado.
+  El problema se presenta en toda la cadena de abastecimiento gestionada por el distribuidor: cuando el tanque de un comprador se acerca a su nivel crítico y la alerta no llega a tiempo, cuando el distribuidor debe asignar conductor y cisterna entre varias solicitudes simultáneas, y cuando la cisterna ya está en ruta, momento en el que el estado de la entrega no se actualiza en la plataforma hasta la confirmación final del conductor.
 
 - **Where (¿Dónde?)**
-  El problema se ubica en las instalaciones del comprador, donde se mide el nivel del tanque; en el centro de operaciones del distribuidor, donde se reciben y aceptan las solicitudes; y en las terminales, rutas y puntos de entrega donde se asignan y operan los recursos de transporte. La información del tanque, el pedido, la disponibilidad de la flota y la entrega se mantiene distribuida en sistemas que no comparten el mismo flujo.
+  El problema se ubica en dos puntos principales: en las instalaciones del comprador, donde está el tanque cuyo nivel determina si se genera o no un pedido; y en las operaciones internas del distribuidor, donde se decide qué conductor y qué cisterna atienden cada solicitud, y donde se espera la confirmación de entrega, que hoy se comunica por canales externos a la plataforma.
 
 - **Who (¿Quién?)**
-  El cliente principal es el Distribuidor Logístico de Combustible, representado por el jefe de operaciones, el operador del centro de control, el planificador de despachos, el conductor y el responsable de liquidación. Como actor asociado participa el comprador, quien instala el dispositivo IoT en su tanque y recibe el abastecimiento. El distribuidor necesita atender automáticamente la necesidad del comprador, utilizar eficientemente su flota y entregar la carga de forma segura y trazable.
+  El principal afectado es el distribuidor logístico de combustible, que opera una flota de unidades cisterna y atiende a clientes corporativos o industriales. Dentro del distribuidor, los responsables de operaciones y despacho enfrentan la dificultad de asignar conductores y cisternas sin datos centralizados de disponibilidad y capacidad, y de confirmar la entrega sin depender de comunicación manual con el conductor. Los compradores asociados participan como usuarios secundarios: su rol se limita a que el nivel de su tanque, medido por el sensor IoT, sea la señal que activa el flujo de abastecimiento del distribuidor.
 
 - **Why (¿Por qué?)**
-  La causa principal es la falta de integración entre el sensor IoT del tanque del comprador, el sistema de pedidos del distribuidor, la disponibilidad de conductores y cisternas y la telemetría de la entrega. Sin un flujo digital iniciado por el evento de nivel bajo, el distribuidor debe transcribir solicitudes, solicitar manualmente su aceptación y seleccionar recursos sin una validación automática de volumen, capacidad, compatibilidad y disponibilidad.
+  La causa principal es la falta de integración entre el nivel físico del tanque del comprador, la operación logística del distribuidor y el estado del pedido durante la entrega. Sin datos continuos del nivel del tanque, el distribuidor no puede anticipar la demanda ni generar el pedido automáticamente. Sin un registro centralizado de conductores habilitados y capacidad de cisternas, la asignación depende del criterio manual de un operador. Y sin un registro centralizado del estado de la entrega, la confirmación final depende de la comunicación manual entre el conductor y el distribuidor, en lugar de quedar registrada en la plataforma.
 
 - **How (¿Cómo?)**
-  En el proceso actual, el comprador revisa el tanque o comunica manualmente su necesidad al distribuidor. El operador registra el pedido, consulta la disponibilidad de la flota, solicita la aceptación correspondiente y decide qué conductor y cisterna utilizar. Después, la entrega se coordina mediante llamadas, GPS y documentos separados. La ausencia de un flujo iniciado por IoT impide automatizar la generación del pedido y la asignación de recursos; además, la falta de telemetría de la cisterna dificulta controlar el volumen y la apertura de válvulas durante el transporte.
+  En el proceso actual, el comprador revisa visualmente su tanque o utiliza un método manual y contacta al distribuidor por correo, llamada o mensajería. El distribuidor recibe la solicitud, la registra manualmente y asigna un conductor y una cisterna según disponibilidad, sin verificación automática de que la capacidad de la cisterna cubra el volumen solicitado. Una vez que la cisterna sale a ruta, la confirmación de la entrega se comunica de forma manual, por lo que la plataforma no refleja el estado real del pedido hasta que el conductor informa la descarga.
 
 - **How Much (¿Cuánto?)**
-  La gestión manual consume tiempo y puede producir errores en la creación del pedido, la aceptación, la selección del conductor, la capacidad de la cisterna y la programación de la entrega. Un pedido tardío puede generar desabastecimiento para el comprador, mientras que una asignación inadecuada puede aumentar los viajes, el combustible consumido y los costos operativos del distribuidor. El impacto económico exacto deberá medirse durante la validación con la línea base de cada distribuidor.
+  La gestión manual de la asignación de conductor y cisterna puede producir errores de capacidad, retrasos en el despacho o uso ineficiente de la flota. La falta de un registro centralizado del estado de la entrega limita la trazabilidad que el distribuidor puede ofrecer a sus clientes corporativos, y dificulta identificar en qué etapa se encuentra cada pedido sin contactar directamente al conductor. El impacto económico exacto deberá medirse durante la validación con distribuidores.
 
 ### 1.2.2 Lean UX Process
 
-Para el desarrollo de la startup utilizamos el enfoque Lean UX. Este enfoque permite convertir la problemática de los **Distribuidores Logísticos de Combustible** en necesidades concretas, validar hipótesis y ajustar la solución desde las primeras etapas. La unidad de análisis es el flujo que comienza en el tanque del comprador asociado, continúa con la generación y aceptación del pedido, la asignación del conductor y la cisterna, y concluye con la entrega segura y trazable del combustible.
+Para el desarrollo de la startup utilizamos el enfoque Lean UX. Este enfoque permite convertir la problemática general en necesidades concretas del distribuidor logístico de combustible, nuestro segmento objetivo principal, validar hipótesis y ajustar la solución desde las primeras etapas. En nuestro caso, la plataforma debe resolver el monitoreo del nivel de los tanques de los compradores asociados, la generación automática de pedidos, la aceptación o rechazo de solicitudes, la asignación de conductor y cisterna según capacidad, y el seguimiento del estado de la entrega hasta su confirmación final.
+
+En la sección 1.2.1 se describe el problema del proceso completo de abastecimiento desde la perspectiva del distribuidor. En la sección 1.2.2.1 este problema se analiza en un único Problem Statement centrado en el distribuidor logístico de combustible, ya que es el segmento comercial principal y el cliente que contrata la solución; los compradores asociados intervienen como usuarios secundarios cuyo nivel de tanque activa el flujo, pero no constituyen un segmento objetivo independiente.
 
 #### 1.2.2.1 Lean UX Problem Statements
 
 **Distribuidores Logísticos de Combustible**
-- **Problema:** Los distribuidores reciben las necesidades de abastecimiento por llamadas, mensajes o registros manuales. No cuentan con un flujo integrado en el que el nivel bajo del tanque del comprador genere automáticamente el pedido, solicite su aceptación y seleccione el conductor y la cisterna adecuados. La asignación depende de decisiones individuales y puede no considerar el volumen solicitado, la capacidad del vehículo, la disponibilidad, la compatibilidad del combustible o la ruta.
-- **Impacto:** Aumenta el tiempo entre la detección de la necesidad y la confirmación del servicio, se producen errores en la selección de recursos y se dificulta que el distribuidor utilice eficientemente su flota. Además, la falta de telemetría durante el transporte limita la verificación del volumen entregado y de la apertura autorizada de las válvulas.
-- **Riesgo:** La solución puede ser rechazada si genera pedidos duplicados, activa solicitudes por lecturas incorrectas, asigna una cisterna insuficiente o interfiere con el flujo operativo del distribuidor. También debe garantizar que la automatización no permita descargas sin autorización y que la información conserve integridad para la trazabilidad de la entrega.
-- **Business Outcomes:** Reducir en un **80 %** el tiempo de generación y registro manual de pedidos; lograr que al menos el **90 %** de las solicitudes activadas por IoT sean aceptadas o rechazadas en menos de **5 minutos**; asignar automáticamente recursos válidos para el **95 %** de las solicitudes en menos de **2 minutos**; y reducir en un **25 %** los viajes o reasignaciones causados por una selección inadecuada.
-- **User Outcomes:** El operador del distribuidor debe visualizar una solicitud generada por el tanque del comprador en menos de **60 segundos**; el planificador debe recibir una recomendación de conductor y cisterna que cumpla con capacidad, disponibilidad y compatibilidad; y el supervisor debe consultar el estado del pedido, la ubicación de la unidad, el volumen transportado y la evidencia de entrega desde un mismo flujo.
-- **User Persona:** Carlos Mendoza, jefe de Operaciones y Despacho de un Distribuidor Logístico de Combustible, tiene 42 años, es ingeniero de Transportes o Industrial y cuenta con más de 10 años de experiencia en logística de hidrocarburos. Supervisa entre **20 y 60 cisternas**, entre **30 y 100 conductores** y aproximadamente **300 a 900 solicitudes mensuales**. Utiliza un TMS/ERP, GPS y hojas de cálculo, pero la selección de recursos todavía depende de llamadas y decisiones manuales. Su criterio de adopción es confirmar un pedido y asignar recursos en menos de **5 minutos**, sin revisar información duplicada.
-- **How Might We...? (¿Cómo podríamos...?):** ¿Cómo podríamos utilizar la telemetría IoT del tanque del comprador para iniciar automáticamente la solicitud de combustible y permitir que el Distribuidor Logístico de Combustible acepte el servicio, seleccione el conductor y la cisterna adecuados, controle las válvulas y mantenga la trazabilidad de la carga hasta la entrega?
+- **Problema:** Los distribuidores que atienden a clientes corporativos o industriales mediante flotas de cisternas no cuentan con visibilidad en tiempo real del nivel de los tanques de sus compradores asociados, por lo que reciben solicitudes de forma reactiva y las gestionan manualmente. Además, la asignación de conductor y cisterna no verifica de forma sistemática la capacidad requerida, y no existe un registro centralizado del estado de la entrega hasta su confirmación final.
+- **Impacto:** Aumenta el riesgo de errores de capacidad en la asignación de cisternas, retrasa la atención de solicitudes y reduce la trazabilidad de la entrega frente a los clientes corporativos.
+- **Riesgo:** La adopción puede verse afectada si la plataforma no se integra con la operación real de despacho del distribuidor, o si el conductor no confirma oportunamente el estado de la entrega dentro de la plataforma.
+- **How Might We...? (¿Cómo podríamos...?):** ¿Cómo podríamos permitir que un distribuidor reciba automáticamente el pedido cuando el tanque de un comprador asociado alcanza su umbral crítico, acepte o rechace la solicitud, asigne un conductor habilitado y una cisterna con capacidad suficiente, y mantenga actualizado el estado de la entrega hasta su confirmación final, reduciendo el tiempo de asignación en un 40 % y los pedidos sin estado de entrega registrado a cero durante los primeros tres meses?
 
 #### 1.2.2.2 Lean UX Assumptions
 
 **Business Assumptions (Suposiciones de Negocio)**
-
-* Los Distribuidores Logísticos de Combustible incorporarán el dispositivo IoT como parte de un servicio integral para sus compradores asociados si este reduce el trabajo manual y mejora la continuidad del abastecimiento.
-* El distribuidor aceptará una solicitud generada automáticamente si puede verificar el nivel del tanque, el volumen requerido, el punto de entrega y las condiciones del servicio antes de confirmar la operación.
-* La asignación automática de conductores y cisternas generará valor si considera como mínimo la capacidad del vehículo, el tipo de combustible, la disponibilidad, la ruta y las restricciones del despacho.
-* La automatización del flujo reducirá en **80 %** el tiempo de registro manual, logrará que el **90 %** de las solicitudes se atienda en menos de **5 minutos** y disminuirá en **25 %** las reasignaciones operativas.
-* La telemetría de la cisterna, el control de válvulas y la trazabilidad de la entrega serán condiciones necesarias para que el distribuidor pueda ofrecer el paquete completo a sus compradores.
+* Los distribuidores logísticos de combustible buscan reducir errores de asignación y mejorar la confiabilidad de sus entregas para proteger su relación con clientes corporativos.
+* Los distribuidores están dispuestos a instalar un dispositivo IoT en los tanques de sus compradores asociados como parte de su servicio integral.
+* Los distribuidores valorarán contar con un único lugar desde donde aceptar o rechazar solicitudes generadas automáticamente por el nivel de tanque de sus compradores.
+* La falta de visibilidad sobre el nivel de los tanques y la asignación manual de flota justifican reemplazar progresivamente el proceso actual por un flujo centralizado y automatizado.
+* Los distribuidores valorarán contar con trazabilidad del estado de la entrega como un diferenciador frente a otros proveedores de combustible.
 
 **User Assumptions (Suposiciones de Usuario)**
-
-* *¿Quién es el usuario?*
-  El usuario principal es el jefe de Operaciones y Despacho del distribuidor. También participan el operador del centro de control, el planificador, el conductor y el responsable de liquidación. El comprador es un usuario asociado, porque su tanque genera el evento que inicia el pedido.
-* *¿Dónde encaja nuestro producto en su trabajo?*
-  FullTank se utilizará como una plataforma que conecta el tanque del comprador con la operación del distribuidor: detecta el nivel bajo, genera el pedido, solicita la aceptación, recomienda los recursos de transporte y permite supervisar la entrega.
-* *¿Qué problemas debe resolver nuestro producto?*
-  FullTank debe eliminar la comunicación manual de la necesidad de abastecimiento, reducir los errores de selección de conductor y cisterna, controlar la capacidad asignada y conservar la trazabilidad del volumen y de las válvulas durante la entrega.
-* *¿Cuándo y cómo es nuestro producto usado?*
-  El comprador utilizará el dispositivo IoT de forma continua en su tanque. El distribuidor utilizará la plataforma cuando se genere el pedido, durante su aceptación, al asignar al conductor y la cisterna y durante el seguimiento del despacho. El conductor utilizará las autorizaciones de la unidad durante la carga y descarga, y el responsable de liquidación cerrará la entrega con la evidencia registrada.
-* *¿Qué características son importantes?*
-  Son importantes la medición de nivel del tanque del comprador, la generación automática del pedido, la solicitud de aceptación, el cálculo del volumen requerido, la recomendación de conductor y cisterna, la medición de la carga, el posicionamiento geográfico, la detección de apertura de válvulas, las geocercas, las alertas y el acta digital de recepción.
-* *¿Cómo debe verse nuestro producto y cómo debe comportarse?*
-  El producto debe presentar un flujo operativo claro con los estados `nivel bajo detectado`, `pedido generado`, `pendiente de aceptación`, `recursos asignados`, `en tránsito`, `en descarga` y `entregado`. La recomendación de recursos debe explicar por qué una cisterna cumple con el volumen y las condiciones del pedido, y las alertas deben incluir contexto, prioridad, ubicación y acción recomendada.
+* *¿Quién es el usuario?* El usuario principal es el distribuidor logístico de combustible: sus responsables de operaciones y despacho, que gestionan solicitudes, conductores y cisternas. Los compradores asociados son usuarios secundarios, cuyo tanque activa el flujo de abastecimiento.
+* *¿Dónde encaja nuestro producto en su trabajo?* FullTank se utilizará como la plataforma central del distribuidor para monitorear los tanques de sus compradores, recibir y decidir solicitudes, asignar conductor y cisterna, y hacer seguimiento del estado de cada entrega.
+* *¿Qué problemas debe resolver nuestro producto?* FullTank debe eliminar la dependencia de canales informales para recibir solicitudes, automatizar la verificación de capacidad al asignar una cisterna, y ofrecer trazabilidad del estado de la entrega hasta su confirmación final.
+* *¿Cuándo y cómo es nuestro producto usado?* El distribuidor lo usará para recibir solicitudes generadas automáticamente por el nivel del tanque del comprador, aceptarlas o rechazarlas, asignar conductor y cisterna, y hacer seguimiento del estado de la entrega. El comprador solo interactúa de forma secundaria, principalmente para consultar el estado de su pedido.
+* *¿Qué características son importantes?* Son importantes la asociación de tanques de compradores con detección automática de umbral bajo, la generación de pedidos sin transcripción manual, la aceptación o rechazo centralizado de solicitudes con notificación al comprador, la selección automática de conductor y cisterna por capacidad, y el seguimiento del estado de la entrega hasta su confirmación final.
+* *¿Cómo debe verse nuestro producto y cómo debe comportarse?* El producto debe presentar una interfaz operativa y clara, orientada al flujo de trabajo diario de un distribuidor: solicitudes entrantes, estado de la flota disponible y seguimiento de entregas en curso, con alertas visibles ante solicitudes pendientes o entregas sin confirmar.
 
 **Feature Assumptions**
-
-* Creemos que el sensor IoT del tanque del comprador detectará el umbral bajo con una precisión mínima del **95 %** y generará una única solicitud automática en menos de **60 segundos**.
-* Creemos que la integración entre el dispositivo IoT y el módulo de pedidos permitirá que el **100 %** de las solicitudes tenga asociado el comprador, el volumen requerido, el producto y el punto de entrega.
-* Creemos que un motor de asignación seleccionará en menos de **2 minutos** una cisterna cuya capacidad sea igual o superior al volumen solicitado y un conductor disponible y habilitado para el servicio.
-* Creemos que el distribuidor podrá aceptar o rechazar al menos el **90 %** de las solicitudes automáticas en menos de **5 minutos**, sin transcribir nuevamente la información del pedido.
-* Creemos que la telemetría de la cisterna, las geocercas y el control contextual de válvulas harán que el **100 %** de las aperturas autorizadas quede asociado al pedido y al viaje correspondiente.
-* Creemos que el gateway Edge y la sincronización idempotente conservarán los eventos del pedido, la asignación y la entrega durante interrupciones temporales de conectividad.
+* Creemos que al asociar los tanques de los compradores a la plataforma y detectar automáticamente el umbral de bajo nivel, el distribuidor podrá anticipar la demanda sin depender de que el comprador lo contacte.
+* Creemos que al generar el pedido automáticamente con el producto, volumen, ubicación y fecha requeridos, eliminaremos la transcripción manual de solicitudes.
+* Creemos que al centralizar la aceptación o rechazo de solicitudes y notificar su estado al comprador, reduciremos el tiempo de respuesta del distribuidor.
+* Creemos que al seleccionar automáticamente un conductor habilitado y una cisterna con capacidad igual o superior al volumen solicitado, reduciremos los errores de asignación de flota.
+* Creemos que al mantener actualizado el estado de la entrega hasta su confirmación final, aumentaremos la trazabilidad que el distribuidor puede ofrecer a sus clientes.
+* Creemos que al ofrecer una interfaz clara y centrada en la operación diaria de despacho, aumentaremos la adopción entre distribuidores.
 
 #### 1.2.2.3 Lean UX Hypothesis Statements
 
 **Hypothesis Statement 01:**
-* *Creemos* que el dispositivo IoT instalado en el tanque del comprador iniciará automáticamente el flujo de abastecimiento cuando el nivel alcance el umbral configurado.
+* *Creemos* que asociar los tanques de los compradores a la plataforma y detectar automáticamente el umbral de bajo nivel reducirá el tiempo entre la necesidad real de reposición y la generación del pedido.
 * *Sabremos* que hemos tenido éxito
-* *Cuando* al menos el **95 %** de las pruebas genere un único pedido en menos de **60 segundos**, con el comprador, el producto, el volumen y el punto de entrega correctamente asociados.
+* *Cuando* durante el primer trimestre de uso, más del 80 % de los pedidos se generen automáticamente por umbral de tanque, sin que el comprador tenga que iniciar el contacto manualmente.
 
 **Hypothesis Statement 02:**
-* *Creemos* que automatizar la solicitud de aceptación permitirá al distribuidor responder a los pedidos generados por los tanques de sus compradores sin depender de llamadas, mensajes o transcripciones manuales.
+* *Creemos* que generar el pedido automáticamente con el producto, volumen, ubicación y fecha requeridos reducirá los errores de transcripción en la solicitud.
 * *Sabremos* que hemos tenido éxito
-* *Cuando* al menos el **90 %** de las solicitudes sea aceptada o rechazada en menos de **5 minutos**, y el tiempo de registro manual de la solicitud se reduzca en un **80 %** frente a la línea base.
+* *Cuando* más del 70 % de los pedidos generados no requieran corrección posterior de sus datos.
 
 **Hypothesis Statement 03:**
-* *Creemos* que un motor de asignación automática seleccionará el conductor y la cisterna más adecuados según el volumen requerido, la capacidad disponible, el tipo de combustible, la habilitación del conductor y las restricciones de la ruta.
+* *Creemos* que centralizar la aceptación o rechazo de solicitudes y notificar su estado al comprador reducirá el tiempo de respuesta del distribuidor ante cada pedido.
 * *Sabremos* que hemos tenido éxito
-* *Cuando* al menos el **95 %** de las solicitudes reciba una asignación válida en menos de **2 minutos**, ninguna recomendación utilice una cisterna con capacidad inferior al volumen requerido y las reasignaciones por incompatibilidad disminuyan en un **25 %**.
+* *Cuando* el tiempo promedio entre la recepción de la solicitud y la decisión del distribuidor se reduzca en un 40 % respecto al proceso manual actual.
 
 **Hypothesis Statement 04:**
-* *Creemos* que integrar el pedido generado por IoT con la telemetría de la cisterna, las geocercas, las válvulas y el registro de recepción permitirá entregar el combustible con seguridad y conservar la trazabilidad completa del flujo.
+* *Creemos* que seleccionar automáticamente un conductor habilitado y una cisterna con capacidad igual o superior al volumen solicitado reducirá los errores de asignación de flota.
 * *Sabremos* que hemos tenido éxito
-* *Cuando* el **98 %** de las muestras esperadas llegue con una antigüedad menor a **60 segundos**, el **100 %** de las aperturas de válvula quede asociado a un pedido y una geocerca autorizados, y el **100 %** de las entregas genere un acta digital consultable.
+* *Cuando* se elimine la asignación de cisternas con capacidad insuficiente durante los primeros tres meses de uso.
+
+**Hypothesis Statement 05:**
+* *Creemos* que mantener actualizado el estado de la entrega dentro de la plataforma, desde el despacho hasta la confirmación final, aumentará la trazabilidad percibida por el distribuidor y sus clientes corporativos.
+* *Sabremos* que hemos tenido éxito
+* *Cuando* más del 90 % de los pedidos entregados queden registrados con su estado actualizado en la plataforma, sin depender de una llamada de confirmación manual.
+
+**Hypothesis Statement 06:**
+* *Creemos* que automatizar todo el flujo desde la detección del nivel bajo del tanque hasta la confirmación de entrega reducirá el tiempo total de ciclo de abastecimiento del distribuidor.
+* *Sabremos* que hemos tenido éxito
+* *Cuando* el tiempo promedio entre la alerta generada por el sensor y la confirmación de entrega se reduzca de forma medible respecto al proceso manual actual, durante el primer trimestre de uso.
 
 #### 1.2.2.4 Lean UX Canvas
 
