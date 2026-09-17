@@ -2,6 +2,8 @@
 
 ## 2.1. Competidores
 
+El análisis competitivo se realiza para un único segmento objetivo: **Distribuidores Logísticos de Combustible**. Los compradores asociados se consideran usuarios finales del servicio que el distribuidor ofrece mediante tanques instrumentados, no un segmento comercial independiente.
+
 En el mercado existen diversas soluciones digitales enfocadas en la gestión de combustible y flotas que compiten de manera directa o indirecta con lo propuesto. Entre ellas destaca **Zavgar**, una plataforma SaaS que ayuda a las empresas con flotas vehiculares a optimizar costos y controlar el consumo de combustible. Otro competidor importante es **FuelCloud**, que ofrece una solución integrada de hardware y software para garantizar seguridad y precisión en el despacho de combustible, principalmente en empresas con tanques propios. Finalmente, **Wialon** se presenta como una plataforma internacional de gestión de flotas que combina monitoreo GPS, análisis operativos y control de combustible, dirigida a compañías logísticas y de transporte.
 
 ### 2.1.1. Análisis competitivo.
@@ -148,7 +150,7 @@ Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo
 
 Las entrevistas buscan comprender el proceso actual de abastecimiento antes de presentar la propuesta de FullTank. Por ese motivo, las preguntas se formulan de manera abierta y se enfocan en experiencias concretas, especialmente en la revisión del nivel de los tanques, la creación de pedidos y la coordinación de los despachos.
 
-La evidencia se conserva en los dos grupos entrevistados. Para el nuevo alcance, el grupo de proveedores se considera el segmento principal y el grupo de empresas solicitantes se mantiene como fuente de requisitos del tanque asociado, del umbral de reposición y de la visibilidad que el distribuidor debe ofrecer a sus compradores. Las preguntas adicionales deben validar la generación automática del pedido, la aceptación de la solicitud y la selección de recursos según volumen y capacidad.
+La evidencia se conserva en las dos perspectivas entrevistadas dentro de un único segmento objetivo: los **Distribuidores Logísticos de Combustible**. La perspectiva del comprador asociado se utiliza para especificar el tanque, el umbral de reposición y la visibilidad que el distribuidor debe ofrecer como parte de su servicio; la perspectiva del distribuidor valida la generación automática del pedido, la aceptación de la solicitud y la selección de recursos según volumen y capacidad.
 
 **A. Distribuidores Logísticos de Combustible**
 
@@ -197,7 +199,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 ### 2.2.2 Registro de entrevistas
 
 
-**1. Segmento 1: Compradores asociados**
+**1. Perspectiva del comprador asociado dentro del segmento objetivo**
 
 - Entrevista 1:
 
@@ -248,7 +250,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
     <tr>
       <td><strong>Resumen</strong></td>
       <td>
-        Sebastian Beingolea forma parte del segmento 1, enfocado en empresas solicitantes del servicio de combustible. Durante la entrevista se recopila información sobre sus necesidades, procesos actuales y principales dificultades relacionadas con la gestión del abastecimiento de combustible, identificando oportunidades de mejora mediante herramientas digitales que permitan optimizar la comunicación, seguimiento de pedidos y control del suministro.
+        Sebastian Beingolea aporta la perspectiva del comprador asociado atendido por el distribuidor. Durante la entrevista se recopila información sobre sus necesidades, procesos actuales y principales dificultades relacionadas con la gestión del abastecimiento de combustible, identificando oportunidades de mejora que el distribuidor puede incorporar en su servicio mediante IoT.
       </td>
     </tr>
   </tbody>
@@ -313,7 +315,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 | **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
 | **Resumen**           | Renzo Aguilar, responsable de logística en una empresa constructora, revisa el nivel de sus tanques de forma manual y coordina pedidos por llamadas y WhatsApp sin registro centralizado. Ha sufrido paralización de maquinaria por desabastecimiento. Prefiere aprobar manualmente cada solicitud automática al menos al inicio, hasta ganar confianza en la plataforma. |
 
-**2. Segmento 2: Distribuidores Logísticos de Combustible**
+**2. Perspectiva del Distribuidor Logístico de Combustible**
 
 - Entrevista 1:
 
@@ -364,7 +366,7 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
     <tr>
       <td><strong>Resumen</strong></td>
       <td>
-        Andres Rodriguez forma parte del segmento 2, enfocado en proveedores de combustible. Durante la entrevista se aborda la perspectiva de los proveedores respecto al proceso de atención de pedidos, coordinación con clientes, distribución del combustible y principales retos operativos. Se identifican oportunidades de mejora relacionadas con la gestión de solicitudes, comunicación con los clientes, planificación de entregas y uso de herramientas digitales que permitan optimizar el seguimiento de pedidos, disponibilidad de stock y eficiencia del servicio.
+        Andres Rodriguez aporta la perspectiva del Distribuidor Logístico de Combustible. Durante la entrevista se aborda el proceso de atención de pedidos, coordinación con compradores, distribución del combustible y principales retos operativos. Se identifican oportunidades de mejora relacionadas con la gestión de solicitudes, planificación de entregas y uso de herramientas digitales que permitan optimizar el seguimiento, la disponibilidad de stock y la eficiencia del servicio.
       </td>
     </tr>
   </tbody>
@@ -433,15 +435,15 @@ Al finalizar cada entrevista, se puede presentar brevemente la propuesta de Full
 
 
 ### 2.2.3 Análisis de entrevistas
-En esta sección se presenta el análisis detallado de la información recolectada. Las entrevistas registradas se conservan como evidencia del proceso de abastecimiento y se reinterpretan según el alcance actualizado: el **Distribuidor Logístico de Combustible** es el cliente principal de FullTank y la empresa compradora es un cliente asociado cuyo tanque inicia el flujo mediante un dispositivo IoT. Esta distinción no elimina las entrevistas del segmento comprador; permite utilizar sus hallazgos para definir los datos que el distribuidor debe recibir automáticamente.
+En esta sección se presenta el análisis detallado de la información recolectada. Las entrevistas registradas se conservan como evidencia del proceso de abastecimiento y se reinterpretan dentro de un único segmento objetivo: el **Distribuidor Logístico de Combustible**. La empresa compradora no constituye un segundo segmento; es un actor asociado cuyo tanque inicia el flujo mediante un dispositivo IoT que el distribuidor ofrece y administra como parte de su servicio.
 
-### Segmento 1: Compradores asociados
+### Perspectiva del comprador asociado
 
 **Análisis de Características Objetivas y Subjetivas:** El análisis evidencia que los compradores asociados detectan la necesidad de combustible mediante revisiones manuales o comunicaciones al proveedor. El 100% de los entrevistados utiliza canales informales y registros separados, por lo que el distribuidor recibe la necesidad sin una estructura uniforme de nivel, volumen requerido, producto, ubicación y fecha de entrega. El problema del comprador se incorpora como una entrada IoT para que el distribuidor pueda anticipar y procesar la reposición.
 
 A nivel subjetivo, los entrevistados priorizan la continuidad operativa y la confiabilidad del proveedor. Estos hallazgos justifican que el dispositivo IoT registre el nivel del tanque y que el comprador pueda consultar el estado de la solicitud sin convertirse en el responsable de crear manualmente cada pedido.
 
-### Segmento 2: Distribuidores Logísticos de Combustible
+### Perspectiva del Distribuidor Logístico de Combustible
 
 **Análisis de Características Objetivas y Subjetivas:** El análisis revela una operación fragmentada y dependiente de procesos manuales. El 100% de los distribuidores entrevistados recibe pedidos mediante WhatsApp, llamadas o correo y utiliza Excel u otras herramientas separadas para registrar pedidos, contratos y despachos. La información del comprador no se transforma automáticamente en una solicitud estructurada y la aceptación del servicio depende de una revisión individual.
 
@@ -451,9 +453,9 @@ Desde una perspectiva subjetiva, el 100% identifica errores por información inc
 
 **Contrastación de roles:**
 
-La evidencia de ambos grupos describe un único flujo de negocio con responsabilidades distintas. El comprador asociado origina la necesidad mediante el nivel del tanque y requiere continuidad operativa; el distribuidor recibe esa señal, acepta o rechaza el servicio, asigna los recursos y ejecuta la entrega. Ambos grupos dependen actualmente de herramientas informales, pero la necesidad prioritaria del cliente de FullTank es que el distribuidor pueda convertir la señal IoT en una operación atendible y rentable.
+Las dos perspectivas describen un único flujo de negocio dentro del segmento objetivo. El comprador asociado origina la necesidad mediante el nivel del tanque y requiere continuidad operativa; el distribuidor recibe esa señal, acepta o rechaza el servicio, asigna los recursos y ejecuta la entrega. La necesidad prioritaria del segmento es que el distribuidor pueda convertir la señal IoT en una operación atendible y rentable.
 
-La diferencia de percepción define dos resultados complementarios: continuidad de abastecimiento para el comprador y eficiencia, control y escalabilidad para el distribuidor. Las historias de usuario y las épicas del Capítulo III se derivan principalmente de este segundo resultado, sin perder la señal IoT que lo habilita.
+Las perspectivas producen dos resultados complementarios dentro del mismo segmento: continuidad de abastecimiento para el comprador atendido y eficiencia, control y escalabilidad para el distribuidor. Las historias de usuario y las épicas del Capítulo III se derivan de la necesidad del distribuidor, sin perder la señal IoT que la habilita.
 
 Esta relación define la propuesta de valor:
 
@@ -464,12 +466,12 @@ Esta relación define la propuesta de valor:
 
 Basado en el análisis de las entrevistas, se definen los siguientes perfiles de usuario:
 
-**User Persona Comprador asociado ("El Operador Crítico")**
+**Perfil operativo asociado: comprador atendido ("El Operador Crítico")**
 - Rasgo clave: Prioriza la continuidad operativa y la confiabilidad del abastecimiento.
 - Sustento: Las entrevistas identifican el desabastecimiento y la falta de trazabilidad como riesgos para la operación.
 - Necesidad principal: Mantener el tanque por encima del nivel crítico y conocer el estado del pedido generado por el dispositivo IoT.
 
-**User Persona Distribuidor ("El Gestor Saturado")**
+**User Persona principal: Distribuidor Logístico de Combustible ("El Gestor Saturado")**
 - Rasgo clave: Busca automatizar la operación para reducir carga manual y escalar sus despachos.
 - Sustento: El 100% reporta desorganización, errores, duplicidad de confirmaciones y procesos manuales intensivos.
 - Necesidad principal: Convertir el evento de nivel bajo en un pedido aceptable y asignar automáticamente un conductor y una cisterna compatibles.
@@ -478,13 +480,14 @@ Basado en el análisis de las entrevistas, se definen los siguientes perfiles de
 
 ## 2.3 Needfinding
 ### 2.3.1 User Personas
-- Segmento 1: Comprador asociado
+- **Segmento objetivo único: Distribuidores Logísticos de Combustible.**
+  - Perfil operativo asociado: comprador cuyo tanque activa el servicio IoT.
   <img src="../assets/chapter-2/mapping/userCarlos.png" alt="Captura entrevistado Carlos Ramirez"/>
 
-- Segmento 2: Distribuidor Logístico de Combustible
+  - User Persona principal: distribuidor que administra pedidos, flota y entregas.
   <img src="../assets/chapter-2/mapping/userAndrea.png" alt="Captura entrevistado Andrea Lopez"/>
 
-Los artefactos visuales de personas se conservan como evidencia de las entrevistas. Para el alcance actualizado, Carlos representa al comprador asociado que opera el tanque instrumentado y Andrea representa al distribuidor que administra el flujo automático de pedidos y despachos.
+Los artefactos visuales de personas se conservan como evidencia de las entrevistas. Para el alcance actualizado, Carlos representa al comprador asociado del servicio y Andrea representa al distribuidor, que es el cliente y segmento objetivo que administra el flujo automático de pedidos y despachos.
 
 
 
@@ -497,8 +500,8 @@ El User Task Matrix presenta las tareas que realizan los User Persona para cumpl
   <thead>
     <tr>
       <th rowspan="2">Tarea (Task)</th>
-      <th colspan="2">Comprador asociado</th>
-      <th colspan="2">Distribuidor Logístico</th>
+      <th colspan="2">Rol asociado: comprador</th>
+      <th colspan="2">Rol principal: distribuidor</th>
     </tr>
     <tr>
       <th>Frecuencia</th>
@@ -592,7 +595,7 @@ El User Task Matrix presenta las tareas que realizan los User Persona para cumpl
 ### 2.3.3 User Journey Mapping
 
 
--Segmento 1: Comprador asociado
+**Rol asociado dentro del segmento: comprador**
 
 El User Journey Mapping de Carlos representa el recorrido actual del comprador asociado, desde la observación del nivel del tanque hasta la recepción del combustible. En el alcance actualizado, este recorrido se convierte en la fuente de datos IoT que inicia el pedido, en lugar de ser un flujo comercial independiente.
 
@@ -602,7 +605,7 @@ El Journey busca evidenciar los puntos críticos de su experiencia actual, ident
 
  <img src="../assets/chapter-2/mapping/journeyCarlos.png" alt="userJourney de Carlos"/>
 
--Segmento 2: Distribuidor Logístico de Combustible
+**Rol principal del segmento: Distribuidor Logístico de Combustible**
 
 El User Journey Mapping de Andrea representa el recorrido actual de la coordinadora de operaciones de un distribuidor, desde la recepción de la solicitud hasta la entrega. El mapa se utiliza para identificar las decisiones que deben automatizarse y las excepciones que todavía requieren intervención humana.
 
@@ -620,13 +623,13 @@ El Journey busca evidenciar los puntos críticos de su experiencia actual, ident
 
 Para la elaboración de los Empathy Maps, el equipo partió del conocimiento y observaciones recolectadas durante el análisis de los User Persona. Se colocó al centro de cada mapa al usuario correspondiente (Carlos y Andrea) y se respondieron las preguntas claves sobre su entorno, emociones, comportamientos y necesidades.
 
--Segmento 1: Comprador asociado
+**Rol asociado dentro del segmento: comprador**
 
 
  <img src="../assets/chapter-2/mapping/empathyCarlos.png" alt="empathyMapping de Carlos"/>
 
 
--Segmento 2: Distribuidor Logístico de Combustible
+**Rol principal del segmento: Distribuidor Logístico de Combustible**
 
  <img src="../assets/chapter-2/mapping/empathyAndrea.png" alt="empathyMapping de Andrea"/>
 

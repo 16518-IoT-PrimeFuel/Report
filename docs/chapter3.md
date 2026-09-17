@@ -6,7 +6,7 @@ Las épicas de este capítulo se derivan de las necesidades identificadas en el 
 
 La trazabilidad funcional se organiza de la siguiente manera:
 
-Para conservar la numeración y el contenido de las historias levantadas en las entrevistas, las historias heredadas que utilizan los términos «proveedor» y «solicitante» se interpretan respectivamente como **Distribuidor Logístico de Combustible** y **comprador asociado**. Las historias nuevas del flujo IoT emplean directamente esta nomenclatura.
+El único segmento comercial de este capítulo es el **Distribuidor Logístico de Combustible**. Para conservar la numeración y el contenido de las historias levantadas en las entrevistas, las historias heredadas que utilizan los términos «proveedor», «solicitante» o «ambos roles» se interpretan como puntos de contacto dentro de ese mismo servicio: respectivamente, el distribuidor, el comprador asociado y la interacción entre ambos. Las historias nuevas del flujo IoT emplean directamente esta nomenclatura.
 
 * **Necesidad N1 — Activar el abastecimiento sin comunicación manual:** se cubre con **EP02 — Activación IoT y solicitudes automáticas**, que agrupa la asociación del tanque, la detección del umbral, la generación idempotente del pedido y la consulta de su estado.
 * **Necesidad N2 — Permitir que el distribuidor decida si puede atender el pedido:** se cubre con **EP03 — Aceptación y gestión del pedido del distribuidor**, que agrupa la revisión, aceptación, rechazo, despacho y cierre de la solicitud.
@@ -42,50 +42,50 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-02</td>
   <td>Ver sección About Us</td>
-  <td>Como visitante de ambos segmentos, quiero conocer quiénes están detrás de FullTank para confiar en el sistema.</td>
-  <td><b>Escenario 1: Información visible del equipo</b><br/>Dado que el visitante de ambos segmentos accede a About Us,<br/>Cuando se carga la sección,<br/>Entonces puede leer una descripción del equipo detrás del sistema.<br/><br/><b>Escenario 2: Ver valores o misión</b><br/>Dado que el visitante de ambos segmentos revisa la sección completa,<br/>Cuando llega al final del contenido,<br/>Entonces puede conocer los valores o misión de la empresa.</td>
+  <td>Como visitante del servicio FullTank, quiero conocer quiénes están detrás de FullTank para confiar en el sistema.</td>
+  <td><b>Escenario 1: Información visible del equipo</b><br/>Dado que el visitante del servicio FullTank accede a About Us,<br/>Cuando se carga la sección,<br/>Entonces puede leer una descripción del equipo detrás del sistema.<br/><br/><b>Escenario 2: Ver valores o misión</b><br/>Dado que el visitante del servicio FullTank revisa la sección completa,<br/>Cuando llega al final del contenido,<br/>Entonces puede conocer los valores o misión de la empresa.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-03</td>
   <td>Ver sección How it works?</td>
-  <td>Como visitante de ambos segmentos, quiero entender cómo funciona FullTank paso a paso para evaluar si se ajusta a mis necesidades.</td>
-  <td><b>Escenario 1: Comprensión del flujo de pedidos</b><br/>Dado que el visitante de ambos segmentos accede a How it works?,<br/>Cuando lee la sección,<br/>Entonces entiende el flujo de pedido desde solicitud hasta entrega.<br/><br/><b>Escenario 2: Interacción clara entre usuarios</b><br/>Dado que el visitante de ambos segmentos busca claridad,<br/>Cuando revisa la sección,<br/>Entonces puede comprender cómo interactúan solicitante y proveedor.</td>
+  <td>Como visitante del servicio FullTank, quiero entender cómo funciona FullTank paso a paso para evaluar si se ajusta a mis necesidades.</td>
+  <td><b>Escenario 1: Comprensión del flujo de pedidos</b><br/>Dado que el visitante del servicio FullTank accede a How it works?,<br/>Cuando lee la sección,<br/>Entonces entiende el flujo de pedido desde solicitud hasta entrega.<br/><br/><b>Escenario 2: Interacción clara entre usuarios</b><br/>Dado que el visitante del servicio FullTank busca claridad,<br/>Cuando revisa la sección,<br/>Entonces puede comprender cómo interactúan solicitante y proveedor.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-04</td>
   <td>Enviar mensaje de contacto</td>
-  <td>Como visitante de ambos segmentos, quiero enviar un mensaje desde Contact Us para solicitar más información.</td>
-  <td><b>Escenario 1: Envío exitoso de mensaje</b><br/>Dado que el visitante de ambos segmentos completa el formulario correctamente,<br/>Cuando presiona "Enviar",<br/>Entonces el mensaje es registrado para revisión.<br/><br/><b>Escenario 2: Validación de campos obligatorios</b><br/>Dado que el visitante de ambos segmentos deja campos vacíos,<br/>Cuando intenta enviar el formulario,<br/>Entonces el sistema muestra una advertencia.<br/><br/><b>Escenario 3: Confirmación visual del envío</b><br/>Dado que el visitante de ambos segmentos envía el formulario exitosamente,<br/>Cuando el mensaje es registrado,<br/>Entonces recibe una confirmación visual o notificación.</td>
+  <td>Como visitante del servicio FullTank, quiero enviar un mensaje desde Contact Us para solicitar más información.</td>
+  <td><b>Escenario 1: Envío exitoso de mensaje</b><br/>Dado que el visitante del servicio FullTank completa el formulario correctamente,<br/>Cuando presiona "Enviar",<br/>Entonces el mensaje es registrado para revisión.<br/><br/><b>Escenario 2: Validación de campos obligatorios</b><br/>Dado que el visitante del servicio FullTank deja campos vacíos,<br/>Cuando intenta enviar el formulario,<br/>Entonces el sistema muestra una advertencia.<br/><br/><b>Escenario 3: Confirmación visual del envío</b><br/>Dado que el visitante del servicio FullTank envía el formulario exitosamente,<br/>Cuando el mensaje es registrado,<br/>Entonces recibe una confirmación visual o notificación.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-36</td>
   <td>Ver sección Benefits</td>
-  <td>Como visitante de ambos segmentos, quiero conocer las principales ventajas con las que puedo contar para evaluar la implementación de la plataforma.</td>
-  <td><b>Escenario 1: Visualizar beneficios</b><br/>Dado que el visitante de ambos segmentos accede a la sección "¿Por qué elegir FullTank?",<br/>Cuando visualiza los múltiples beneficios,<br/>Entonces puede identificar nuestra ventajas frente a nuestros competidores.<br/><br/><b>Escenario 2: Visualizar beneficios</b><br/>Dado que el visitante de ambos segmentos accede a la sección "¿Por qué elegir FullTank?",<br/>Cuando observa la lista de beneficios,<br/>Entonces ve como le podría beneficiar usar FullTank.</td>
+  <td>Como visitante del servicio FullTank, quiero conocer las principales ventajas con las que puedo contar para evaluar la implementación de la plataforma.</td>
+  <td><b>Escenario 1: Visualizar beneficios</b><br/>Dado que el visitante del servicio FullTank accede a la sección "¿Por qué elegir FullTank?",<br/>Cuando visualiza los múltiples beneficios,<br/>Entonces puede identificar nuestra ventajas frente a nuestros competidores.<br/><br/><b>Escenario 2: Visualizar beneficios</b><br/>Dado que el visitante del servicio FullTank accede a la sección "¿Por qué elegir FullTank?",<br/>Cuando observa la lista de beneficios,<br/>Entonces ve como le podría beneficiar usar FullTank.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-37</td>
   <td>Ver sección Lo que Dicen Nuestros Clientes</td>
-  <td>Como visitante de ambos segmentos, quiero conocer los testimonios de los usuarios de FullTank para tener confianza en la plataforma y saber que otras empresas ya la están usando.</td>
-  <td><b>Escenario 1: Ver testimonios de clientes</b><br/>Dado que el visitante de ambos segmentos está interesado en los comentarios de los clientes,<br/>Cuando accede a la sección,<br/>Entonces puede leer un breve testimonio sobre experiencias usando FullTank.<br/><br/><b>Escenario 2: Visualizar testimonios recientes</b><br/>Dado que el visitante de ambos segmentos accede a la sección y esta se actualiza regularmente,<br/>Cuando se carga la información,<br/>Entonces visualiza las últimos testimonios que se han unido a FullTank.</td>
+  <td>Como visitante del servicio FullTank, quiero conocer los testimonios de los usuarios de FullTank para tener confianza en la plataforma y saber que otras empresas ya la están usando.</td>
+  <td><b>Escenario 1: Ver testimonios de clientes</b><br/>Dado que el visitante del servicio FullTank está interesado en los comentarios de los clientes,<br/>Cuando accede a la sección,<br/>Entonces puede leer un breve testimonio sobre experiencias usando FullTank.<br/><br/><b>Escenario 2: Visualizar testimonios recientes</b><br/>Dado que el visitante del servicio FullTank accede a la sección y esta se actualiza regularmente,<br/>Cuando se carga la información,<br/>Entonces visualiza las últimos testimonios que se han unido a FullTank.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-38</td>
   <td>Ver sección Planes y Precios</td>
-  <td>Como visitante (ambos segmentos), quiero saber que planes se adecuan a mis necesidades para poder iniciar un proceso de registro o solicitud.</td>
+  <td>Como visitante del servicio FullTank, quiero saber que planes se adecuan a mis necesidades para poder iniciar un proceso de registro o solicitud.</td>
   <td><b>Escenario 1: Ver información sobre ser solicitante de combustible</b><br/>Dado que el visitante entra a la sección Precios y Planes,<br/>Cuando visualiza los diferentes precios y las features incluidas,<br/>Entonces entiende que existe flexibilidad para adaptar FullTank a su empresa.<br/><br/><b>Escenario 2: Seleccionar un plan</b><br/>Dado que el visitante está interesado en obtener un plan específico,<br/>Cuando hace clic en el call to action,<br/>Entonces es redirigido a la página de registro.</td>
   <td>EP01</td>
 </tr>
 <tr>
   <td>US-39</td>
   <td>Cambiar idioma</td>
-  <td>Como visitante de ambos segmentos, quiero poder cambiar entre inglés y español para entender la plataforma en mi idioma preferido.</td>
-  <td><b>Escenario 1: Cambiar idioma a español</b><br/>Dado que el visitante de ambos segmentos está viendo la página en inglés,<br/>Cuando selecciona la opción de español,<br/>Entonces toda la interfaz de la página se muestra en español.<br/><br/><b>Escenario 2: Cambiar idioma a inglés</b><br/>Dado que el visitante está viendo la página en español,<br/>Cuando selecciona la opción de inglés,<br/>Entonces toda la interfaz de la página se muestra en inglés.</td>
+  <td>Como visitante del servicio FullTank, quiero poder cambiar entre inglés y español para entender la plataforma en mi idioma preferido.</td>
+  <td><b>Escenario 1: Cambiar idioma a español</b><br/>Dado que el visitante del servicio FullTank está viendo la página en inglés,<br/>Cuando selecciona la opción de español,<br/>Entonces toda la interfaz de la página se muestra en español.<br/><br/><b>Escenario 2: Cambiar idioma a inglés</b><br/>Dado que el visitante está viendo la página en español,<br/>Cuando selecciona la opción de inglés,<br/>Entonces toda la interfaz de la página se muestra en inglés.</td>
   <td>EP01</td>
 </tr>
 
@@ -131,7 +131,7 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-43</td>
   <td>Ver detalle de pedido</td>
-  <td>Como usuario de ambos segmentos, quiero ver el detalle completo de un pedido para revisar toda la información asociada.</td>
+  <td>Como usuario del servicio FullTank, quiero ver el detalle completo de un pedido para revisar toda la información asociada.</td>
   <td><b>Escenario 1: Visualización completa del detalle</b><br/>Dado que el usuario selecciona un pedido desde su panel,<br/>Cuando se carga la vista de detalle,<br/>Entonces puede ver tipo de combustible, cantidad, estado, fechas, datos de pago y asignación logística.<br/><br/><b>Escenario 2: Pedido no encontrado</b><br/>Dado que el usuario intenta acceder al detalle de un pedido inexistente,<br/>Cuando se carga la vista,<br/>Entonces el sistema muestra un mensaje de error y ofrece regresar al listado.<br/><br/><b>Escenario 3: Restricción de acceso a pedidos ajenos</b><br/>Dado que el usuario intenta acceder al detalle de un pedido que no le pertenece,<br/>Cuando carga la URL directamente,<br/>Entonces el sistema restringe el acceso y redirige a su propio panel.</td>
   <td>EP02</td>
 </tr>
@@ -348,14 +348,14 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-25</td>
   <td>Ver sección de preguntas frecuentes</td>
-  <td>Como visitante de ambos segmentos, quiero acceder a una sección de preguntas frecuentes para resolver dudas rápidamente.</td>
+  <td>Como visitante del servicio FullTank, quiero acceder a una sección de preguntas frecuentes para resolver dudas rápidamente.</td>
   <td><b>Escenario 1: Visualización de preguntas comunes</b><br/>Dado que el visitante accede a la sección,<br/>Cuando se carga el contenido,<br/>Entonces puede leer las preguntas y respuestas más frecuentes.<br/><br/><b>Escenario 2: Organización por categorías</b><br/>Dado que el visitante accede a la sección de preguntas frecuentes con muchas entradas,<br/>Cuando navega por la sección,<br/>Entonces puede visualizarlas clasificadas en categorías.<br/><br/><b>Escenario 3: Error al cargar FAQs</b><br/>Dado que el visitante accede a la sección y ocurre un fallo en la carga,<br/>Cuando intenta visualizar las preguntas frecuentes,<br/>Entonces se muestra un mensaje de error o un contenido informativo alternativo.</td>
   <td>EP10</td>
 </tr>
 <tr>
   <td>US-26</td>
   <td>Acceder a información de contacto rápido</td>
-  <td>Como usuario de ambos segmentos, quiero ver datos de contacto directo (teléfono o correo) para hacer consultas urgentes.</td>
+  <td>Como usuario del servicio FullTank, quiero ver datos de contacto directo (teléfono o correo) para hacer consultas urgentes.</td>
   <td><b>Escenario 1: Visualización de datos de contacto</b><br/>Dado que el usuario accede a la sección de soporte,<br/>Cuando se carga la página,<br/>Entonces puede visualizar claramente el correo de soporte y número telefónico.<br/><br/><b>Escenario 2: Acceso al correo de cliente</b><br/>Dado que el usuario hace clic en la dirección de correo,<br/>Cuando tiene una app de correo configurada,<br/>Entonces se abre automáticamente su aplicación de correo predeterminada.<br/><br/><b>Escenario 3: Falla en la configuración de contacto</b><br/>Dado que el usuario accede a la página y los datos de contacto no están bien configurados,<br/>Cuando se carga la sección de contacto,<br/>Entonces el sistema muestra un mensaje genérico invitando a intentar más tarde.</td>
   <td>EP10</td>
 </tr>
@@ -367,14 +367,14 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-27</td>
   <td>Buscar pedido por código</td>
-  <td>Como usuario de ambos segmentos, quiero buscar un pedido específico por su código para encontrarlo rápidamente.</td>
+  <td>Como usuario del servicio FullTank, quiero buscar un pedido específico por su código para encontrarlo rápidamente.</td>
   <td><b>Escenario 1: Pedido encontrado</b><br/>Dado que el usuario escribe un código válido,<br/>Cuando existe un pedido con ese código,<br/>Entonces se muestra el resultado correspondiente.<br/><br/><b>Escenario 2: Pedido no encontrado</b><br/>Dado que el usuario digita un código no correspondiente a ningún pedido,<br/>Cuando finaliza la búsqueda,<br/>Entonces el sistema muestra un mensaje de que no hay coincidencias.</td>
   <td>EP11</td>
 </tr>
 <tr>
   <td>US-28</td>
   <td>Filtrar pedidos por estado</td>
-  <td>Como usuario de ambos segmentos, quiero filtrar mis pedidos por estado (pendiente, aprobado, entregado) para facilitar la revisión.</td>
+  <td>Como usuario del servicio FullTank, quiero filtrar mis pedidos por estado (pendiente, aprobado, entregado) para facilitar la revisión.</td>
   <td><b>Escenario 1: Aplicar filtro correctamente</b><br/>Dado que el usuario selecciona un estado,<br/>Cuando se aplica el filtro,<br/>Entonces solo se muestran los pedidos con ese estado.<br/><br/><b>Escenario 2: No hay pedidos en ese estado</b><br/>Dado que el usuario selecciona un estado que no tiene coincidencias,<br/>Cuando ejecuta el filtro,<br/>Entonces se muestra un mensaje indicando que no hay pedidos para ese estado.</td>
   <td>EP11</td>
 </tr>
@@ -438,7 +438,7 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-35</td>
   <td>Descargar reporte PDF</td>
-  <td>Como usuario de ambos segmentos, quiero descargar un resumen de pedidos o ventas en formato PDF para archivarlo o compartirlo.</td>
+  <td>Como usuario del servicio FullTank, quiero descargar un resumen de pedidos o ventas en formato PDF para archivarlo o compartirlo.</td>
   <td><b>Escenario 1: Generación de PDF con datos</b><br/>Dado que el usuario hace clic en "Descargar",<br/>Cuando hay datos en el periodo seleccionado,<br/>Entonces se genera un archivo PDF descargable.<br/><br/><b>Escenario 2: No hay datos en el periodo seleccionado</b><br/>Dado que el usuario no tiene registros en el periodo seleccionado,<br/>Cuando se solicita la descarga,<br/>Entonces el sistema notifica que no hay contenido para exportar.<br/><br/><b>Escenario 3: Falla en la generación del PDF</b><br/>Dado que el usuario intenta descargar el archivo y ocurre un error en el backend al generar el PDF,<br/>Cuando hace clic en el botón de descargar,<br/>Entonces se muestra un mensaje de error sin afectar la sesión.</td>
   <td>EP14</td>
 </tr>
@@ -757,7 +757,7 @@ Los entregables se agrupan en las épicas del apartado 3.1: **EP02 Activación I
 | 03 | US-08 | Registrar información de pago | Como solicitante, quiero ingresar la información de los pagos correspondientes para validar el pedido ante el proveedor. |      3       |
 | 04 | US-07 | Confirmar recepción de pedido | Como solicitante, quiero confirmar que recibí el pedido para que el proveedor lo cierre. |      2       |
 | 05 | US-09 | Ver historial de pedidos | Como solicitante, quiero ver mis pedidos anteriores para tener control sobre mi consumo. |      2       |
-| 06 | US-43 | Ver detalle de pedido | Como usuario de ambos segmentos, quiero ver el detalle completo de un pedido para revisar toda la información asociada. |      2       |
+| 06 | US-43 | Ver detalle de pedido | Como usuario del servicio FullTank, quiero ver el detalle completo de un pedido para revisar toda la información asociada. |      2       |
 | 07 | US-10 | Ver solicitudes pendientes | Como distribuidor, quiero revisar solicitudes con nivel, volumen, producto, ubicación y fecha para tomar acción. |      2       |
 | 08 | US-11 | Aceptar solicitud | Como distribuidor, quiero aceptar una solicitud generada por IoT cuando pueda atender sus condiciones. |      3       |
 | 09 | US-42 | Rechazar solicitud | Como distribuidor, quiero rechazar una solicitud cuando no pueda atenderla e indicar el motivo. |      2       |
@@ -773,26 +773,26 @@ Los entregables se agrupan en las épicas del apartado 3.1: **EP02 Activación I
 | 19 | US-47 | Ver Dashboard principal del proveedor | Como proveedor, quiero acceder a un panel principal con KPIs de operación y un gráfico de tendencia de ventas para tener visibilidad en tiempo real del estado de mi negocio. |      3       |
 | 20 | US-29 | Recibir notificación de aprobación | Como solicitante, quiero recibir una notificación cuando un pedido sea aprobado o rechazado para estar informado. |      2       |
 | 21 | US-30 | Notificación de pedido despachado | Como solicitante, quiero recibir una notificación cuando un pedido haya sido despachado para estar informado. |      2       |
-| 22 | US-27 | Buscar pedido por código | Como usuario de ambos segmentos, quiero buscar un pedido específico por su código para encontrarlo rápidamente. |      2       |
-| 23 | US-28 | Filtrar pedidos por estado | Como usuario de ambos segmentos, quiero filtrar mis pedidos por estado para facilitar la revisión. |      2       |
+| 22 | US-27 | Buscar pedido por código | Como usuario del servicio FullTank, quiero buscar un pedido específico por su código para encontrarlo rápidamente. |      2       |
+| 23 | US-28 | Filtrar pedidos por estado | Como usuario del servicio FullTank, quiero filtrar mis pedidos por estado para facilitar la revisión. |      2       |
 | 24 | US-31 | Ver listado de empresas | Como proveedor, quiero ver una lista de empresas solicitantes para identificar a mis clientes frecuentes. |      2       |
 | 25 | US-32 | Ver detalles de empresa | Como proveedor, quiero ver información detallada de una empresa solicitante para analizar su historial de pedidos. |      2       |
 | 26 | US-33 | Ver gráfico de consumo (Solicitante) | Como solicitante, quiero ver un gráfico de mi consumo mensual para tener control sobre el uso del combustible. |      3       |
 | 27 | US-34 | Ver gráfico de ventas (Proveedor) | Como proveedor, quiero ver un gráfico de ventas por mes para monitorear el rendimiento del negocio. |      3       |
 | 28 | US-48 | Ver distribución de ventas por sector | Como proveedor, quiero ver la distribución de mis ventas por sector industrial para identificar cuáles son mis clientes más relevantes por rubro. |      2       |
-| 29 | US-35 | Descargar reporte PDF | Como usuario de ambos segmentos, quiero descargar un resumen de pedidos o ventas en formato PDF para archivarlo o compartirlo. |      3       |
+| 29 | US-35 | Descargar reporte PDF | Como usuario del servicio FullTank, quiero descargar un resumen de pedidos o ventas en formato PDF para archivarlo o compartirlo. |      3       |
 | 30 | US-01 | Ver sección Home | Como visitante (proveedor), quiero ver una sección de inicio que resuma el valor de FullTank para comprender rápidamente el objetivo del sistema. |      2       |
-| 31 | US-02 | Ver sección About Us | Como visitante de ambos segmentos, quiero conocer quiénes están detrás de FullTank para confiar en el sistema. |      1       |
-| 32 | US-03 | Ver sección How it works? | Como visitante de ambos segmentos, quiero entender cómo funciona FullTank paso a paso para evaluar si se ajusta a mis necesidades. |      2       |
-| 33 | US-36 | Ver sección Benefits | Como visitante de ambos segmentos, quiero conocer las principales ventajas para evaluar la implementación de la plataforma. |      1       |
-| 34 | US-37 | Ver sección Lo que Dicen Nuestros Clientes | Como visitante de ambos segmentos, quiero conocer los testimonios de usuarios de FullTank para tener confianza en la plataforma. |      2       |
-| 35 | US-38 | Ver sección Planes y Precios | Como visitante de ambos segmentos, quiero saber qué planes se adecuan a mis necesidades para poder iniciar un proceso de registro. |      3       |
-| 36 | US-39 | Cambiar idioma | Como visitante de ambos segmentos, quiero poder cambiar entre inglés y español para entender la plataforma en mi idioma preferido. |      3       |
-| 37 | US-04 | Enviar mensaje de contacto | Como visitante de ambos segmentos, quiero enviar un mensaje desde Contact Us para solicitar más información. |      3       |
+| 31 | US-02 | Ver sección About Us | Como visitante del servicio FullTank, quiero conocer quiénes están detrás de FullTank para confiar en el sistema. |      1       |
+| 32 | US-03 | Ver sección How it works? | Como visitante del servicio FullTank, quiero entender cómo funciona FullTank paso a paso para evaluar si se ajusta a mis necesidades. |      2       |
+| 33 | US-36 | Ver sección Benefits | Como visitante del servicio FullTank, quiero conocer las principales ventajas para evaluar la implementación de la plataforma. |      1       |
+| 34 | US-37 | Ver sección Lo que Dicen Nuestros Clientes | Como visitante del servicio FullTank, quiero conocer los testimonios de usuarios de FullTank para tener confianza en la plataforma. |      2       |
+| 35 | US-38 | Ver sección Planes y Precios | Como visitante del servicio FullTank, quiero saber qué planes se adecuan a mis necesidades para poder iniciar un proceso de registro. |      3       |
+| 36 | US-39 | Cambiar idioma | Como visitante del servicio FullTank, quiero poder cambiar entre inglés y español para entender la plataforma en mi idioma preferido. |      3       |
+| 37 | US-04 | Enviar mensaje de contacto | Como visitante del servicio FullTank, quiero enviar un mensaje desde Contact Us para solicitar más información. |      3       |
 | 38 | US-23 | Ver perfil de usuario | Como usuario registrado, quiero ver mis datos de perfil para revisar mi información registrada. |      1       |
 | 39 | US-24 | Editar datos de perfil | Como usuario registrado, quiero editar mis datos para mantener mi información actualizada. |      2       |
-| 40 | US-25 | Ver sección de preguntas frecuentes | Como visitante de ambos segmentos, quiero acceder a una sección de preguntas frecuentes para resolver dudas rápidamente. |      2       |
-| 41 | US-26 | Acceder a información de contacto rápido | Como usuario de ambos segmentos, quiero ver datos de contacto directo (teléfono o correo) para hacer consultas urgentes. |      1       |
+| 40 | US-25 | Ver sección de preguntas frecuentes | Como visitante del servicio FullTank, quiero acceder a una sección de preguntas frecuentes para resolver dudas rápidamente. |      2       |
+| 41 | US-26 | Acceder a información de contacto rápido | Como usuario del servicio FullTank, quiero ver datos de contacto directo (teléfono o correo) para hacer consultas urgentes. |      1       |
 | 42 | US-40 | Registrar empresa solicitante | Como visitante (solicitante), quiero registrar mi empresa en la plataforma para comenzar a realizar pedidos de combustible. |      3       |
 | 43 | US-41 | Registrar empresa proveedora | Como visitante (proveedor), quiero registrar mi empresa distribuidora en la plataforma para comenzar a gestionar pedidos de combustible. |      3       |
 | 44 | US-15 | Iniciar sesión | Como usuario registrado, quiero iniciar sesión con correo y contraseña para acceder a mi cuenta. |      2       |
