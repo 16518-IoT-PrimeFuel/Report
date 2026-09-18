@@ -463,157 +463,102 @@ Basado en el análisis de las entrevistas, se define el siguiente arquetipo para
 ## 2.3 Needfinding
 ### 2.3.1 User Personas
 - **Segmento objetivo: Distribuidores Logísticos de Combustible.**
-  - Perfil operativo asociado: comprador cuyo tanque activa el servicio IoT.
-  <img src="../assets/chapter-2/mapping/userCarlos.png" alt="Captura entrevistado Carlos Ramirez"/>
+  - Perfil operativo asociado: distribuidor que administra pedidos, flota y entregas.
+  <img src="../assets/chapter-2/mapping/userMarco.png" alt="Captura entrevistado Marco Salazar"/>
 
-  - User Persona principal: distribuidor que administra pedidos, flota y entregas.
-  <img src="../assets/chapter-2/mapping/userAndrea.png" alt="Captura entrevistado Andrea Lopez"/>
-
-Los artefactos visuales de personas se conservan como evidencia de las entrevistas. Para el alcance actualizado, Carlos representa al comprador asociado del servicio y Andrea representa al distribuidor, que es el cliente y segmento objetivo que administra el flujo automático de pedidos y despachos.
-
-
+Los artefactos visuales de personas se conservan como evidencia del proceso. Marco representa al **distribuidor**, que es el cliente y segmento objetivo que administra el flujo automático de pedidos y despachos.
 
 ### 2.3.2 User Task Matrix
 
-
-El User Task Matrix presenta las tareas que realizan los User Persona para cumplir sus objetivos en su día a día, independientemente de si usan nuestro software o no. Se evalúa la frecuencia y la importancia de cada tarea para identificar dónde aportar valor.
+El User Task Matrix presenta las tareas que realiza el User Persona principal —el distribuidor logístico de combustible— para cumplir sus objetivos en su día a día, independientemente de si usa nuestro software o no. Se evalúa la frecuencia y la importancia de cada tarea para identificar dónde aportar valor.
 
 <table border="1">
   <thead>
     <tr>
-      <th rowspan="2">Tarea (Task)</th>
-      <th colspan="2">Rol asociado: comprador</th>
-      <th colspan="2">Rol principal: distribuidor</th>
-    </tr>
-    <tr>
-      <th>Frecuencia</th>
-      <th>Importancia</th>
+      <th>Tarea (Task)</th>
       <th>Frecuencia</th>
       <th>Importancia</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Detectar nivel bajo y generar pedido</td>
-      <td>Alta</td>
-      <td>Alta</td>
+      <td>Recibir la solicitud de un comprador asociado</td>
       <td>Alta</td>
       <td>Alta</td>
     </tr>
     <tr>
-      <td>Validar información y aceptar solicitud</td>
+      <td>Validar la información de la solicitud (producto, volumen, ubicación, fecha)</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Decidir si aceptar o rechazar la solicitud</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Asignar conductor y cisterna disponibles</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Verificar que la cisterna tenga capacidad suficiente para el pedido</td>
       <td>Media</td>
       <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
     </tr>
     <tr>
-      <td>Consultar / actualizar estado del pedido</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Revisar o corregir datos del pedido</td>
+      <td>Coordinar la ruta y el despacho</td>
       <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Informar al comprador sobre la confirmación y el avance del pedido</td>
       <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Confirmar la entrega una vez completado el despacho</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Registrar pedidos y despachos en herramientas separadas (Excel, etc.)</td>
+      <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Revisar historial de pedidos y despachos anteriores</td>
+      <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Generar reportes operativos para la toma de decisiones</td>
       <td>Baja</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Asignar conductor y cisterna</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Gestionar solicitudes activadas por IoT</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Notificar estados y excepciones</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Monitorear telemetría y alertas</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Revisar historial y trazabilidad</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Conciliar despacho y recepción</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Generar reportes operativos</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Media</td>
       <td>Media</td>
     </tr>
   </tbody>
 </table>
 
-
 ### 2.3.3 User Journey Mapping
-
-
-**Rol asociado dentro del segmento: comprador**
-
-El User Journey Mapping de Carlos representa el recorrido actual del comprador asociado, desde la observación del nivel del tanque hasta la recepción del combustible. En el alcance actualizado, este recorrido se convierte en la fuente de datos IoT que inicia el pedido, en lugar de ser un flujo comercial independiente.
-
-En la situación As-Is, Carlos enfrenta un flujo de trabajo manual y poco estructurado: revisa el tanque, comunica la necesidad mediante WhatsApp o correo y realiza seguimiento por llamadas. Esto genera retrasos y falta de trazabilidad. La oportunidad es instrumentar el tanque para que el nivel bajo genere una solicitud estructurada al distribuidor asociado y permita consultar su estado.
-
-El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa. Este análisis servirá como base para diseñar el evento `LowFuelLevelDetected`, la generación idempotente del pedido y la notificación de sus estados.
-
- <img src="../assets/chapter-2/mapping/journeyCarlos.png" alt="userJourney de Carlos"/>
 
 **Rol principal del segmento: Distribuidor Logístico de Combustible**
 
-El User Journey Mapping de Andrea representa el recorrido actual de la coordinadora de operaciones de un distribuidor, desde la recepción de la solicitud hasta la entrega. El mapa se utiliza para identificar las decisiones que deben automatizarse y las excepciones que todavía requieren intervención humana.
+El User Journey Mapping de Marco representa el recorrido actual del jefe de operaciones de un distribuidor, desde la recepción de la solicitud hasta la entrega. El mapa se utiliza para identificar las decisiones que deben automatizarse y las excepciones que todavía requieren intervención humana.
 
-En la situación As-Is, Andrea enfrenta un flujo de trabajo altamente demandante y fragmentado: recibe pedidos por diversos canales, valida la información manualmente, decide si puede atenderlos, busca un conductor, selecciona una cisterna y organiza la ruta mediante llamadas, mensajes y hojas de cálculo. Esto genera sobrecarga operativa, errores de capacidad, reasignaciones y limitada visibilidad del estado de cada entrega.
+En la situación As-Is, Marco enfrenta un flujo de trabajo altamente demandante y fragmentado: recibe pedidos por diversos canales, valida la información manualmente, decide si puede atenderlos, busca un conductor, selecciona una cisterna y organiza la ruta mediante llamadas, mensajes y hojas de cálculo. Esto genera sobrecarga operativa, errores de capacidad, reasignaciones y limitada visibilidad del estado de cada entrega.
 
-El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa. Este análisis servirá como base para automatizar la aceptación de solicitudes, la recomendación de recursos, el seguimiento telemático y la generación del acta de recepción.
+El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa. Este análisis servirá como base para automatizar la aceptación de solicitudes, la recomendación de recursos, el seguimiento del estado de la entrega y la generación del acta de recepción.
 
-
- <img src="../assets/chapter-2/mapping/journeyAndrea.png" alt="UserJourney de Andrea"/>
-
+<img src="../assets/chapter-2/mapping/journeyMarco.png" alt="userJourney de Marco"/>
 
 
 ### 2.3.4 Empathy Mapping
 
-
-Para la elaboración de los Empathy Maps, el equipo partió del conocimiento y observaciones recolectadas durante el análisis de los User Persona. Se colocó al centro de cada mapa al usuario correspondiente (Carlos y Andrea) y se respondieron las preguntas claves sobre su entorno, emociones, comportamientos y necesidades.
-
-**Rol asociado dentro del segmento: comprador**
-
-
- <img src="../assets/chapter-2/mapping/empathyCarlos.png" alt="empathyMapping de Carlos"/>
-
+Para la elaboración del Empathy Map, el equipo partió del conocimiento y las observaciones recolectadas durante el análisis del User Persona. Se colocó al centro del mapa al usuario correspondiente al segmento objetivo (**Marco**, distribuidor logístico de combustible) y se respondieron las preguntas clave sobre su entorno, emociones, comportamientos y necesidades.
 
 **Rol principal del segmento: Distribuidor Logístico de Combustible**
 
- <img src="../assets/chapter-2/mapping/empathyAndrea.png" alt="empathyMapping de Andrea"/>
+ <img src="../assets/chapter-2/mapping/empathyMarco.png" alt="empathyMapping de Marco"/>
 
 ## 2.4 Big Picture Event Storming
 
