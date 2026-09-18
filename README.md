@@ -104,68 +104,52 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
 
 **Link de frontend desplegado con Vercel:** [FullTank Frontend](https://frontend-dgwsg79ja-bralexcds-projects.vercel.app/iam)
 
-**Link de la Landing Page desplegada con GitHub Pages:** Pendiente de una URL pública disponible.
-
-Este informe ha sido desarrollado de forma colaborativa mediante GitHub, empleando GitFlow y Conventional Commits. Cada miembro del equipo ha contribuido con commits y ramas durante el desarrollo del proyecto.
-
-**Participación por miembro**
-
-A continuación, se muestra un gráfico de barras con la cantidad de commits realizados por cada integrante del equipo:
-
-![alt text](assets/introduction/barra.png)
-
-**Evolución temporal de commits**
-
-El siguiente gráfico muestra una línea de tiempo con la evolución semanal de los commits realizados por todos los miembros:
-
-![alt text](assets/introduction/tiempo.png)
-
 ## Contenido
 
-- Capítulo I: Introducción
-  - 1.1. Startup Profile
-    - 1.1.1. Descripción de la Startup
-    - 1.1.2. Perfiles de integrantes del equipo
-  - 1.2. Solution Profile
-    - 1.2.1 Antecedentes y problemática
-    - 1.2.2 Lean UX Process.
-      - 1.2.2.1. Lean UX Problem Statements.
-      - 1.2.2.2. Lean UX Assumptions.
-      - 1.2.2.3. Lean UX Hypothesis Statements.
-      - 1.2.2.4. Lean UX Canvas.
-  - 1.3. Segmentos objetivos.
-- Capítulo II: Requirements Elicitation & Analysis
-  - 2.1. Competidores.
-    - 2.1.1. Análisis competitivo.
-    - 2.1.2. Estrategias y tácticas frente a competidores.
-  - 2.2. Entrevistas.
-    - 2.2.1. Diseño de entrevistas.
-    - 2.2.2. Registro de entrevistas.
-    - 2.2.3. Análisis de entrevistas.
-  - 2.3. Needfinding.
-    - 2.3.1. User Personas.
-    - 2.3.2. User Task Matrix.
-    - 2.3.3. User Journey Mapping.
-    - 2.3.4. Empathy Mapping.
-  - 2.4. Big Picture EventStorming.
-  - 2.5. Ubiquitous Language.
-- Capítulo III: Requirements Specification
-  - 3.1. User Stories.
-  - 3.2. Impact Mapping.
-  - 3.3. Product Backlog.
-- Capítulo IV: Solution Software Design
-  - 4.1. Strategic-Level Domain-Driven Design.
-    - 4.1.1. Design-Level EventStorming.
-      - 4.1.1.1 Candidate Context Discovery.
-      - 4.1.1.2 Domain Message Flows Modeling.
-      - 4.1.1.3 Bounded Context Canvases.
-    - 4.1.2. Context Mapping.
-    - 4.1.3. Software Architecture.
-      - 4.1.3.1. Software Architecture System Landscape Diagram.
-      - 4.1.3.2. Software Architecture Context Level Diagrams.
-      - 4.1.3.3. Software Architecture Container Level Diagrams.
-      - 4.1.3.4. Software Architecture Deployment Diagrams.
-  - 4.2. Tactical-Level Domain-Driven Design
+- [Capítulo I: Introducción](docs/chapter1.md)
+  - [1.1. Startup Profile](docs/chapter1.md#11-startup-profile)
+    - [1.1.1. Descripción de la Startup](docs/chapter1.md#111-descripción-de-la-startup)
+    - [1.1.2. Perfiles de integrantes del equipo](docs/chapter1.md#112-perfiles-de-integrantes-del-equipo)
+  - [1.2. Solution Profile](docs/chapter1.md#12-solution-profile)
+    - [1.2.1 Antecedentes y problemática](docs/chapter1.md#121-antecedentes-y-problemática)
+    - [1.2.2 Lean UX Process](docs/chapter1.md#122-lean-ux-process)
+      - [1.2.2.1. Lean UX Problem Statements](docs/chapter1.md#1221-lean-ux-problem-statements)
+      - [1.2.2.2. Lean UX Assumptions](docs/chapter1.md#1222-lean-ux-assumptions)
+      - [1.2.2.3. Lean UX Hypothesis Statements](docs/chapter1.md#1223-lean-ux-hypothesis-statements)
+      - [1.2.2.4. Lean UX Canvas](docs/chapter1.md#1224-lean-ux-canvas)
+  - [1.3. Segmentos objetivos](docs/chapter1.md#13-segmentos-objetivos)
+- [Capítulo II: Requirements Elicitation & Analysis](docs/chapter2.md)
+  - [2.1. Competidores](docs/chapter2.md#21-competidores)
+    - [2.1.1. Análisis competitivo](docs/chapter2.md#211-análisis-competitivo)
+    - [2.1.2. Estrategias y tácticas frente a competidores](docs/chapter2.md#212-estrategias-y-tácticas-frente-a-competidores)
+  - [2.2. Entrevistas](docs/chapter2.md#22-entrevistas)
+    - [2.2.1. Diseño de entrevistas](docs/chapter2.md#221-diseño-de-entrevistas)
+    - [2.2.2. Registro de entrevistas](docs/chapter2.md#222-registro-de-entrevistas)
+    - [2.2.3. Análisis de entrevistas](docs/chapter2.md#223-análisis-de-entrevistas)
+  - [2.3. Needfinding](docs/chapter2.md#23-needfinding)
+    - [2.3.1. User Personas](docs/chapter2.md#231-user-personas)
+    - [2.3.2. User Task Matrix](docs/chapter2.md#232-user-task-matrix)
+    - [2.3.3. User Journey Mapping](docs/chapter2.md#233-user-journey-mapping)
+    - [2.3.4. Empathy Mapping](docs/chapter2.md#234-empathy-mapping)
+  - [2.4. Big Picture EventStorming](docs/chapter2.md#24-big-picture-event-storming)
+  - [2.5. Ubiquitous Language](docs/chapter2.md#25-ubiquitous-language)
+- [Capítulo III: Requirements Specification](docs/chapter3.md)
+  - [3.1. User Stories](docs/chapter3.md#31-user-stories)
+  - [3.2. Impact Mapping](docs/chapter3.md#32-impact-mapping)
+  - [3.3. Product Backlog](docs/chapter3.md#33-product-backlog)
+- [Capítulo IV: Solution Software Design](docs/chapter4.md)
+  - [4.1. Strategic-Level Domain-Driven Design](docs/chapter4.md#41-strategic-level-domain-driven-design)
+    - [4.1.1. Design-Level EventStorming](docs/chapter4.md#411-design-level-eventstorming)
+      - [4.1.1.1 Candidate Context Discovery](docs/chapter4.md#4111-candidate-context-discovery)
+      - [4.1.1.2 Domain Message Flows Modeling](docs/chapter4.md#4112-domain-message-flows-modeling)
+      - [4.1.1.3 Bounded Context Canvases](docs/chapter4.md#4113-bounded-context-canvases)
+    - [4.1.2. Context Mapping](docs/chapter4.md#412-context-mapping)
+    - [4.1.3. Software Architecture](docs/chapter4.md#413-software-architecture)
+      - [4.1.3.1. Software Architecture System Landscape Diagram](docs/chapter4.md#4131-software-architecture-system-landscape-diagram)
+      - [4.1.3.2. Software Architecture Context Level Diagrams](docs/chapter4.md#4132-software-architecture-context-level-diagrams)
+      - [4.1.3.3. Software Architecture Container Level Diagrams](docs/chapter4.md#4133-software-architecture-container-level-diagrams)
+      - [4.1.3.4. Software Architecture Deployment Diagrams](docs/chapter4.md#4134-software-architecture-deployment-diagrams)
+  - [4.2. Tactical-Level Domain-Driven Design](docs/chapter4.md#42-tactical-level-domain-driven-design)
     - 4.2.X. Bounded Context: \<Bounded Context Name\>
       - 4.2.X.1. Domain Layer.
       - 4.2.X.2. Interface Layer.
@@ -216,12 +200,12 @@ El siguiente gráfico muestra una línea de tiempo con la evolución semanal de 
     - 6.3.1. Diseño de Entrevistas.
     - 6.3.2. Registro de Entrevistas.
     - 6.3.3. Evaluaciones según heurísticas.
-  - 6.4. Video About-the-Product.
-- Conclusiones
+  - [6.4. Video About-the-Product](docs/anexes.md#video-about-the-product)
+- [Conclusiones](docs/anexes.md#conclusiones)
   - Conclusiones y recomendaciones.
-  - Video About-the-Team.
-- Bibliografía
-- Anexos
+  - [Video About-the-Team](docs/anexes.md#video-about-the-team)
+- [Bibliografía](docs/anexes.md#bibliografía)
+- [Anexos](docs/anexes.md#anexos)
 
 ## Student Outcome
 
