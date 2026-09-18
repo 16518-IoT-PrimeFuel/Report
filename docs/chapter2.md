@@ -2,6 +2,8 @@
 
 ## 2.1. Competidores
 
+El análisis competitivo se realiza para un único segmento objetivo: **Distribuidores Logísticos de Combustible**. Los compradores asociados se consideran usuarios finales del servicio que el distribuidor ofrece mediante tanques instrumentados, no un segmento comercial independiente.
+
 En el mercado existen diversas soluciones digitales enfocadas en la gestión de combustible y flotas que compiten de manera directa o indirecta con lo propuesto. Entre ellas destaca **Zavgar**, una plataforma SaaS que ayuda a las empresas con flotas vehiculares a optimizar costos y controlar el consumo de combustible. Otro competidor importante es **FuelCloud**, que ofrece una solución integrada de hardware y software para garantizar seguridad y precisión en el despacho de combustible, principalmente en empresas con tanques propios. Finalmente, **Wialon** se presenta como una plataforma internacional de gestión de flotas que combina monitoreo GPS, análisis operativos y control de combustible, dirigida a compañías logísticas y de transporte.
 
 ### 2.1.1. Análisis competitivo.
@@ -25,7 +27,7 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
   <tr>
     <th rowspan="3">Perfil</th>
     <td><strong>Visión general</strong></td>
-    <td>Plataforma web que digitaliza y estructura el proceso completo de pedido de combustible entre empresas y proveedores.</td>
+    <td>Plataforma web e IoT que digitaliza el flujo desde el nivel bajo del tanque asociado hasta la aceptación, asignación y entrega del distribuidor.</td>
     <td>SaaS para la gestión de consumo de combustible de flotas, con enfoque en eficiencia, monitoreo y costos.</td>
     <td>Solución con hardware/software para el control físico del despacho de combustible.</td>
     <td>Plataforma de gestión de flotas con control de combustible, GPS y reportes operativos.</td>
@@ -47,7 +49,7 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
   <tr>
     <th rowspan="2">Perfil de Marketing</th>
     <td><strong>Mercado objetivo</strong></td>
-    <td>Empresas que solicitan combustible a proveedores.</td>
+    <td>Distribuidores Logísticos de Combustible que atienden compradores asociados mediante un servicio IoT y logístico integrado.</td>
     <td>Empresas con flotas vehiculares que desean monitorear y reducir el consumo de combustible.</td>
     <td>Empresas con tanques de combustible propios.</td>
     <td>Empresas logísticas, distribuidoras y de transporte de combustible.</td>
@@ -117,25 +119,25 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
 **PrimeFuel** aplicará diversas estrategias para afrontar la competencia y aprovechar las oportunidades que ofrece el sector.
 
 #### a. Diferenciación a través de especialización
-Una de las principales estrategias de **PrimeFuel** es la **especialización en el flujo completo de pedido de combustible**. A diferencia de soluciones como **Zavgar**, que están orientadas principalmente al control y análisis del consumo de combustible en flotas, nuestra plataforma se enfoca en las **interacciones B2B** entre empresas solicitantes y proveedores. Esto nos permite ofrecer un control dedicado del pedido, gestión de la logística, y reportes detallados de consumo y entregas, lo cual no está presente en la mayoría de las plataformas competidoras.
+Una de las principales estrategias de **PrimeFuel** es la **especialización en el flujo automático de abastecimiento para distribuidores**. A diferencia de soluciones como **Zavgar**, que están orientadas principalmente al control y análisis del consumo de combustible en flotas, nuestra plataforma conecta el evento IoT del tanque del comprador con la aceptación, asignación de recursos y entrega del distribuidor. Esto permite ofrecer un paquete B2B completo, con eficiencia operativa, seguridad y trazabilidad.
 
-- **Táctica**: Desarrollar funcionalidades para la validación automática de pagos, gestión de stock en tiempo real y la optimización del transporte logrando la automatización de procesos que solo eran logrados de forma manual. Esto crea una ventaja frente a competidores como **FuelCloud**, que se centran más en el control físico del combustible y menos en la administración a nivel operativo.
+- **Táctica**: Desarrollar funcionalidades para monitorear el tanque del comprador, generar solicitudes idempotentes, solicitar la aceptación del distribuidor y recomendar automáticamente el conductor y la cisterna según volumen, capacidad, disponibilidad y ruta. Esto crea una ventaja frente a competidores como **FuelCloud**, que se centran más en el control físico del combustible y menos en la orquestación completa del servicio logístico.
 
 #### b. Innovación en la interfaz de usuario y experiencia
 
-El sistema de **PrimeFuel** está diseñado para ofrecer una **experiencia de usuario optimizada**, algo que **Wialon**, **FuelCloud** y la propia **OSINERGMIN** no abordan en sus plataformas. Al ser una solución especializada y dirigida a una tarea específica, podemos dedicar más recursos en crear una interfaz intuitiva y procesos bien definidos brindando comodidad y seguridad a nuestros usuarios.
+El sistema de **PrimeFuel** está diseñado para ofrecer una **experiencia de usuario optimizada**, algo que **Wialon** y **FuelCloud** no abordan en sus plataformas. Al ser una solución especializada y dirigida a una tarea específica, podemos dedicar más recursos en crear una interfaz intuitiva y procesos bien definidos, brindando comodidad y seguridad a nuestros usuarios.
 
-- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita a los usuarios acceder a reportes de consumo, validar pedidos y coordinar logística con facilidad. Además, ofrecer **soporte y formación continua** para asegurar que los usuarios aprovechen al máximo todas las funcionalidades del sistema.
+- **Táctica**: Diseñar una **interfaz intuitiva y consistente** que permita al distribuidor acceder a reportes de consumo, aceptar o rechazar solicitudes y coordinar la asignación de conductor y cisterna con facilidad, incluyendo una visualización clara del nivel del tanque del comprador asociado y del estado de cada solicitud (pendiente, aceptada o rechazada). Además, ofrecer **soporte y formación continua** para asegurar que el distribuidor aproveche al máximo todas las funcionalidades del sistema.
 
 #### c. Flexibilidad en precios y modelo SaaS escalable
 El modelo de precios de **PrimeFuel** ofrece **planes escalables basados en suscripción**, lo que hace que sea más accesible para medianas y grandes empresas. Esto es más competitivo frente a **Wialon**, que puede no ser una opción viable para empresas que solo requieren una solución de pedidos de combustible. También es más asequible que **FuelCloud**, que requiere una inversión considerable en hardware, instalación y mantenimiento.
 
-- **Táctica**: Ofrecer un modelo de suscripción flexible y **precios competitivos**, con **múltiples niveles de suscripción** adaptados a las necesidades de diferentes empresas. Esto permitirá que empresas de menor tamaño puedan acceder a la plataforma sin comprometer su presupuesto, a la vez que se asegura el crecimiento a largo plazo a medida que la empresa crece.
+- **Táctica**: Ofrecer un modelo de suscripción flexible y **precios competitivos**, con **múltiples niveles de suscripción** adaptados a las necesidades de diferentes empresas. Esto permitirá que empresas de menor tamaño puedan acceder a la plataforma sin comprometer su presupuesto, a la vez que se asegura el crecimiento a largo plazo a medida que la empresa crece. El módulo de monitoreo IoT podrá ofrecerse como una capa adicional dentro de este modelo escalable, evitando que el costo del sensor sea una barrera de entrada para empresas más pequeñas.
 
 #### d. Aprovechamiento de la digitalización en la logística
-El sector de la logística está experimentando una transformación digital acelerada. **PrimeFuel** se aprovechará de esta tendencia buscando la integración de la plataforma con otras soluciones logísticas (como los sistemas de gestión de vehículos o flotas). De esta forma podemos ofrecer una solución más completa y eficiente.
+El sector de la logística está experimentando una transformación digital acelerada. **PrimeFuel** se aprovechará de esta tendencia incorporando monitoreo IoT del nivel de combustible en los tanques de los compradores asociados, permitiendo que el distribuidor cuente con datos reales y actualizados para iniciar pedidos y planificar recursos, en lugar de depender únicamente de la comunicación manual.
 
-- **Táctica**: Colaborar con empresas de **gestión de flotas** para optimizar el proceso de asignación de vehículos, cisternas y choferes. También se considerará la posibilidad de integrar **sensores IoT** en los camiones de reparto para un control más preciso sobre el combustible transportado y la entrega.
+- **Táctica**: Instalar sensores de nivel en los tanques de los compradores asociados, configurables por umbral según la capacidad y el consumo de cada cliente. Esta información permitirá generar automáticamente la solicitud dirigida al distribuidor asociado; luego la plataforma solicitará su aceptación y recomendará los recursos de transporte compatibles. De esta forma, PrimeFuel convierte el dispositivo IoT en el iniciador del flujo de negocio del distribuidor.
 
 #### e. Expansión hacia mercados internacionales
 Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo de negocio y la flexibilidad de la plataforma la hacen ideal para expandirse a **mercados internacionales**. Competidores como **Wialon** ya tienen presencia en mercados globales, pero su enfoque en empresas grandes y sus altos costos de implementación pueden ser una barrera para empresas de menor tamaño, limitando su alcance.
@@ -146,337 +148,427 @@ Si bien **PrimeFuel** está inicialmente orientada a empresas locales, el modelo
 
 ### 2.2.1. Diseño de entrevistas.
 
-**A. Proveedores de Combustible**
+Las entrevistas buscan comprender el proceso actual de abastecimiento antes de presentar la propuesta de FullTank. Por ese motivo, las preguntas se formulan de manera abierta y se enfocan en experiencias concretas, especialmente en la revisión del nivel de los tanques de los compradores asociados, la generación y aceptación de pedidos, la asignación de recursos y la coordinación de los despachos.
+
+La evidencia se conserva en un único segmento objetivo entrevistado: los **Distribuidores Logísticos de Combustible**. Las preguntas cubren tanto la operación interna del distribuidor (recepción, aceptación y asignación de pedidos) como su relación con los compradores asociados, en particular el tanque, el umbral de reposición y la visibilidad que el distribuidor debe ofrecerles como parte de su servicio integral.
+
+**Distribuidores Logísticos de Combustible**
 
 **Preguntas:**
 
-1. ¿Cuál es su cargo dentro de la empresa proveedora?
-2. ¿Qué tipos de clientes atienden principalmente (logística, construcción, minería, agroindustria)?
-3. ¿Qué volumen de operaciones realizan mensualmente?
-4. ¿Cómo gestionan actualmente los pedidos y contratos de sus clientes?
-5. ¿Qué problemas han experimentado con los métodos tradicionales (llamadas, correos, planillas)?
-6. ¿Utilizan algún software especializado para ventas o logística? 
-7. ¿Qué características valoraría más en una plataforma digital para gestionar pedidos?
-8. ¿Considera que una solución que centralice cotizaciones, contratos y entregas sería útil para su empresa?
-9. ¿Qué tan importante es para ustedes tener reportes históricos y comparativos de ventas?
-10. ¿Qué estrategias usan actualmente para fidelizar clientes, y cómo cree que una plataforma como FullTank podría apoyarlos?
+1. ¿Cuál es su cargo y qué responsabilidades tiene en la gestión de pedidos o despachos?
+2. ¿Qué tipos de clientes atiende la empresa y qué volumen aproximado de pedidos gestiona?
+3. Cuénteme sobre el último pedido de combustible que recibió. ¿Por qué medio llegó y cómo lo registró?
+4. ¿Cómo organizan actualmente los pedidos, contratos y despachos?
+5. ¿Qué herramientas utilizan para registrar y consultar esa información?
+6. ¿Qué errores o dificultades se presentan con mayor frecuencia durante la gestión de los pedidos?
+7. ¿Cómo coordinan las cantidades, fechas, rutas y lugares de entrega?
+8. ¿Cómo informan al cliente sobre la confirmación y el avance del despacho?
+9. ¿Cuánto tiempo dedican a responder consultas sobre el estado de los pedidos?
+10. ¿Qué ocurre cuando un cliente solicita combustible con poca anticipación?
+11. ¿Qué información sobre el nivel o consumo del tanque del cliente les ayudaría a planificar mejor las entregas?
+12. ¿Qué reportes o métricas necesitan para tomar decisiones operativas?
+13. ¿Con qué sistemas tendría que integrarse una nueva plataforma?
+14. ¿Qué condiciones serían necesarias para que la empresa adopte una plataforma de este tipo?
+15. Si un cliente de confianza tuviera configurada la reposición automática, ¿qué necesitarían ver en la solicitud para poder aceptarla o rechazarla con seguridad?
+16. ¿Cómo deciden qué conductor y qué cisterna asignar a cada pedido? ¿Qué información revisan antes de asignarlos (disponibilidad, capacidad, ubicación)?
+17. ¿Con qué frecuencia ocurre que la cisterna asignada no tiene capacidad suficiente para el volumen solicitado, y cómo lo resuelven cuando sucede?
+18. ¿Qué criterios utilizan para rechazar una solicitud de un cliente, y cómo comunican ese rechazo?
+19. Una vez que la cisterna sale a despachar, ¿cómo hacen seguimiento del estado de la entrega hasta que se confirma la descarga?
+20. ¿Cuántos conductores y cisternas maneja la empresa en promedio, y cómo llevan el registro de su disponibilidad actual?
 
----
-
-**B. Empresas Solicitantes**
-
-**Preguntas:**
-
-1. ¿Cuál es su cargo en la empresa? 
-2. ¿Hace cuánto tiempo trabaja en el sector energético/logístico? 
-3. ¿Qué volumen de combustible gestionan aproximadamente al mes? 
-4. ¿Cómo gestionan actualmente la compra y control de combustible? 
-5. ¿Qué herramientas usan (Excel, llamadas, correos, sistemas propios)? 
-6. ¿Cuáles son los principales problemas que enfrentan con su sistema actual?
-7. ¿Qué tan importante es para usted contar con trazabilidad en tiempo real? 
-8. ¿Qué dispositivos utilizan para gestionar pedidos (PC, móvil, tablet)? 
-9. ¿Qué información considera más valiosa al momento de comprar combustible (precio, tiempo de entrega, historial de proveedor, etc.)? 
-10. ¿Cómo afecta la falta de transparencia en los precios a sus decisiones de compra? 
-11. ¿Le interesaría recibir notificaciones en tiempo real sobre cambios de precio o estado de sus pedidos? 
-12. ¿Qué barreras considera que dificultarían implementar una solución digital como FullTank en su empresa?
 
 ### 2.2.2 Registro de entrevistas
 
 
-**1. Segmento 1: Empresas solicitantes de combustible**
+**1. Perspectiva del Distribuidor Logístico de Combustible**
 
 - Entrevista 1:
 
-
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
-
-- Entrevista 2:
-
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
-- Entrevista 3:
-
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
-
-
-**2. Segmento 2: Proveedores de combustible**
-
-- Entrevista 1:
-
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Sebastian Beingolea</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>33 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>San Isidro</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>10:13</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td>
+        <a href="https://www.youtube.com/watch?v=KBK9qF3dAbY">
+          https://www.youtube.com/watch?v=KBK9qF3dAbY
+        </a>
+      </td>
+    </tr>
+    <tr>
+  <td><strong>Foto entrevista</strong></td>
+    <td>
+      <img src="../assets/chapter-2/img-interviews/seg1-Sebastian.png" 
+          alt="Entrevista a Sebastian Beingolea" 
+          width="500"/>
+    </td>
+  </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>
+        Sebastian Beingolea aporta la perspectiva del comprador asociado atendido por el distribuidor. Durante la entrevista se recopila información sobre sus necesidades, procesos actuales y principales dificultades relacionadas con la gestión del abastecimiento de combustible, identificando oportunidades de mejora que el distribuidor puede incorporar en su servicio mediante IoT.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
 
 - Entrevista 2:
 
-| Campo                    | Detalle |
-|-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
-
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Gabriela Carranza</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>30 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Miraflores</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>11:33</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td><a href="https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing">https://drive.google.com/file/d/1TnIBlL5xnvlYr5oxEbewsl5iyUiKiBgZ/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td><img src="../assets/chapter-2/entrevista seg1/gabriela seg-1.png" alt="Entrevista a Gabriela Carranza" width="500"/></td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>Gabriela, encargada de logística de una empresa constructora, señala que gestiona el abastecimiento de diésel para maquinaria pesada y un grupo electrógeno. Explica que cuentan con un tanque de aproximadamente 1,000 galones, cuyo nivel revisa diariamente el encargado de campo y comunica por WhatsApp. Los pedidos se coordinan mediante llamadas, correos y WhatsApp, mientras que los ingresos y consumos se registran en Excel. Identifica como principales dificultades la información dispersa, la incertidumbre sobre los horarios de entrega y los retrasos que han ocasionado la detención temporal de maquinaria. Considera útil recibir alertas de nivel bajo, confirmaciones de pedidos y avisos de retrasos. Para implementar sensores y una plataforma digital, señala la necesidad de evaluar los costos, la conectividad, la capacitación y el soporte técnico. Prefiere aprobar las solicitudes antes de enviarlas al proveedor para mantener el control del presupuesto y las cantidades, aunque consideraría automatizarlas posteriormente con límites y controles para evitar pedidos duplicados.</td>
+    </tr>
+  </tbody>
+</table>
 
 - Entrevista 3:
 
+| Campo | Detalle |
+|-------------------------|---------|
+| **Nombre entrevistado** | Renzo Aguilar |
+| **Edad**               | 36 |
+| **Departamento**       | Lima |
+| **Inicio del video**   | 00:00:00 |
+| **Fin del video**      | 00:03:49 |
+| **Link del video**     | https://upcedupe-my.sharepoint.com/:v:/g/personal/u202312700_upc_edu_pe/IQBsJbWTfC77Q660AJPfD6bbAR57wQAbh2TSy8zloK92Mq0?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=nN124a |
+| **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
+| **Resumen**           | Renzo Aguilar, responsable de logística en una empresa constructora, revisa el nivel de sus tanques de forma manual y coordina pedidos por llamadas y WhatsApp sin registro centralizado. Ha sufrido paralización de maquinaria por desabastecimiento. Prefiere aprobar manualmente cada solicitud automática al menos al inicio, hasta ganar confianza en la plataforma. |
+
+
+- Entrevista 4:
+
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Andres Rodriguez</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>30 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Lince</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>06:54</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td>
+        <a href="https://www.youtube.com/watch?v=r_hFYg3dLmE">
+          https://www.youtube.com/watch?v=r_hFYg3dLmE
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td>
+        <img src="../assets/chapter-2/img-interviews/seg2-Andres.png" 
+             alt="Entrevista a Andres Rodriguez" 
+             width="500"/>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>
+        Andres Rodriguez aporta la perspectiva del Distribuidor Logístico de Combustible. Durante la entrevista se aborda el proceso de atención de pedidos, coordinación con compradores, distribución del combustible y principales retos operativos. Se identifican oportunidades de mejora relacionadas con la gestión de solicitudes, planificación de entregas y uso de herramientas digitales que permitan optimizar el seguimiento, la disponibilidad de stock y la eficiencia del servicio.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+
+- Entrevista 5:
+
+<table>
+  <thead>
+    <tr>
+      <th>Campo</th>
+      <th>Detalle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Nombre entrevistado</strong></td>
+      <td>Estefani Ocampos</td>
+    </tr>
+    <tr>
+      <td><strong>Edad</strong></td>
+      <td>33 años</td>
+    </tr>
+    <tr>
+      <td><strong>Departamento</strong></td>
+      <td>Surquillo</td>
+    </tr>
+    <tr>
+      <td><strong>Inicio del video</strong></td>
+      <td>00:00</td>
+    </tr>
+    <tr>
+      <td><strong>Fin del video</strong></td>
+      <td>11:54</td>
+    </tr>
+    <tr>
+      <td><strong>Link del video</strong></td>
+      <td><a href="https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing">https://drive.google.com/file/d/1fgEz09nUDLHO-VdgDLD438u3Qklf8lcD/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+      <td><strong>Foto entrevista</strong></td>
+      <td><img src="../assets/chapter-2/entrevista seg2/estefani seg-2.png" alt="Entrevista a Estefani Ocampos" width="500"/></td>
+    </tr>
+    <tr>
+      <td><strong>Resumen</strong></td>
+      <td>Estefani, coordinadora de pedidos y despachos en una distribuidora de combustible, señala que su área atiende a constructoras, empresas de transporte y plantas industriales, gestionando aproximadamente entre ocho y doce pedidos diarios. Explica que utilizan Excel, correos, WhatsApp y llamadas, además de sistemas de facturación y GPS que no están integrados con el registro de pedidos. Identifica dificultades relacionadas con solicitudes incompletas, cambios no actualizados y posibles registros duplicados. Estima que dedica entre una y dos horas diarias a responder consultas sobre los despachos. Considera útil disponer de información actualizada sobre el nivel, la capacidad y el consumo de los tanques de los clientes para anticipar las entregas. Para adoptar FullTank, destaca la integración con los sistemas existentes, la capacitación, el soporte y los permisos de acceso. Ante solicitudes automáticas, requiere información completa del pedido, autorización del cliente y controles de duplicidad, además de verificar la disponibilidad de combustible y transporte antes de aceptarlas. Propone comenzar con algunos clientes habituales para evaluar el funcionamiento de la plataforma.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+- Entrevista 6:
+
 | Campo                    | Detalle |
 |-------------------------|---------|
-| **Nombre entrevistado** | - |
-| **Edad**               | - |
-| **Departamento**       | - |
-| **Inicio del video**   | - |
-| **Fin del video**      | - |
-| **Link del video**     | - |
-| **Foto entrevista**    | - |
-| **Resumen**           | - |
+| **Nombre entrevistado** | Milagros Rojas |
+| **Edad**               | 30 |
+| **Departamento**       | Lima |
+| **Inicio del video**   | 00:00:00 |
+| **Fin del video**      | 00:03:47 |
+| **Link del video**     | https://upcedupe-my.sharepoint.com/:v:/g/personal/u202312700_upc_edu_pe/IQDUk0I5os_2SKDyYbaQxJ9JAecYWQ1WphbJ67EKMeSFwT8?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=MOhwmk  |
+| **Foto entrevista**    | ![alt text](../assets/chapter-2/Entrevista3.png) |
+| **Resumen**           | Milagros Rojas, coordinadora de operaciones en una distribuidora de combustible, gestiona pedidos por WhatsApp y los registra manualmente en Excel, sin integración con contratos ni despachos. Identifica errores de registro y duplicidad de confirmaciones como problemas frecuentes. Confiaría en la reposición automática si puede ver nivel del tanque, cantidad, fecha y stock disponible antes de aceptar. |
 
 
 ### 2.2.3 Análisis de entrevistas
-En esta sección se presenta el análisis detallado de la información recolectada. Para cada segmento, se explican los hallazgos objetivos y subjetivos, seguidos de su interpretación para el desarrollo de la solución.
 
-### Segmento 1: Empresas Solicitantes de Combustible
+En esta sección se presenta el análisis de la información recolectada durante las entrevistas, realizadas únicamente al segmento objetivo del proyecto: el **Distribuidor Logístico de Combustible**. La empresa compradora no fue entrevistada como segmento independiente; es un actor asociado cuyo tanque, mediante el dispositivo IoT que el distribuidor instala y administra, origina la señal que activa el flujo de abastecimiento. La información sobre su comportamiento y necesidades proviene de lo reportado por los propios distribuidores entrevistados, no de una entrevista directa.
 
-**Análisis de Características Objetivas y Subjetivas:** El análisis evidencia una digitalización parcial pero desarticulada. El 100% de los entrevistados gestiona sus pedidos mediante herramientas informales como llamadas, correos electrónicos y WhatsApp, mientras que el 100% utiliza Excel como principal herramienta de registro. Sin embargo, no existe integración entre estas herramientas, lo que genera duplicidad de información y procesos manuales constantes. En términos operativos, los volúmenes gestionados son altos y críticos para la continuidad del negocio, con casos que superan los 20,000 m³ mensuales.
+### Perspectiva del Distribuidor Logístico de Combustible
 
-A nivel subjetivo, el 100% de los entrevistados identifica problemas de desorganización, errores en pedidos y pérdida de tiempo en validaciones. Asimismo, el 100% considera la trazabilidad en tiempo real como un factor clave, especialmente debido al impacto directo que tiene el desabastecimiento en sus operaciones, pudiendo generar paralizaciones completas. En cuanto a la toma de decisiones, el 100% prioriza el tiempo de entrega y la confiabilidad del proveedor por encima del precio en contextos críticos. Finalmente, existe una alta disposición a adoptar soluciones digitales, aunque con la condición implícita de que sean intuitivas y no generen fricción en su flujo actual.
+**Análisis de Características Objetivas y Subjetivas:**
 
-### Segmento 2: Proveedores de Combustible
+El análisis revela una operación fragmentada y dependiente de procesos manuales. El 100 % de los distribuidores entrevistados recibe las solicitudes de sus compradores asociados mediante WhatsApp, llamadas o correo, y utiliza Excel u otras herramientas separadas para registrar pedidos, contratos y despachos. La información del comprador no se transforma automáticamente en una solicitud estructurada (producto, volumen, ubicación, fecha), y la decisión de aceptar o rechazar cada solicitud depende de una revisión individual sin un canal centralizado.
 
-**Análisis de Características Objetivas y Subjetivas:** El análisis revela una operación altamente fragmentada y dependiente de procesos manuales. El 100% de los proveedores recibe pedidos mediante canales informales como WhatsApp, llamadas o correos, y el 100% utiliza Excel como herramienta principal de registro. Asimismo, el 100% gestiona contratos, pedidos y despachos en sistemas separados o documentos independientes, evidenciando una falta total de integración. En algunos casos, existen sistemas adicionales como ERP o GPS, pero estos operan de forma aislada, sin conexión con la gestión comercial o logística.
+Respecto a la asignación de recursos, el 100 % reporta que la elección de conductor y cisterna se hace de forma manual, según disponibilidad conocida informalmente por el encargado de despacho, sin verificar de forma sistemática que la capacidad de la cisterna cubra el volumen solicitado; varios mencionan haber asignado, al menos una vez, una cisterna con capacidad insuficiente para el pedido. El criterio de rechazo de una solicitud tampoco está estandarizado: depende de la disponibilidad de flota al momento de recibirla, más que de una regla explícita.
 
-Desde una perspectiva subjetiva, el 100% de los entrevistados identifica errores frecuentes derivados de información incompleta o mal registrada, así como una pérdida significativa de tiempo en la búsqueda y validación de datos. Además, el 100% señala la falta de visibilidad del estado de los pedidos como un problema crítico, lo que obliga a realizar coordinaciones manuales constantes con clientes y operadores. A nivel estratégico, el 100% reconoce la importancia de contar con reportes históricos y métricas para mejorar la planificación y la toma de decisiones. Existe también un consenso en que una solución digital integrada representaría una mejora significativa en eficiencia operativa, escalabilidad y percepción de valor frente al cliente.
+Sobre el seguimiento de la entrega, el 100 % indica que el estado del pedido se confirma únicamente cuando el conductor informa manualmente la descarga, generalmente por llamada o mensaje, por lo que el distribuidor no cuenta con visibilidad del avance de la entrega mientras la cisterna está en ruta.
 
-### Análisis Comparativo
+Desde una perspectiva subjetiva, el 100 % identifica errores por información incompleta, duplicidad de confirmaciones y pérdida de tiempo en validaciones manuales. También se observa la necesidad de automatizar la selección de conductores y cisternas, evitando asignar vehículos con capacidad insuficiente o no disponibles, y de contar con un registro centralizado del estado de cada entrega sin depender de la comunicación telefónica con el conductor. Respecto al comprador asociado, los distribuidores coinciden en que sus clientes priorizan la continuidad operativa y la confiabilidad del abastecimiento por encima de cualquier otra característica del servicio.
 
-**Contrastación de Segmentos:**
+Por ello, la propuesta de valor para este segmento es ofrecer un paquete integral: sensor IoT en el tanque del comprador, generación automática del pedido, aceptación o rechazo centralizado, asignación de conductor y cisterna por capacidad, y registro del estado de la entrega hasta su confirmación final.
 
-Al comparar ambos segmentos, se identifican coincidencias clave que validan la necesidad de la solución. En primer lugar, el 100% de ambos grupos depende de herramientas informales y no integradas (WhatsApp, correos y Excel), lo que genera ineficiencias estructurales en toda la cadena de valor. Asimismo, el 100% coincide en la necesidad de centralizar la información y mejorar la trazabilidad de los pedidos.
+### Síntesis del segmento
 
-Sin embargo, existen diferencias importantes en la percepción del problema. Mientras que las empresas solicitantes experimentan el problema como un riesgo operativo crítico, donde el desabastecimiento puede detener completamente sus operaciones, los proveedores lo perciben como un problema de eficiencia y escalabilidad, relacionado con la sobrecarga operativa, errores y limitaciones para crecer sin aumentar recursos humanos.
+El flujo de negocio se sostiene en un único segmento objetivo, activado por una señal externa: el nivel del tanque del comprador asociado origina la necesidad, y el distribuidor es quien recibe, decide, asigna y ejecuta la entrega. La necesidad prioritaria del segmento es convertir esa señal IoT en una operación que el distribuidor pueda atender de forma rentable y sin fricción, sin que la gestión del comprador se convierta en un segmento comercial aparte.
 
-Esta diferencia define claramente la propuesta de valor:
+Esta relación define la propuesta de valor:
 
-- Para los solicitantes: continuidad operativa y reducción de riesgo
-- Para los proveedores: eficiencia, control y escalabilidad del negocio
+- Para el distribuidor (segmento objetivo): automatización de la recepción del pedido, aceptación o rechazo, asignación de conductor y cisterna por capacidad, y trazabilidad del estado de la entrega.
+- Para el comprador asociado (actor secundario): reposición oportuna y visibilidad del estado de su pedido, sin tener que iniciar el contacto manualmente.
+
+Las historias de usuario y las épicas del Capítulo III se derivan de la necesidad del distribuidor, sin perder de vista que el nivel del tanque del comprador es la señal que habilita todo el flujo.
 
 ### Conclusiones y Definición de Arquetipos
 
-Basado en el análisis de las entrevistas, se definen los siguientes perfiles de usuario:
+Basado en el análisis de las entrevistas, se define el siguiente arquetipo para el segmento objetivo, junto con un perfil de referencia del actor secundario que no fue entrevistado directamente:
 
-**User Persona Solicitante ("El Operador Crítico")**
-- Rasgo clave: Prioriza la continuidad operativa y la confiabilidad por encima del costo.
-- Sustento: El 100% considera la trazabilidad en tiempo real como crítica y prioriza el tiempo de entrega frente al precio.
-- Necesidad principal: Evitar desabastecimientos y tener visibilidad inmediata del estado de sus pedidos.
+**User Persona principal: Distribuidor Logístico de Combustible ("El Gestor Saturado")**
+- Rasgo clave: Busca automatizar la operación para reducir carga manual y escalar sus despachos con la flota disponible.
+- Sustento: El 100 % reporta desorganización, errores, duplicidad de confirmaciones, asignación manual de conductor/cisterna sin verificación de capacidad, y ausencia de seguimiento del estado de la entrega.
+- Necesidad principal: Convertir el evento de nivel bajo del tanque de un comprador asociado en un pedido aceptable, asignar automáticamente un conductor y una cisterna compatibles, y mantener trazabilidad del estado de la entrega hasta su confirmación.
 
-**User Persona Proveedor ("El Gestor Saturado")**
-- Rasgo clave: Busca orden y automatización para reducir carga operativa y escalar.
-- Sustento: El 100% reporta desorganización, errores y procesos manuales intensivos, además de la necesidad de integrar sistemas.
-- Necesidad principal: Centralizar la gestión de pedidos, contratos y despachos en una sola plataforma.
+**Perfil de referencia (no entrevistado): comprador asociado ("El Operador Crítico")**
+- Rasgo clave: Prioriza la continuidad operativa y la confiabilidad del abastecimiento, según lo reportado por los distribuidores.
+- Sustento: Los distribuidores entrevistados identifican el desabastecimiento y la falta de trazabilidad de sus compradores como riesgos recurrentes de la relación comercial.
+- Necesidad principal (inferida): Mantener el tanque por encima del nivel crítico y conocer el estado del pedido generado por el dispositivo IoT, sin participar activamente en su creación.
 
 
 
 ## 2.3 Needfinding
 ### 2.3.1 User Personas
-- Segmento 1: Empresas solicitantes de combustible
-  <img src="../assets/chapter-2/mapping/userCarlos.png" alt="Captura entrevistado Carlos Ramirez"/>
+- **Segmento objetivo: Distribuidores Logísticos de Combustible.**
+  - Perfil operativo asociado: distribuidor que administra pedidos, flota y entregas.
+  <img src="../assets/chapter-2/mapping/userMarco.png" alt="Captura entrevistado Marco Salazar"/>
 
-- Segmento 2: Proveedores de Combustible
-  <img src="../assets/chapter-2/mapping/userAndrea.png" alt="Captura entrevistado Andrea Lopez"/>
-
-
+Los artefactos visuales de personas se conservan como evidencia del proceso. Marco representa al **distribuidor**, que es el cliente y segmento objetivo que administra el flujo automático de pedidos y despachos.
 
 ### 2.3.2 User Task Matrix
 
-
-El User Task Matrix presenta las tareas que realizan los User Persona para cumplir sus objetivos en su día a día, independientemente de si usan nuestro software o no. Se evalúa la frecuencia y la importancia de cada tarea para identificar dónde aportar valor.
+El User Task Matrix presenta las tareas que realiza el User Persona principal —el distribuidor logístico de combustible— para cumplir sus objetivos en su día a día, independientemente de si usa nuestro software o no. Se evalúa la frecuencia y la importancia de cada tarea para identificar dónde aportar valor.
 
 <table border="1">
   <thead>
     <tr>
-      <th rowspan="2">Tarea (Task)</th>
-      <th colspan="2">Empresas Solicitantes</th>
-      <th colspan="2">Proveedores de Combustible</th>
-    </tr>
-    <tr>
-      <th>Frecuencia</th>
-      <th>Importancia</th>
+      <th>Tarea (Task)</th>
       <th>Frecuencia</th>
       <th>Importancia</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Registrar / recibir pedidos</td>
-      <td>Alta</td>
-      <td>Alta</td>
+      <td>Recibir la solicitud de un comprador asociado</td>
       <td>Alta</td>
       <td>Alta</td>
     </tr>
     <tr>
-      <td>Validar información del pedido</td>
+      <td>Validar la información de la solicitud (producto, volumen, ubicación, fecha)</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Decidir si aceptar o rechazar la solicitud</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Asignar conductor y cisterna disponibles</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Verificar que la cisterna tenga capacidad suficiente para el pedido</td>
       <td>Media</td>
       <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
     </tr>
     <tr>
-      <td>Consultar / actualizar estado del pedido</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Modificar pedido</td>
+      <td>Coordinar la ruta y el despacho</td>
       <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Informar al comprador sobre la confirmación y el avance del pedido</td>
       <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Confirmar la entrega una vez completado el despacho</td>
+      <td>Alta</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>Registrar pedidos y despachos en herramientas separadas (Excel, etc.)</td>
+      <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Revisar historial de pedidos y despachos anteriores</td>
+      <td>Media</td>
+      <td>Media</td>
+    </tr>
+    <tr>
+      <td>Generar reportes operativos para la toma de decisiones</td>
       <td>Baja</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Programar y planificar entregas</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Gestionar múltiples pedidos</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Comunicarse entre cliente y proveedor</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Recibir / enviar notificaciones</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-      <td>Alta</td>
-    </tr>
-    <tr>
-      <td>Revisar historial de pedidos</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Monitorear desempeño / consumo</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Media</td>
-      <td>Media</td>
-    </tr>
-    <tr>
-      <td>Generar reportes y métricas</td>
-      <td>Baja</td>
-      <td>Media</td>
-      <td>Media</td>
       <td>Media</td>
     </tr>
   </tbody>
 </table>
 
-
 ### 2.3.3 User Journey Mapping
 
+**Rol principal del segmento: Distribuidor Logístico de Combustible**
 
--Segmento 1: Empresas solicitantes de combustible
+El User Journey Mapping de Marco representa el recorrido actual del jefe de operaciones de un distribuidor, desde la recepción de la solicitud hasta la entrega. El mapa se utiliza para identificar las decisiones que deben automatizarse y las excepciones que todavía requieren intervención humana.
 
-El User Journey Mapping de Carlos representa el recorrido actual que experimenta como responsable en una empresa constructora, en la gestión del abastecimiento de combustible necesario para la operación de maquinaria pesada. El mapa ilustra el proceso end-to-end, desde la identificación de la necesidad de combustible hasta la evaluación de la entrega y desempeño del proveedor.
+En la situación As-Is, Marco enfrenta un flujo de trabajo altamente demandante y fragmentado: recibe pedidos por diversos canales, valida la información manualmente, decide si puede atenderlos, busca un conductor, selecciona una cisterna y organiza la ruta mediante llamadas, mensajes y hojas de cálculo. Esto genera sobrecarga operativa, errores de capacidad, reasignaciones y limitada visibilidad del estado de cada entrega.
 
-En la situación As-Is, Carlos enfrenta un flujo de trabajo manual y poco estructurado: detecta necesidades sin apoyo de alertas, busca proveedores de manera informal, realiza pedidos mediante canales como WhatsApp o correo y da seguimiento a través de llamadas constantes. Esto genera desorden en la información, falta de trazabilidad, retrasos y una alta dependencia de la comunicación manual.
+El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa. Este análisis servirá como base para automatizar la aceptación de solicitudes, la recomendación de recursos, el seguimiento del estado de la entrega y la generación del acta de recepción.
 
-El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa (Awareness, Data Collection, Daily Management, Communication, Reporting y Evaluation). Este análisis servirá como base para diseñar una solución que centralice la información, automatice el registro de pedidos y permita el seguimiento en tiempo real.
-
- <img src="../assets/chapter-2/mapping/journeyCarlos.png" alt="userJourney de Carlos"/>
-
--Segmento 2: Proveedores de Combustible
-
-El User Journey Mapping de Andrea representa el recorrido actual que experimenta como coordinadora en una empresa distribuidora de combustible, encargada de gestionar múltiples pedidos, coordinar entregas y asegurar el cumplimiento logístico. El mapa ilustra el proceso end-to-end, desde la recepción de pedidos hasta la evaluación del desempeño operativo.
-
-En la situación As-Is, Andrea enfrenta un flujo de trabajo altamente demandante y fragmentado: recibe pedidos por diversos canales, valida información manualmente, organiza rutas sin herramientas automatizadas y mantiene comunicación constante con clientes mediante llamadas y mensajes. Esto genera sobrecarga operativa, errores en la planificación, saturación en la comunicación y limitada visibilidad de métricas clave.
-
-El Journey busca evidenciar los puntos críticos de su experiencia actual, identificando emociones, tareas, fricciones y oportunidades de mejora a lo largo de cada etapa (Awareness, Data Collection, Daily Management, Communication, Reporting y Evaluation). Este análisis servirá como base para diseñar una solución tecnológica que centralice pedidos, automatice la planificación logística y mejore la visibilidad operativa mediante indicadores y dashboards.
-
-
- <img src="../assets/chapter-2/mapping/journeyAndrea.png" alt="UserJourney de Andrea"/>
-
+<img src="../assets/chapter-2/mapping/journeyMarco.png" alt="userJourney de Marco"/>
 
 
 ### 2.3.4 Empathy Mapping
 
+Para la elaboración del Empathy Map, el equipo partió del conocimiento y las observaciones recolectadas durante el análisis del User Persona. Se colocó al centro del mapa al usuario correspondiente al segmento objetivo (**Marco**, distribuidor logístico de combustible) y se respondieron las preguntas clave sobre su entorno, emociones, comportamientos y necesidades.
 
-Para la elaboración de los Empathy Maps, el equipo partió del conocimiento y observaciones recolectadas durante el análisis de los User Persona. Se colocó al centro de cada mapa al usuario correspondiente (Carlos y Andrea) y se respondieron las preguntas claves sobre su entorno, emociones, comportamientos y necesidades.
+**Rol principal del segmento: Distribuidor Logístico de Combustible**
 
--Segmento 1: Empresas solicitantes de combustible
-
-
- <img src="../assets/chapter-2/mapping/empathyCarlos.png" alt="empathyMapping de Carlos"/>
-
-
--Segmento 2: Proveedores de Combustible
-
- <img src="../assets/chapter-2/mapping/empathyAndrea.png" alt="empathyMapping de Andrea"/>
+ <img src="../assets/chapter-2/mapping/empathyMarco.png" alt="empathyMapping de Marco"/>
 
 ## 2.4 Big Picture Event Storming
 
-Para comprender a profundidad el dominio del negocio de **PrimeFuel** y alinear la visión tecnológica con las operaciones reales de compraventa y distribución de combustible, el equipo llevó a cabo una sesión de **Event Storming**. Esta técnica colaborativa nos permitió identificar los hitos clave del sistema sin adelantarnos a detalles técnicos.
+Para comprender a profundidad el dominio del negocio de **PrimeFuel** y alinear la visión tecnológica con las operaciones reales de distribución de combustible, el equipo llevó a cabo una sesión de **Event Storming**. La sesión se reinterpreta con el distribuidor como actor principal y con el evento IoT del tanque como iniciador del flujo. Esta técnica colaborativa permitió identificar los hitos clave del sistema sin adelantarnos a detalles técnicos.
 
 ### Step 1 – Free Exploration (Exploración Libre)
 
 En esta primera etapa, el equipo realizó una lluvia de ideas desestructurada para capturar todos los **Eventos de Dominio** relevantes de la operativa logística y comercial. Utilizando notas de color naranja (*post-its*), registramos hechos que ya ocurrieron en el negocio, redactados estrictamente en tiempo pasado (ej. *Fuel request created*, *Fuel dispatched*). 
 
-El objetivo principal fue plasmar sobre el lienzo la realidad del negocio, desde el registro de usuarios hasta el despacho físico en las cisternas, priorizando la cantidad de eventos sobre el orden cronológico o la jerarquía.
+El objetivo principal fue plasmar sobre el lienzo la realidad del negocio, desde la asociación del tanque del comprador hasta el despacho físico en las cisternas, priorizando la cantidad de eventos sobre el orden cronológico o la jerarquía.
 
 <div align="center">
   <img src="../assets/chapter-2/mapping/step1.png" alt="Step 1 - Unstructured Exploration" width="100%"/>
@@ -487,10 +579,10 @@ El objetivo principal fue plasmar sobre el lienzo la realidad del negocio, desde
 
 Tras listar los eventos de dominio, procedimos a organizar el caos inicial estructurando los *post-its* en un flujo lógico de negocio de izquierda a derecha. Agrupamos los eventos en cuatro grandes bloques temporales que reflejan el ciclo de vida real de una operación de abastecimiento de combustible:
 
-1. **Onboarding & Contracting:** Abarca el registro de las empresas y la formalización de los contratos de exclusividad.
-2. **Order Management:** Contiene el núcleo transaccional administrativo, desde la creación de la solicitud y envío de cotizaciones, hasta la confirmación y validación financiera.
-3. **Logistics & Dispatch:** Refleja la operativa física, incluyendo la asignación de cisternas (*Tanker assigned to order*), actualización de inventarios y la entrega del combustible.
-4. **Monitoring & Analytics:** Agrupa los eventos asíncronos de valor agregado, como el envío de notificaciones, alertas de precios y reportes de consumo.
+1. **Tank Onboarding & IoT Monitoring:** Abarca la asociación del comprador y su tanque, la configuración del umbral y la recepción de lecturas del dispositivo.
+2. **Automatic Order Management:** Contiene el evento `LowFuelLevelDetected`, la generación idempotente del pedido, la solicitud de aceptación y las decisiones de aceptar o rechazar.
+3. **Resource Assignment & Dispatch:** Refleja la selección automática del conductor y de la cisterna según volumen, capacidad, compatibilidad, disponibilidad y ruta, además de la carga y el despacho.
+4. **Telemetry, Delivery & Traceability:** Agrupa el seguimiento de la unidad, el control de válvulas, las alertas, la recepción del combustible, la conciliación y los reportes operativos.
 
 Esta estructura temporal nos ayudó a identificar claramente las áreas críticas donde la digitalización eliminará los actuales cuellos de botella del sector.
 
@@ -515,15 +607,23 @@ En este proyecto, cuyo objetivo principal es mejorar la eficiencia, la trazabili
   <tbody>
     <tr>
       <td>Fuel Request</td>
-      <td>Order generated by a client company specifying type, quantity, and delivery details of fuel.</td>
+      <td>Solicitud de abastecimiento generada por el dispositivo IoT al detectar que el tanque asociado alcanzó su umbral de nivel bajo.</td>
     </tr>
     <tr>
       <td>Client Company</td>
-      <td>Organization that requires fuel for its operations and uses the platform to place and track orders.</td>
+      <td>Empresa compradora asociada al distribuidor cuyo tanque utiliza el dispositivo IoT y origina la solicitud.</td>
     </tr>
     <tr>
       <td>Fuel Supplier</td>
-      <td>Company responsible for receiving, validating, and fulfilling fuel requests.</td>
+      <td>Distribuidor Logístico de Combustible responsable de aceptar solicitudes, asignar recursos y ejecutar la entrega.</td>
+    </tr>
+    <tr>
+      <td>Tank Device</td>
+      <td>Dispositivo IoT instalado en el tanque del comprador para medir el nivel y emitir lecturas asociadas a un tanque y una ubicación.</td>
+    </tr>
+    <tr>
+      <td>Low Fuel Level Event</td>
+      <td>Evento emitido cuando la lectura del tanque es igual o inferior al umbral configurado y habilita la generación del pedido.</td>
     </tr>
     <tr>
       <td>Order Status</td>
@@ -535,7 +635,19 @@ En este proyecto, cuyo objetivo principal es mejorar la eficiencia, la trazabili
     </tr>
     <tr>
       <td>Delivery Scheduling</td>
-      <td>Process of assigning date, time, and logistics resources to fulfill a fuel request.</td>
+      <td>Proceso de asignar fecha, ruta, conductor y cisterna compatibles con el volumen y las condiciones del pedido.</td>
+    </tr>
+    <tr>
+      <td>Resource Assignment</td>
+      <td>Recomendación o selección automática de un conductor habilitado y una cisterna con capacidad igual o superior al volumen solicitado.</td>
+    </tr>
+    <tr>
+      <td>Valve Authorization</td>
+      <td>Regla que permite o bloquea la apertura de una válvula según la geocerca, la identidad del operador y el estado del viaje.</td>
+    </tr>
+    <tr>
+      <td>Delivery Traceability</td>
+      <td>Cadena de eventos que relaciona el nivel que originó el pedido, la aceptación, la asignación, la telemetría, la descarga y la recepción.</td>
     </tr>
     <tr>
       <td>Centralized Dashboard</td>
