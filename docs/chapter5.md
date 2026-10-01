@@ -251,8 +251,12 @@ Las pantallas se diseñaron a partir de las historias de usuario con mayor prior
 | Perfil | Web y móvil | Datos del usuario, edición y cierre de sesión. | US-17, US-23, US-24 |
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/web-wireframes.png" alt="Wireframes de la aplicación web" width="800"/>
-  <p><em>Figura 5.3: Wireframes de la aplicación web.</em></p>
+  <img src="../assets/chapter-5/apps/web-wireframes-1.png" alt="Wireframes de la aplicación web — parte 1" width="800"/>
+  <br/>
+  <img src="../assets/chapter-5/apps/web-wireframes-2.png" alt="Wireframes de la aplicación web — parte 2" width="800"/>
+  <br/>
+  <img src="../assets/chapter-5/apps/web-wireframes-3.png" alt="Wireframes de la aplicación web — parte 3" width="800"/>
+  <p><em>Figura 5.3: Wireframes de la aplicación web, presentados en tres partes.</em></p>
 </div>
 
 <div align="center">
