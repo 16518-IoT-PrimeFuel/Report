@@ -204,8 +204,14 @@ La landing page está dirigida al Distribuidor Logístico de Combustible. Su est
 Estas secciones cubren las historias US-01, US-02, US-03, US-04, US-25, US-26, US-36, US-37, US-38 y US-39.
 
 <div align="center">
-  <img src="../assets/chapter-5/landing/landing-wireframe.png" alt="Wireframe de la landing page" width="700"/>
-  <p><em>Figura 5.1: Wireframe de la landing page.</em></p>
+  <img src="../assets/chapter-5/landing/landing-wireframe-1.png" alt="Wireframe de la landing page — parte 1" width="700"/>
+  <br/>
+  <img src="../assets/chapter-5/landing/landing-wireframe-2.png" alt="Wireframe de la landing page — parte 2" width="700"/>
+  <br/>
+  <img src="../assets/chapter-5/landing/landing-wireframe-3.png" alt="Wireframe de la landing page — parte 3" width="700"/>
+  <br/>
+  <img src="../assets/chapter-5/landing/landing-wireframe-4.png" alt="Wireframe de la landing page — parte 4" width="700"/>
+  <p><em>Figura 5.1: Wireframe de la landing page, presentado en cuatro partes consecutivas.</em></p>
 </div>
 
 ### 5.3.2. Landing Page Mock-up
