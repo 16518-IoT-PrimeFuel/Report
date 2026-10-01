@@ -219,8 +219,12 @@ Estas secciones cubren las historias US-01, US-02, US-03, US-04, US-25, US-26, U
 El mock-up aplica la guía de estilo: el hero usa fondo navy con el título en blanco (Poppins 600) y el botón Registrarse en Azul FullTank 700; las secciones alternan fondo blanco y `#F5F8FC`; los pasos de "Cómo funciona" usan íconos Material Symbols en Azul FullTank; y la sección del dispositivo muestra el indicador de nivel con los colores verde, ámbar y rojo.
 
 <div align="center">
-  <img src="../assets/chapter-5/landing/landing-mockup.png" alt="Mock-up de la landing page" width="700"/>
-  <p><em>Figura 5.2: Mock-up de la landing page.</em></p>
+  <img src="../assets/chapter-5/landing/landing-mockup-1.png" alt="Mock-up de la landing page — parte 1" width="700"/>
+  <br/>
+  <img src="../assets/chapter-5/landing/landing-mockup-2.png" alt="Mock-up de la landing page — parte 2" width="700"/>
+  <br/>
+  <img src="../assets/chapter-5/landing/landing-mockup-3.png" alt="Mock-up de la landing page — parte 3" width="700"/>
+  <p><em>Figura 5.2: Mock-up de la landing page, presentado en tres partes consecutivas.</em></p>
 </div>
 
 ## 5.4. Applications UX/UI Design
