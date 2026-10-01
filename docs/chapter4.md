@@ -1,6 +1,8 @@
 # Capítulo IV: Solution Software Design
 
-El presente capítulo describe el diseño de la solución de software de **FullTank**, elaborado por la startup **PrimeFuel**, aplicando los principios de **Domain-Driven Design (DDD)** y el modelo **C4** para la documentación de la arquitectura. El único segmento comercial objetivo es el **Distribuidor Logístico de Combustible**. El comprador asociado participa como actor operativo del servicio mediante un dispositivo IoT instalado en su tanque, pero no constituye un segmento independiente. Por ello, el flujo arquitectónico inicia en una lectura de nivel bajo y continúa con la generación idempotente del pedido, la aceptación del distribuidor, la asignación automática de conductor y cisterna, el despacho, la telemetría, el control de válvulas y el cierre de la entrega. El diseño se organiza en dos niveles complementarios: un nivel **estratégico**, donde se delimita el dominio, se descubren los *bounded contexts* y se establecen sus relaciones; y un nivel **táctico**, donde cada contexto se detalla en sus capas de dominio, interfaz, aplicación e infraestructura, junto con sus diagramas de componentes y de código.
+En este capítulo se presenta el diseño de software de **FullTank**, la plataforma de la startup **PrimeFuel** para el **Distribuidor Logístico de Combustible**, que es el único segmento objetivo. El comprador asociado participa como usuario secundario: el nivel de su tanque, medido por el dispositivo IoT, inicia el flujo de abastecimiento, y el comprador solo consulta el estado de sus pedidos, pagos y notificaciones.
+
+El diseño aplica **Domain-Driven Design (DDD)** en dos niveles. En el nivel estratégico se identifican los *bounded contexts*, sus flujos de mensajes y sus relaciones. En el nivel táctico se describe cada *bounded context* por capas (dominio, interfaz, aplicación e infraestructura). La arquitectura se documenta con el **modelo C4**. Todo el contenido está alineado con el backend implementado en **Spring Boot 4.0.6 y Java 26**, con **MySQL 8** como base de datos y esquema versionado con Flyway.
 
 ## 4.1. Strategic-Level Domain-Driven Design
 
@@ -17,29 +19,38 @@ El desarrollo del proceso de Domain-Driven Design se realizó en la aplicación 
   <p><em>Figura 4.1: Sesión de Event Storming realizada en Miro.</em></p>
 </div>
 
+El recorrido de la sesión siguió el ciclo de vida de una reposición:
+
+1. **Lectura de nivel.** El comando *registrar lectura* lo emite el dispositivo del tanque; el hecho resultante es una lectura validada y asociada a un tanque.
+2. **Nivel bajo.** La política de reposición compara el nivel con el umbral del tanque. Si el nivel es igual o menor al umbral y no hay otra solicitud pendiente, se abre un episodio de reposición. Este es el evento de negocio que el capítulo II llama *Low Fuel Level Event*.
+3. **Solicitud.** Si el tanque tiene la generación automática habilitada, el episodio produce una solicitud con producto, volumen, dirección y fecha.
+4. **Decisión.** El distribuidor acepta o rechaza la solicitud. La aceptación crea la orden de combustible dentro de la misma transacción.
+5. **Asignación.** El distribuidor elige un conductor y una cisterna elegibles; el sistema reserva stock y flota y crea la entrega en estado asignado.
+6. **Entrega y cierre.** La entrega avanza por sus estados físicos hasta completarse; al cerrar se liberan las reservas y la orden queda pendiente de pago.
+7. **Pago.** El comprador registra el pago y, cuando se confirma, la orden pasa a pagada.
+
 #### 4.1.1.1. Candidate Context Discovery
 
-A partir de la sesión de Event Storming se identificaron los siguientes contextos candidatos del dominio de FullTank, cada uno con una responsabilidad claramente delimitada dentro del proceso de abastecimiento de combustible:
+Para descubrir los contextos se usó la técnica de *start with value*: se agruparon los eventos alrededor de las decisiones que generan valor para el distribuidor y luego se separaron las capacidades de soporte y las genéricas. Cada contexto resultante corresponde a un módulo del backend.
 
-1. **IAM (Identity and Access Management):** autenticación, autorización y gestión de credenciales dentro del sistema. Administra procesos como el registro de clientes y proveedores, inicio de sesión, recuperación de contraseñas y asignación de permisos según el rol. Su propósito es garantizar accesos seguros y controlados, asegurando que cada usuario interactúe únicamente con las funcionalidades que le corresponden dentro de la plataforma.
+| Bounded Context | Responsabilidad | Clasificación |
+|---|---|---|
+| **Replenishment** | Evalúa la política de umbral del tanque, abre y rearma episodios de nivel bajo y gestiona el ciclo de la solicitud de abastecimiento (pendiente, aceptada, rechazada o cancelada). | Core |
+| **Fulfillment** | Crea la entrega asignada y controla su ciclo físico (asignada, iniciada, en destino, descargando, completada, fallida o cancelada), con historial de transiciones y línea de tiempo. | Core |
+| **Ordering** | Mantiene la orden de combustible vinculada a una solicitud aceptada y su ciclo comercial hasta el pago. | Core |
+| **Equipment** | Registra los clientes del distribuidor, sus sitios y tanques, y el vínculo temporal entre dispositivo y tanque con sus credenciales. | Supporting |
+| **Telemetry** | Recibe las lecturas del dispositivo, las autentica, las deduplica y publica solo las lecturas válidas. | Supporting |
+| **Fleet** | Registra conductores y cisternas, calcula su elegibilidad y reserva los recursos por ventana de tiempo validando la capacidad. | Supporting |
+| **Supply** | Expone el catálogo de productos por distribuidor y reserva el stock de una asignación para no sobrevender. | Supporting |
+| **Inventory** | Administra los productos de combustible del distribuidor, su precio y su stock disponible. | Supporting |
+| **Payment** | Registra el pago de una orden y su confirmación o reembolso. | Generic |
+| **Notification** | Genera la bandeja in-app de cada usuario a partir de los eventos de negocio. | Generic |
+| **Reporting** | Calcula indicadores de solo lectura para el distribuidor y el comprador. | Generic |
+| **IAM** | Autentica con JWT, gestiona organizaciones, membresías, invitaciones y roles, y resuelve el tenant de cada petición. | Generic |
 
-2. **Catalog:** gestión de los productos y condiciones de abastecimiento que el distribuidor ofrece a sus compradores asociados. Su propósito es validar el tipo de combustible, las unidades de medida y las condiciones que debe cumplir una solicitud generada por el tanque IoT.
+Además de estos contextos, el backend tiene un módulo **Application Flows** que no es un *bounded context*, sino la raíz de composición: orquesta en una sola transacción la aceptación de una solicitud y la asignación de una entrega usando únicamente las interfaces públicas (paquete `api`) de cada contexto.
 
-3. **Ordering:** gestión del ciclo de vida de las solicitudes y órdenes iniciadas por eventos IoT o por una operación de contingencia. Administra la validación del nivel, la generación idempotente de solicitudes, la aceptación o rechazo por parte del distribuidor, la creación de órdenes, el despacho, la confirmación y el cierre. Su propósito es orquestar el flujo principal del negocio desde el evento `LowFuelLevelDetected` hasta la entrega.
-
-4. **Fulfillment:** gestión logística necesaria para cumplir con las órdenes generadas. Administra el registro de cisternas y conductores, la validación de capacidad, compatibilidad, habilitación y disponibilidad, la recomendación automática de recursos y la ejecución del despacho. Su propósito es garantizar que cada pedido sea asignado a recursos válidos antes de iniciar la entrega.
-
-5. **Payment:** gestión de los pagos asociados a las órdenes. Administra procesos como la solicitud de pago, registro de transacciones y aprobación del pago. Su propósito es asegurar que las operaciones económicas se realicen de manera confiable, validando que los pedidos cuenten con el respaldo financiero necesario antes de su ejecución o finalización.
-
-6. **Notification:** generación y gestión de notificaciones dentro del sistema. Administra procesos como la creación de notificaciones y el seguimiento de su estado (leídas o no leídas). Su propósito es mantener informados a los usuarios sobre eventos relevantes, como cambios en el estado de pedidos, pagos o entregas, mejorando la comunicación dentro de la plataforma.
-
-7. **Reporting & Analytics:** generación y visualización de reportes basados en la información del sistema. Administra procesos como la elaboración de reportes de ventas, consumo y métricas operativas. Su propósito es proporcionar información clave para la toma de decisiones, permitiendo analizar el comportamiento del negocio y optimizar sus procesos.
-
-8. **Inventory:** gestión de los productos de combustible ofrecidos por los distribuidores dentro del sistema. Administra procesos como el registro, actualización y eliminación de productos, así como la disponibilidad que debe validar el distribuidor antes de aceptar una solicitud IoT.
-
-9. **Equipment e IoT Tank Monitoring:** gestión de los tanques asociados y de los dispositivos IoT instalados en ellos. Administra el registro del dispositivo, la configuración del umbral, la recepción de lecturas, la validación de la asociación tanque-comprador y la emisión del evento `LowFuelLevelDetected`. Su propósito es iniciar de forma confiable el pedido automático que será procesado por Ordering.
-
-La delimitación estratégica establece que **Equipment e IoT Tank Monitoring** es el contexto iniciador, **Ordering** es el núcleo transaccional, **Fulfillment** resuelve la asignación de recursos y el despacho, y **Notification**, **Reporting & Analytics** y **IAM** actúan como capacidades transversales. La telemetría de la cisterna y el control de válvulas se consideran capacidades de seguridad y trazabilidad vinculadas a Fulfillment, no funcionalidades aisladas de seguimiento GPS.
+El backend también contiene los módulos de seguimiento por GPS del conductor (*tracking*) y de geocerca y válvula (*safety*). Por la decisión de alcance del capítulo I no forman parte de esta versión, por lo que no se documentan en este capítulo.
 
 #### 4.1.1.2. Domain Message Flows Modeling
 
