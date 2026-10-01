@@ -260,8 +260,10 @@ Las pantallas se diseñaron a partir de las historias de usuario con mayor prior
 </div>
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/mobile-wireframes.png" alt="Wireframes de la aplicación móvil" width="800"/>
-  <p><em>Figura 5.4: Wireframes de la aplicación móvil.</em></p>
+  <img src="../assets/chapter-5/apps/mobile-wireframes-1.png" alt="Wireframes de la aplicación móvil — parte 1" width="800"/>
+  <br/>
+  <img src="../assets/chapter-5/apps/mobile-wireframes-2.png" alt="Wireframes de la aplicación móvil — parte 2" width="800"/>
+  <p><em>Figura 5.4: Wireframes de la aplicación móvil, presentados en dos partes.</em></p>
 </div>
 
 ### 5.4.2. Applications Wireflow Diagrams
