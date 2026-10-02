@@ -276,12 +276,12 @@ Los wireflows unen los wireframes con las transiciones de cada objetivo del usua
 4. **Consultar el pedido y pagar (comprador):** Mis pedidos → Detalle de la orden → Registrar pago → Pago pendiente de confirmación.
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/wireflow-distributor.png" alt="Wireflow del distribuidor" width="800"/>
+  <img src="../assets/chapter-5/wireflow/wireflow-distributor.png" alt="Wireflow del distribuidor" width="900"/>
   <p><em>Figura 5.5: Wireflow del distribuidor (solicitud, asignación y entrega).</em></p>
 </div>
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/wireflow-buyer.png" alt="Wireflow del comprador asociado" width="700"/>
+  <img src="../assets/chapter-5/wireflow/wireflow-buyer.png" alt="Wireflow del comprador asociado" width="700"/>
   <p><em>Figura 5.6: Wireflow del comprador asociado.</em></p>
 </div>
 
@@ -295,13 +295,28 @@ Los mock-ups aplican la guía de estilo sobre los wireframes. Las decisiones vis
 - En el **detalle de la entrega**, la línea de tiempo muestra cada transición con su hora.
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/web-mockups.png" alt="Mock-ups de la aplicación web" width="800"/>
-  <p><em>Figura 5.7: Mock-ups de la aplicación web.</em></p>
+  <img src="../assets/chapter-5/mock-ups/Mock-ups-web-1.png" alt="Detalle de tanque" width="800"/>
+  <p><em>Figura 5.7a (Web): Detalle de tanque, nivel como barra vertical.</em></p>
 </div>
 
 <div align="center">
-  <img src="../assets/chapter-5/apps/mobile-mockups.png" alt="Mock-ups de la aplicación móvil" width="800"/>
-  <p><em>Figura 5.8: Mock-ups de la aplicación móvil.</em></p>
+  <img src="../assets/chapter-5/mock-ups/Mock-ups-web-2.png" alt="Asignar recursos" width="800"/>
+  <p><em>Figura 5.7b (Web): Asignar recursos en una orden.</em></p>
+</div>
+
+<div align="center">
+  <img src="../assets/chapter-5/mock-ups/Mock-ups-web-3.png" alt="Detalle de entrega" width="800"/>
+  <p><em>Figura 5.7c (Web): Detalle de entrega con línea de tiempo.</em></p>
+</div>
+
+<div align="center">
+  <img src="../assets/chapter-5/mock-ups/Mock-ups-web-4.png" alt="Lista de solicitudes y órdenes" width="800"/>
+  <p><em>Figura 5.7d (Web): Lista de solicitudes y órdenes con chips de estado.</em></p>
+</div>
+
+<div align="center">
+  <img src="../assets/chapter-5/mock-ups/Mock-ups-mobile.png" alt="Mock-ups de la aplicación móvil" width="800"/>
+  <p><em>Figura 5.8 (Mobile): Mock-ups de la aplicación móvil.</em></p>
 </div>
 
 ### 5.4.4. Applications User Flow Diagrams
