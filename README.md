@@ -77,7 +77,8 @@
         - Ponce Perales Alberto Alejandro <br>
         - Mejia Aliaga Katherine Maryory <br>
         - Delgado Carrasco Schneider Carlos Alberto<br>
-        -Lopez Goitia Carlos Alberto
+        -Lopez Goitia Carlos Alberto<br>
+        - Jhon Danny Guerrero Vasquez
       </td>
       <td>Creación y consolidación de los capítulos I, II, III y IV del informe, incluyendo la documentación de requisitos, diseño estratégico y diseño táctico de los bounded contexts.</td>
     </tr>
