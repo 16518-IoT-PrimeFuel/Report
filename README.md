@@ -49,6 +49,10 @@
       <td>u202223286</td>
       <td>Rodriguez Parco Joseph Pablo</td>
     </tr>
+      <tr>
+      <td>u202116246</td>
+      <td>Guerrero Vasquez Jhon Danny</td>
+    </tr>
   </table>
 </div>
 <div align="center">
@@ -78,6 +82,7 @@
         - Mejia Aliaga Katherine Maryory <br>
         - Delgado Carrasco Schneider Carlos Alberto<br>
         -Lopez Goitia Carlos Alberto
+        - Guerrero Vasquez Jhon Danny
       </td>
       <td>Creación y consolidación de los capítulos I, II, III y IV del informe, incluyendo la documentación de requisitos, diseño estratégico y diseño táctico de los bounded contexts.</td>
     </tr>
@@ -234,7 +239,9 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         Participó en las reuniones de coordinación y comunicó aportes para el desarrollo de la solución y la organización del trabajo.<br>
         <b>Lopez Goitia Carlos Alberto</b><br>
         Participó en las reuniones de coordinación del equipo, exponiendo el estado de avance del informe y comunicando aportes para la organización de los entregables.<br>
+      <b>Guerrero Vasquez Jhon Danny</b><br>Nuevo integrante que se incorporo al equipo<br>
       </td>
+
       <td>
         La participación en reuniones, entrevistas y sesiones de brainstorming permitió al equipo fortalecer su capacidad para comunicar ideas, hallazgos y propuestas de manera clara, coordinar acuerdos y colaborar en la definición de la solución.
       </td>
@@ -255,6 +262,8 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         Apoyó en la elaboración y revisión del informe, verificando que la información técnica y las propuestas estuvieran documentadas.<br>
         <b>Lopez Goitia Carlos Alberto</b><br>
         Redactó documentación técnica del proyecto, incluyendo la conversión del README a PDF y los scripts de video del entregable, procurando que la información fuera clara y comprensible para el lector.<br>
+        <b>Guerrero Vasquez Jhon Danny</b><br>
+        Nuevo integrante del equipo, colaborativo.<br>
       </td>
       <td>
         La elaboración y revisión colaborativa del informe permitió al equipo fortalecer su capacidad para estructurar, redactar y presentar información técnica de forma clara, ordenada, coherente y comprensible para diferentes rangos de audiencia.
