@@ -11,7 +11,7 @@ El único segmento comercial de este capítulo es el **Distribuidor Logístico d
 * **Necesidad N1 — Activar el abastecimiento sin comunicación manual:** se cubre con **EP02 — Activación IoT y solicitudes automáticas**, que agrupa la asociación del tanque, la detección del umbral, la generación idempotente del pedido y la consulta de su estado.
 * **Necesidad N2 — Permitir que el distribuidor decida si puede atender el pedido:** se cubre con **EP03 — Aceptación y gestión del pedido del distribuidor**, que agrupa la revisión, aceptación, rechazo, despacho y cierre de la solicitud.
 * **Necesidad N3 — Asignar recursos compatibles y disponibles:** se cubre con **EP08 — Asignación de recursos y despacho**, que agrupa la administración de conductores y cisternas, la validación de capacidad y la asignación al pedido.
-* **Necesidad N4 — Entregar el combustible de forma segura y demostrable:** se cubre con **EP16 — Telemetría, seguridad y trazabilidad**, que agrupa la telemetría de tanque y cisterna, el control de válvulas, las alertas y la evidencia de recepción.
+* **Necesidad N4 — Entregar el combustible de forma segura y demostrable:** se cubre con **EP16 — Monitoreo del tanque y trazabilidad de la entrega**, que agrupa la asociación del tanque con su dispositivo, las alertas de operación y la evidencia de la entrega.
 * **Necesidad N5 — Mantener acceso, comunicación y decisiones basadas en datos:** se cubre con las épicas transversales de IAM, notificaciones, reportes, catálogo e inventario, que soportan las capacidades principales sin sustituirlas.
 
 Las historias existentes de registro manual, consulta, pagos, autenticación y landing se conservan como capacidades complementarias o de contingencia. El flujo principal, sin embargo, debe empezar en el evento IoT de nivel bajo y no en un formulario manual del comprador.
@@ -277,14 +277,14 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
 <tr>
   <td>US-49</td>
   <td>Asignar recursos a despacho</td>
-  <td>Como distribuidor, quiero recibir una recomendación automática de conductor y cisterna para un pedido aceptado, considerando volumen, capacidad, producto, disponibilidad y ruta.</td>
+  <td>Como distribuidor, quiero recibir una recomendación automática de conductor y cisterna para un pedido aceptado, considerando volumen, capacidad y disponibilidad.</td>
   <td><b>Escenario 1: Asignación exitosa de recursos al despacho</b><br/>Dado que el proveedor selecciona un pedido aprobado y elige un vehículo y conductor disponibles,<br/>Cuando confirma la asignación,<br/>Entonces ambos recursos quedan vinculados al pedido y el despacho queda registrado con estado "Asignado".<br/><br/><b>Escenario 2: Recursos no disponibles para la fecha del pedido</b><br/>Dado que el proveedor intenta asignar recursos a un pedido y tanto el vehículo como el conductor seleccionados ya tienen compromisos en esa fecha,<br/>Cuando ejecuta la asignación,<br/>Entonces el sistema muestra cuáles recursos están en conflicto e impide completar la operación.</td>
   <td>EP08</td>
 </tr>
 
 <!-- EP16 -->
 <tr>
-  <td colspan="5"><b>EP16 — Telemetría, Seguridad y Trazabilidad:</b> Como distribuidor, quiero monitorear los eventos IoT y controlar la descarga para demostrar que cada pedido se ejecutó de forma segura y trazable.</td>
+  <td colspan="5"><b>EP16 — Monitoreo del Tanque y Trazabilidad de la Entrega:</b> Como distribuidor, quiero monitorear el nivel de los tanques y registrar cada etapa de la entrega para demostrar que cada pedido se ejecutó de forma trazable.</td>
 </tr>
 <tr>
   <td>US-51</td>
@@ -294,31 +294,17 @@ Las historias existentes de registro manual, consulta, pagos, autenticación y l
   <td>EP16</td>
 </tr>
 <tr>
-  <td>US-52</td>
-  <td>Consultar telemetría del pedido</td>
-  <td>Como supervisor de operaciones, quiero consultar nivel, volumen, ubicación y estado de la cisterna asociados al pedido para supervisar su ejecución.</td>
-  <td><b>Escenario 1: Telemetría disponible</b><br/>Dado que existe un pedido en tránsito,<br/>Cuando el supervisor abre su detalle,<br/>Entonces visualiza el último dato recibido, su antigüedad y la ubicación de la unidad.<br/><br/><b>Escenario 2: Pérdida temporal de conexión</b><br/>Dado que el dispositivo no transmite temporalmente,<br/>Cuando el sistema recibe una nueva lectura,<br/>Entonces sincroniza los eventos pendientes sin duplicarlos.</td>
-  <td>EP16</td>
-</tr>
-<tr>
-  <td>US-53</td>
-  <td>Autorizar o bloquear válvula</td>
-  <td>Como sistema, quiero autorizar o bloquear la apertura de la válvula según la geocerca, la identidad del conductor y el estado del pedido para evitar descargas no permitidas.</td>
-  <td><b>Escenario 1: Apertura autorizada</b><br/>Dado que el pedido está aceptado, la unidad está en la geocerca autorizada y el conductor está habilitado,<br/>Cuando se solicita la apertura,<br/>Entonces el sistema registra la autorización y permite la descarga.<br/><br/><b>Escenario 2: Apertura no autorizada</b><br/>Dado que la unidad está fuera de geocerca o el pedido no está habilitado,<br/>Cuando se solicita la apertura,<br/>Entonces el sistema bloquea la válvula y genera una alerta.</td>
-  <td>EP16</td>
-</tr>
-<tr>
   <td>US-54</td>
   <td>Recibir alertas de operación</td>
-  <td>Como operador de control, quiero recibir alertas por caída anómala de nivel, desvío, apertura no autorizada o pérdida de comunicación para atender incidentes.</td>
-  <td><b>Escenario 1: Alerta crítica</b><br/>Dado que se detecta un evento que supera el umbral definido,<br/>Cuando el motor de reglas lo procesa,<br/>Entonces se crea una alerta con prioridad, ubicación, pedido y acción recomendada.<br/><br/><b>Escenario 2: Reconocimiento</b><br/>Dado que el operador revisa la alerta,<br/>Cuando la marca como atendida,<br/>Entonces se registra su identidad, fecha y comentario.</td>
+  <td>Como operador de control, quiero recibir alertas por nivel crítico del tanque, falla de una entrega o pérdida de comunicación del dispositivo para atender incidentes.</td>
+  <td><b>Escenario 1: Alerta crítica</b><br/>Dado que se detecta un evento que supera el umbral definido,<br/>Cuando el motor de reglas lo procesa,<br/>Entonces se crea una alerta con prioridad, el tanque o el pedido relacionado y la acción recomendada.<br/><br/><b>Escenario 2: Reconocimiento</b><br/>Dado que el operador revisa la alerta,<br/>Cuando la marca como atendida,<br/>Entonces se registra su identidad, fecha y comentario.</td>
   <td>EP16</td>
 </tr>
 <tr>
   <td>US-55</td>
   <td>Generar expediente de entrega</td>
-  <td>Como responsable de liquidación, quiero obtener un expediente que relacione el pedido, la asignación, la telemetría, la descarga y la recepción para auditar la operación.</td>
-  <td><b>Escenario 1: Expediente completo</b><br/>Dado que una entrega finalizó,<br/>Cuando el responsable solicita su expediente,<br/>Entonces el sistema muestra el identificador del pedido, lecturas de inicio y fin, ubicación, conductor, cisterna, eventos de válvula y confirmación de recepción.<br/><br/><b>Escenario 2: Evidencia incompleta</b><br/>Dado que falta una lectura o firma requerida,<br/>Cuando se intenta cerrar la entrega,<br/>Entonces el sistema identifica la evidencia faltante y evita presentar el viaje como completamente conciliado.</td>
+  <td>Como responsable de liquidación, quiero obtener un expediente que relacione el pedido, la asignación, los estados de la entrega, el volumen entregado y la recepción para auditar la operación.</td>
+  <td><b>Escenario 1: Expediente completo</b><br/>Dado que una entrega finalizó,<br/>Cuando el responsable solicita su expediente,<br/>Entonces el sistema muestra el identificador del pedido, el conductor, la cisterna, la línea de tiempo de la entrega, el volumen solicitado y entregado, y la confirmación de recepción.<br/><br/><b>Escenario 2: Evidencia incompleta</b><br/>Dado que falta un dato requerido, como el volumen entregado,<br/>Cuando se intenta cerrar la entrega,<br/>Entonces el sistema identifica la evidencia faltante y evita presentar el viaje como completamente conciliado.</td>
   <td>EP16</td>
 </tr>
 
