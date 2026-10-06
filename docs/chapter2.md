@@ -581,8 +581,8 @@ Tras listar los eventos de dominio, procedimos a organizar el caos inicial estru
 
 1. **Tank Onboarding & IoT Monitoring:** Abarca la asociación del comprador y su tanque, la configuración del umbral y la recepción de lecturas del dispositivo.
 2. **Automatic Order Management:** Contiene el evento `LowFuelLevelDetected`, la generación idempotente del pedido, la solicitud de aceptación y las decisiones de aceptar o rechazar.
-3. **Resource Assignment & Dispatch:** Refleja la selección automática del conductor y de la cisterna según volumen, capacidad, compatibilidad, disponibilidad y ruta, además de la carga y el despacho.
-4. **Telemetry, Delivery & Traceability:** Agrupa el seguimiento de la unidad, el control de válvulas, las alertas, la recepción del combustible, la conciliación y los reportes operativos.
+3. **Resource Assignment & Dispatch:** Refleja la recomendación y la selección del conductor y de la cisterna según el volumen, la capacidad y la disponibilidad, además del despacho de la orden.
+4. **Delivery & Traceability:** Agrupa el avance de la entrega por estados (inicio, llegada y cierre con el volumen entregado), las notificaciones, el pago y los reportes operativos.
 
 Esta estructura temporal nos ayudó a identificar claramente las áreas críticas donde la digitalización eliminará los actuales cuellos de botella del sector.
 
@@ -631,23 +631,19 @@ En este proyecto, cuyo objetivo principal es mejorar la eficiencia, la trazabili
     </tr>
     <tr>
       <td>Order Tracking</td>
-      <td>Real-time monitoring of the progress and location of a fuel delivery.</td>
+      <td>Seguimiento del avance de una entrega a través de sus estados: asignada, iniciada, en destino, completada o fallida.</td>
     </tr>
     <tr>
       <td>Delivery Scheduling</td>
-      <td>Proceso de asignar fecha, ruta, conductor y cisterna compatibles con el volumen y las condiciones del pedido.</td>
+      <td>Proceso de asignar fecha, ventana de entrega, conductor y cisterna con capacidad suficiente para el volumen del pedido.</td>
     </tr>
     <tr>
       <td>Resource Assignment</td>
       <td>Recomendación o selección automática de un conductor habilitado y una cisterna con capacidad igual o superior al volumen solicitado.</td>
     </tr>
     <tr>
-      <td>Valve Authorization</td>
-      <td>Regla que permite o bloquea la apertura de una válvula según la geocerca, la identidad del operador y el estado del viaje.</td>
-    </tr>
-    <tr>
       <td>Delivery Traceability</td>
-      <td>Cadena de eventos que relaciona el nivel que originó el pedido, la aceptación, la asignación, la telemetría, la descarga y la recepción.</td>
+      <td>Cadena de eventos que relaciona el nivel que originó el pedido, la aceptación, la asignación, los estados de la entrega, el volumen entregado y el pago.</td>
     </tr>
     <tr>
       <td>Centralized Dashboard</td>
