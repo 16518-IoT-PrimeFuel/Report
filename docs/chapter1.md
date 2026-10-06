@@ -78,13 +78,11 @@
       <td>Soy studiante de 7mo ciclo de Ingeniería de Software (21 años), apasionada por el desarrollo de proyectos de Internet de las Cosas (IoT) y con un fuerte interés en
         aprender a guiar y liderar iniciativas tecnológicas.
       </td>
-    </tr>
-    <tr>
-      <td><img src="../assets/chapter-1/members/jhon.png" alt="Jhon D. Guerrero Vasquez"></td>
+      <td><img src="assets/chapter-1/members/foto de batman.png" alt="Jhon D. Guerrero Vasquez"></td>
       <td>Jhon D. Guerrero Vasquez</td>
       <td>u202116246</td>
       <td>Ingeniería de Software</td>
-      <td>Soy estudiante de Ingeniería de software que le apasiona la arquitectura de software y el desarrollo web, gusto por el trabajo colaborativo y de soluciones creativas frente a necesidades especificas.</td>
+      <td>Soy estudiante de Ingeniería de Software, apasionado por la arquitectura de software y el desarrollo de aplicaciones web y mi fuerte interes en este proyecto consiste en validadr los bounded context en la programación haciendo uso de las tecnologias. También me apasiona el trabajo colaborativo y el debate para encontrar soluciones creativas frente a las necesidades.</td>
     </tr>
   </tbody>
 </table>
