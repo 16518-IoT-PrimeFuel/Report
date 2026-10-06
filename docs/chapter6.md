@@ -623,17 +623,17 @@ En este sprint se desplegaron los web services y la aplicación web, con la conf
 | Landing Page | **[pendiente: URL pública de la landing page]** |
 
 <div align="center">
-  <img src="../assets/chapter-6/sprint-1/deploy-aiven.png" alt="Servicio MySQL en Aiven" width="800"/>
+  <img src="../assets/chapter-6/software-deployment/aiven.png" alt="Servicio MySQL en Aiven" width="800"/>
   <p><em>Figura 6.12: Servicio MySQL en Aiven.</em></p>
 </div>
 
 <div align="center">
-  <img src="../assets/chapter-6/sprint-1/deploy-render.png" alt="Web Service en Render" width="800"/>
+  <img src="../assets/chapter-6/software-deployment/render.png" alt="Web Service en Render" width="800"/>
   <p><em>Figura 6.13: Web Service de los web services en Render, con sus variables de entorno.</em></p>
 </div>
 
 <div align="center">
-  <img src="../assets/chapter-6/sprint-1/deploy-vercel.png" alt="Proyecto en Vercel" width="800"/>
+  <img src="../assets/chapter-6/software-deployment/vercel.png" alt="Proyecto en Vercel" width="800"/>
   <p><em>Figura 6.14: Proyecto de la aplicación web en Vercel.</em></p>
 </div>
 
@@ -674,9 +674,4 @@ Los tres commits iniciales de la landing page son del 10/09/2026, anteriores a e
 <div align="center">
   <img src="../assets/chapter-6/sprint-1/insights-landing.png" alt="Insights del repositorio landing-page" width="800"/>
   <p><em>Figura 6.17: Insights del repositorio de la landing page.</em></p>
-</div>
-
-<div align="center">
-  <img src="../assets/chapter-6/sprint-1/insights-report.png" alt="Insights del repositorio Report" width="800"/>
-  <p><em>Figura 6.18: Insights del repositorio del informe.</em></p>
 </div>
