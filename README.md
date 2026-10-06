@@ -76,15 +76,19 @@
       <td>AV1</td>
       <td>14/09/26</td>
       <td>
-        - Bonifacio Jaramillo Samuel Jesus <br>
-        - Castro Pariona Jefferson Ernesto <br>
-        - Ponce Perales Alberto Alejandro <br>
-        - Mejia Aliaga Katherine Maryory <br>
-        - Delgado Carrasco Schneider Carlos Alberto<br>
-        -Lopez Goitia Carlos Alberto
-        - Guerrero Vasquez Jhon Danny
+        FullTank Team
       </td>
       <td>Creación y consolidación de los capítulos I, II, III y IV del informe, incluyendo la documentación de requisitos, diseño estratégico y diseño táctico de los bounded contexts.</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr>
+      <td>TB1</td>
+      <td>6/10/26</td>
+      <td>
+        FullTank Team
+      </td>
+      <td>Creación y consolidación de los capítulos V y VI del informe, incluyendo el diseño UI/UX de landing, web y móvil, la evidencia de implementación, pruebas y despliegue del Sprint 1, y la actualización de los capítulos I y II</td>
     </tr>
   </tbody>
 </table>
@@ -241,9 +245,30 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         Participó en las reuniones de coordinación del equipo, exponiendo el estado de avance del informe y comunicando aportes para la organización de los entregables.<br>
         <b>Guerrero Vasquez Jhon Danny</b><br>
         Nuevo integrante que se incorporó al equipo.<br>
+        <br>
+        <b>TB1</b><br>
+        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Coordinó el avance del Sprint 1 en las reuniones y por Discord, y explicó al equipo las decisiones de backend, frontend y despliegue en Render, Aiven y Vercel.<br>
+        <b>Castro Pariona Jefferson Ernesto</b><br>
+        Participó en el Sprint Planning y comunicó los cambios de la landing page para el Distribuidor Logístico de Combustible.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Participó en el Sprint Planning y en las reuniones de coordinación, aportando criterios para el diseño UI/UX y la coherencia del informe.<br>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        Preparó y expuso el Sprint Planning 1, y comunicó al equipo las decisiones de alcance, UI/UX y estructura de los capítulos V y VI.<br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Participó en las reuniones de coordinación y presentó el avance de wireframes y mock-ups de landing, web y móvil.<br>
+        <b>Lopez Goitia Carlos Alberto</b><br>
+        Participó en las reuniones de coordinación, exponiendo el avance de wireflows, mock-ups y evidencias del capítulo VI.<br>
+        <b>Rodriguez Parco Joseph Pablo</b><br>
+        Participó en el Sprint Planning y coordinó con el equipo las decisiones de los web services (ingesta IoT, solicitudes y ciclo de entrega).<br>
+        <b>Guerrero Vasquez Jhon Danny</b><br>
+        Se incorporó al equipo durante este entregable y alineó su participación en las reuniones de coordinación.<br>
       </td>
       <td>
-        La participación en reuniones, entrevistas y sesiones de brainstorming permitió al equipo fortalecer su capacidad para comunicar ideas, hallazgos y propuestas de manera clara, coordinar acuerdos y colaborar en la definición de la solución.
+        <b>AV1</b><br>
+        La participación en reuniones, entrevistas y sesiones de brainstorming permitió al equipo fortalecer su capacidad para comunicar ideas, hallazgos y propuestas de manera clara, coordinar acuerdos y colaborar en la definición de la solución.<br>
+        <b>TB1</b><br>
+        El Sprint Planning y las reuniones de seguimiento sirvieron para acordar alcance, diseño e implementación, y dejar esas decisiones entendidas por todo el equipo.
       </td>
     </tr>
     <tr>
@@ -264,9 +289,30 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         Redactó documentación técnica del proyecto, incluyendo la conversión del README a PDF y los scripts de video del entregable, procurando que la información fuera clara y comprensible para el lector.<br>
         <b>Guerrero Vasquez Jhon Danny</b><br>
         Nuevo integrante del equipo, colaborativo.<br>
+        <br>
+        <b>TB1</b><br>
+        <b>Bonifacio Jaramillo Samuel Jesus</b><br>
+        Redactó y revisó contenido técnico del capítulo VI (configuración, implementación y evidencias de despliegue) y corrigió figuras del informe.<br>
+        <b>Castro Pariona Jefferson Ernesto</b><br>
+        Documentó el enfoque de la landing hacia el Distribuidor Logístico de Combustible y colaboró en la redacción del informe.<br>
+        <b>Mejia Aliaga Katherine Maryory</b><br>
+        Contribuyó en la revisión de los capítulos V y VI para mantener coherencia entre el diseño, el informe y el alcance del sprint.<br>
+        <b>Ponce Perales Alberto Alejandro</b><br>
+        Redactó los capítulos V y VI y actualizó los capítulos I y II: quitó telemática y control de válvulas, y simplificó el seguimiento de entregas.<br>
+        <b>Delgado Carrasco Schneider Carlos Alberto</b><br>
+        Documentó en el capítulo V los wireframes y mock-ups de landing, web y móvil, y agregó evidencias de pruebas, Swagger e insights de contribución.<br>
+        <b>Lopez Goitia Carlos Alberto</b><br>
+        Incorporó al capítulo V los wireflows y mock-ups, y al capítulo VI las capturas de pruebas y ejecución.<br>
+        <b>Rodriguez Parco Joseph Pablo</b><br>
+        Colaboró en la redacción del informe, documentando el trabajo de los web services del Sprint 1.<br>
+        <b>Guerrero Vasquez Jhon Danny</b><br>
+        Actualizó su perfil de integrante en el capítulo I.<br>
       </td>
       <td>
-        La elaboración y revisión colaborativa del informe permitió al equipo fortalecer su capacidad para prevenir, estructurar, redactar y presentar información técnica de forma clara, ordenada, coherente y comprensible para diferentes rangos de audiencia.
+        <b>AV1</b><br>
+        La elaboración y revisión colaborativa del informe permitió al equipo fortalecer su capacidad para prevenir, estructurar, redactar y presentar información técnica de forma clara, ordenada, coherente y comprensible para diferentes rangos de audiencia.<br>
+        <b>TB1</b><br>
+        Los capítulos V y VI, con los ajustes de I y II, dejaron por escrito el diseño, las pruebas y el despliegue para un lector que no vio el código.
       </td>
     </tr>
   </tbody>
