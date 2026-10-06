@@ -327,7 +327,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         <b>Rodriguez Parco Joseph Pablo</b><br>
         Participó en el Sprint Planning y coordinó con el equipo las decisiones de los web services (ingesta IoT, solicitudes y ciclo de entrega).<br>
         <b>Guerrero Vasquez Jhon Danny</b><br>
-        Se incorporó al equipo durante este entregable y alineó su participación en las reuniones de coordinación.<br>
+        Se incorporó al equipo durante este entregable y se alineó su participación en las reuniones de coordinación.<br>
       </td>
       <td>
         <b>AV1</b><br>
@@ -353,7 +353,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         <b>Lopez Goitia Carlos Alberto</b><br>
         Redactó documentación técnica del proyecto, incluyendo la conversión del README a PDF y los scripts de video del entregable, procurando que la información fuera clara y comprensible para el lector.<br>
         <b>Guerrero Vasquez Jhon Danny</b><br>
-        Nuevo integrante del equipo, colaborativo.<br>
+        Nuevo integrante del equipo, colaborativo respecto a la documentación y también contribuyo al analisis del frontend.<br>
         <br>
         <b>TB1</b><br>
         <b>Bonifacio Jaramillo Samuel Jesus</b><br>
@@ -371,7 +371,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
         <b>Rodriguez Parco Joseph Pablo</b><br>
         Colaboró en la redacción del informe, documentando el trabajo de los web services del Sprint 1.<br>
         <b>Guerrero Vasquez Jhon Danny</b><br>
-        Actualizó su perfil de integrante en el capítulo I.<br>
+        Actualizó su perfil de integrante en el capítulo I, contribuyo con el frontend y la validación del landing para que todo funcione correctamente. Además que ayudo en la creación del canvas.<br>
       </td>
       <td>
         <b>AV1</b><br>
