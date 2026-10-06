@@ -1,5 +1,10 @@
 # Conclusiones
 
+El trabajo realizado permitió convertir la propuesta de FullTank en una solución con un alcance más claro: atender al Distribuidor Logístico de Combustible y facilitar la gestión de sus compradores, tanques, solicitudes de reposición y entregas. La revisión de los requisitos y del backlog ayudó a alinear las historias de usuario con ese objetivo y a retirar funciones que ya no formaban parte de la propuesta, como la telemática de flota y el control de válvulas.
+
+El diseño estratégico y técnico dejó una base común para continuar el desarrollo. Los diagramas y la documentación de los bounded contexts describen las principales responsabilidades del sistema, mientras que los wireframes, mock-ups y flujos de usuario muestran cómo se espera que distribuidores y compradores interactúen con la landing page, la aplicación web y la aplicación móvil. El diseño del dispositivo de monitoreo también permitió precisar cómo una lectura de nivel podría convertirse en una solicitud automática de reposición.
+
+Durante el Sprint 1 se avanzó en la implementación del flujo web de abastecimiento y se documentaron evidencias de pruebas, uso de Swagger y despliegue de los servicios y la aplicación web. Las capturas y los registros de los repositorios hacen visible ese progreso y facilitan su revisión. Sin embargo, el propio backlog conserva tareas pendientes y el informe aún identifica información por confirmar, entre ella algunos datos de planificación y los enlaces públicos de la landing page y del prototipo navegable. Por ello, las evidencias presentadas muestran avances concretos del sprint, pero no bastan por sí solas para afirmar que todas las historias previstas quedaron terminadas o que el flujo completo fue validado con usuarios.
 
 
 # Video App Validation
@@ -154,19 +159,15 @@ Vernon, V. (s.f.). _Domain-Driven Design Reference_. Recuperado de https://domai
   <tbody>
     <tr>
       <td>Frontend desplegado</td>
-      <td><a href="https://frontend-dgwsg79ja-bralexcds-projects.vercel.app/iam">Vercel</a></td>
+      <td><a href="https://primefuel-frontend-three.vercel.app">Frontend</a></td>
     </tr>
     <tr>
       <td>Swagger desplegado con Render</td>
-      <td>Pendiente de una URL pública verificada.</td>
+      <td><a href="https://fulltank-backend.onrender.com/swagger-ui.html">Backend</a></td>
     </tr>
     <tr>
       <td>Landing Page desplegada con GitHub Pages</td>
-      <td>Pendiente de una URL pública disponible.</td>
-    </tr>
-    <tr>
-      <td>Diseño en Figma</td>
-      <td>Pendiente de publicación.</td>
+      <td><a href="https://landing-page-five-navy-33.vercel.app/">Landing Page</a></td>
     </tr>
   </tbody>
 </table>

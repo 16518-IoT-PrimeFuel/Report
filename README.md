@@ -111,7 +111,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
 
 **Link de Swagger desplegado con Render:** Pendiente de una URL pública verificada.
 
-**Link de frontend desplegado con Vercel:** [FullTank Frontend](https://frontend-dgwsg79ja-bralexcds-projects.vercel.app/iam)
+**Link de frontend desplegado con Vercel:** [FullTank Frontend](https://primefuel-frontend-three.vercel.app/home)
 
 ## Contenido
 
@@ -159,57 +159,122 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
       - [4.1.3.3. Software Architecture Container Level Diagrams](docs/chapter4.md#4133-software-architecture-container-level-diagrams)
       - [4.1.3.4. Software Architecture Deployment Diagrams](docs/chapter4.md#4134-software-architecture-deployment-diagrams)
   - [4.2. Tactical-Level Domain-Driven Design](docs/chapter4.md#42-tactical-level-domain-driven-design)
-    - 4.2.X. Bounded Context: \<Bounded Context Name\>
-      - 4.2.X.1. Domain Layer.
-      - 4.2.X.2. Interface Layer.
-      - 4.2.X.3. Application Layer.
-      - 4.2.X.4. Infrastructure Layer.
-      - 4.2.X.5. Bounded Context Software Architecture Component Level Diagrams.
-      - 4.2.X.6. Bounded Context Software Architecture Code Level Diagrams.
-        - 4.2.X.6.1. Bounded Context Domain Layer Class Diagrams.
-        - 4.2.X.6.2. Bounded Context Database Design Diagram.
-- Capítulo V: Solution UI/UX Design
-  - 5.1. Style Guidelines.
-    - 5.1.1. General Style Guidelines.
-    - 5.1.2. Web, Mobile and IoT Style Guidelines.
-  - 5.2. Information Architecture.
-    - 5.2.1. Organization Systems.
-    - 5.2.2. Labeling Systems.
-    - 5.2.3. SEO Tags and Meta Tags
-    - 5.2.4. Searching Systems.
-    - 5.2.5. Navigation Systems.
-  - 5.3. Landing Page UI Design.
-    - 5.3.1. Landing Page Wireframe.
-    - 5.3.2. Landing Page Mock-up.
-  - 5.4. Applications UX/UI Design.
-    - 5.4.1. Applications Wireframes.
-    - 5.4.2. Applications Wireflow Diagrams.
-    - 5.4.3. Applications Mock-ups.
-    - 5.4.4. Applications User Flow Diagrams.
-  - 5.5. Applications Prototyping.
-  - 5.6. IoT Device Design.
-- Capítulo VI: Product Implementation, Validation & Deployment
-  - 6.1. Software Configuration Management.
-    - 6.1.1. Software Development Environment Configuration.
-    - 6.1.2. Source Code Management.
-    - 6.1.3. Source Code Style Guide & Conventions.
-    - 6.1.4. Software Deployment Configuration.
-  - 6.2. Landing Page, Services & Applications Implementation.
-    - 6.2.X. Sprint n
-      - 6.2.X.1. Sprint Planning n.
-      - 6.2.X.2. Aspect Leaders and Collaborators.
-      - 6.2.X.3. Sprint Backlog n.
-      - 6.2.X.4. Development Evidence for Sprint Review.
-      - 6.2.X.5. Testing Suite Evidence for Sprint Review.
-      - 6.2.X.6. Execution Evidence for Sprint Review.
-      - 6.2.X.7. Services Documentation Evidence for Sprint Review.
-      - 6.2.X.8. Software Deployment Evidence for Sprint Review.
-      - 6.2.X.9. Team Collaboration Insights during Sprint.
+    - [4.2.1. Bounded Context: IAM](docs/chapter4.md#421-bounded-context-iam)
+      - [4.2.1.1. Domain Layer](docs/chapter4.md#4211-domain-layer)
+      - [4.2.1.2. Interface Layer](docs/chapter4.md#4212-interface-layer)
+      - [4.2.1.3. Application Layer](docs/chapter4.md#4213-application-layer)
+      - [4.2.1.4. Infrastructure Layer](docs/chapter4.md#4214-infrastructure-layer)
+      - [4.2.1.5. Component Diagram](docs/chapter4.md#4215-bounded-context-software-architecture-component-level-diagram)
+      - [4.2.1.6. Code Level Diagrams](docs/chapter4.md#4216-bounded-context-software-architecture-code-level-diagrams)
+        - [4.2.1.6.1. Domain Layer Class Diagram](docs/chapter4.md#42161-bounded-context-domain-layer-class-diagram)
+        - [4.2.1.6.2. Database Design Diagram](docs/chapter4.md#42162-bounded-context-database-design-diagram)
+    - [4.2.2. Bounded Context: Notification](docs/chapter4.md#422-bounded-context-notification)
+      - [Domain Layer](docs/chapter4.md#4221-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4222-interface-layer)
+      - [Application Layer](docs/chapter4.md#4223-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4224-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4225-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4226-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42261-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#42262-bounded-context-database-design-diagram)
+    - [4.2.3. Bounded Context: Inventory](docs/chapter4.md#423-bounded-context-inventory)
+      - [Domain Layer](docs/chapter4.md#4231-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4232-interface-layer)
+      - [Application Layer](docs/chapter4.md#4233-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4234-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4235-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4236-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42361-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#42362-bounded-context-database-design-diagram)
+    - [4.2.4. Cross-Cutting Software Architecture Views](docs/chapter4.md#424-cross-cutting-software-architecture-views)
+      - [Code Level Diagrams](docs/chapter4.md#4241-software-architecture-code-level-diagrams)
+      - [Database Design Diagram](docs/chapter4.md#4242-software-architecture-database-design-diagram)
+    - [4.2.5. Bounded Context: Catalog](docs/chapter4.md#425-bounded-context-catalog)
+      - [Domain Layer](docs/chapter4.md#4251-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4252-interface-layer)
+      - [Application Layer](docs/chapter4.md#4253-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4254-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4255-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4256-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42561-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#42562-bounded-context-database-design-diagram)
+    - [4.2.6. Bounded Context: Fulfillment](docs/chapter4.md#426-bounded-context-fulfillment)
+      - [Domain Layer](docs/chapter4.md#4261-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4262-interface-layer)
+      - [Application Layer](docs/chapter4.md#4263-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4264-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4265-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4266-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42661-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#42662-bounded-context-database-design-diagram)
+    - [4.2.7. Bounded Context: Ordering](docs/chapter4.md#427-bounded-context-ordering)
+      - [Domain Layer](docs/chapter4.md#4271-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4272-interface-layer)
+      - [Application Layer](docs/chapter4.md#4273-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4274-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4275-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4276-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42761-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#42762-bounded-context-database-design-diagram)
+    - [4.2.8. Bounded Context: Payment](docs/chapter4.md#428-bounded-context-payment)
+      - [Domain Layer](docs/chapter4.md#4281-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4282-interface-layer)
+      - [Application Layer](docs/chapter4.md#4283-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4284-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4285-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4286-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42861-bounded-context-domain-layer-class-diagrams)
+        - [Database Design Diagram](docs/chapter4.md#42862-bounded-context-database-design-diagram)
+    - [4.2.9. Bounded Context: Reporting](docs/chapter4.md#429-bounded-context-reporting)
+      - [Domain Layer](docs/chapter4.md#4291-domain-layer)
+      - [Interface Layer](docs/chapter4.md#4292-interface-layer)
+      - [Application Layer](docs/chapter4.md#4293-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#4294-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#4295-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#4296-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#42961-bounded-context-domain-layer-class-diagrams)
+        - [Database Design Diagram](docs/chapter4.md#42962-bounded-context-database-design-diagram)
+- [Capítulo V: Solution UI/UX Design](docs/chapter5.md)
+  - [5.1. Style Guidelines](docs/chapter5.md#51-style-guidelines)
+    - [5.1.1. General Style Guidelines](docs/chapter5.md#511-general-style-guidelines)
+    - [5.1.2. Web, Mobile and IoT Style Guidelines](docs/chapter5.md#512-web-mobile-and-iot-style-guidelines)
+  - [5.2. Information Architecture](docs/chapter5.md#52-information-architecture)
+    - [5.2.1. Organization Systems](docs/chapter5.md#521-organization-systems)
+    - [5.2.2. Labeling Systems](docs/chapter5.md#522-labeling-systems)
+    - [5.2.3. SEO Tags and Meta Tags](docs/chapter5.md#523-seo-tags-and-meta-tags)
+    - [5.2.4. Searching Systems](docs/chapter5.md#524-searching-systems)
+    - [5.2.5. Navigation Systems](docs/chapter5.md#525-navigation-systems)
+  - [5.3. Landing Page UI Design](docs/chapter5.md#53-landing-page-ui-design)
+    - [5.3.1. Landing Page Wireframe](docs/chapter5.md#531-landing-page-wireframe)
+    - [5.3.2. Landing Page Mock-up](docs/chapter5.md#532-landing-page-mock-up)
+  - [5.4. Applications UX/UI Design](docs/chapter5.md#54-applications-uxui-design)
+    - [5.4.1. Applications Wireframes](docs/chapter5.md#541-applications-wireframes)
+    - [5.4.2. Applications Wireflow Diagrams](docs/chapter5.md#542-applications-wireflow-diagrams)
+    - [5.4.3. Applications Mock-ups](docs/chapter5.md#543-applications-mock-ups)
+    - [5.4.4. Applications User Flow Diagrams](docs/chapter5.md#544-applications-user-flow-diagrams)
+  - [5.5. Applications Prototyping](docs/chapter5.md#55-applications-prototyping)
+  - [5.6. IoT Device Design](docs/chapter5.md#56-iot-device-design)
+- [Capítulo VI: Product Implementation, Validation & Deployment](docs/chapter6.md)
+  - [6.1. Software Configuration Management](docs/chapter6.md#61-software-configuration-management)
+    - [6.1.1. Software Development Environment Configuration](docs/chapter6.md#611-software-development-environment-configuration)
+    - [6.1.2. Source Code Management](docs/chapter6.md#612-source-code-management)
+    - [6.1.3. Source Code Style Guide & Conventions](docs/chapter6.md#613-source-code-style-guide-conventions)
+    - [6.1.4. Software Deployment Configuration](docs/chapter6.md#614-software-deployment-configuration)
+  - [6.2. Landing Page, Services & Applications Implementation](docs/chapter6.md#62-landing-page-services-applications-implementation)
+    - [6.2.1. Sprint 1](docs/chapter6.md#621-sprint-1)
+      - [6.2.1.1. Sprint Planning 1](docs/chapter6.md#6211-sprint-planning-1)
+      - [6.2.1.2. Aspect Leaders and Collaborators](docs/chapter6.md#6212-aspect-leaders-and-collaborators)
+      - [6.2.1.3. Sprint Backlog 1](docs/chapter6.md#6213-sprint-backlog-1)
+      - [6.2.1.4. Development Evidence for Sprint Review](docs/chapter6.md#6214-development-evidence-for-sprint-review)
+      - [6.2.1.5. Testing Suite Evidence for Sprint Review](docs/chapter6.md#6215-testing-suite-evidence-for-sprint-review)
+      - [6.2.1.6. Execution Evidence for Sprint Review](docs/chapter6.md#6216-execution-evidence-for-sprint-review)
+      - [6.2.1.7. Services Documentation Evidence for Sprint Review](docs/chapter6.md#6217-services-documentation-evidence-for-sprint-review)
+      - [6.2.1.8. Software Deployment Evidence for Sprint Review](docs/chapter6.md#6218-software-deployment-evidence-for-sprint-review)
+      - [6.2.1.9. Team Collaboration Insights during Sprint](docs/chapter6.md#6219-team-collaboration-insights-during-sprint)
   - 6.3. Validation Interviews.
     - 6.3.1. Diseño de Entrevistas.
     - 6.3.2. Registro de Entrevistas.
-    - 6.3.3. Evaluaciones según heurísticas.
-  - [6.4. Video About-the-Product](docs/anexes.md#video-about-the-product)
+    - 6.3.3. Evaluaciones según heurísticas.  - [6.4. Video About-the-Product](docs/anexes.md#video-about-the-product)
 - [Conclusiones](docs/anexes.md#conclusiones)
   - Conclusiones y recomendaciones.
   - [Video About-the-Team](docs/anexes.md#video-about-the-team)
