@@ -13,7 +13,7 @@ Las herramientas que usa el equipo, agrupadas por actividad del ciclo de vida, s
 | Herramienta | Uso | Referencia |
 |---|---|---|
 | Trello | Tablero del Product Backlog y del Sprint Backlog, con las tarjetas de cada historia y su estado. | https://trello.com/ |
-| **[por confirmar: herramienta de mensajería y reuniones]** | Comunicación diaria y reuniones del equipo. | — |
+| Discord | Comunicación diaria y reuniones del equipo. | — |
 | GitHub (organización) | Repositorios, ramas e historial de cada producto. | https://github.com/16518-IoT-PrimeFuel |
 
 **Requirements Management**
@@ -136,7 +136,7 @@ Todo el código (nombres de clases, métodos, variables, rutas y tablas) se escr
 - CSS con variables en `:root` para colores, tipografía y bordes, y clases en `kebab-case`.
 - Se sigue la [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html).
 
-**Gherkin.** Los criterios de aceptación de las historias de usuario se redactan con la estructura *Given – When – Then*, como se muestra en la sección 3.2.
+**Gherkin.** Los criterios de aceptación de las historias de usuario se redactan con la estructura *Given – When – Then*, como se muestra en la sección 3.1.
 
 ### 6.1.4. Software Deployment Configuration
 
@@ -145,7 +145,6 @@ Todo el código (nombres de clases, métodos, variables, rutas y tablas) se escr
 1. La imagen se construye con el `Dockerfile` del repositorio, en dos etapas: la primera compila el proyecto con `./mvnw -B clean package -DskipTests` sobre `eclipse-temurin:26-jdk`, y la segunda copia el `.jar` a una imagen `eclipse-temurin:26-jre` y lo ejecuta con `java -jar app.jar`.
 2. En Render se crea un *Web Service* conectado al repositorio `backend`, rama `main`, con entorno Docker. Render define el puerto en la variable `PORT`, que la aplicación lee con `server.port=${PORT:8080}`.
 3. En Aiven se crea el servicio MySQL. La aplicación se conecta con `sslMode=REQUIRED` y un *pool* de hasta tres conexiones.
-4. Al iniciar con el perfil `prod`, Flyway aplica las migraciones pendientes e Hibernate solo valida el esquema (`ddl-auto=validate`).
 
 Las variables de entorno que se configuran en Render son:
 
@@ -178,7 +177,6 @@ Ninguna credencial está en el repositorio. El primer administrador de la plataf
 | Web Application | https://primefuel-frontend-three.vercel.app |
 | Web Services (API) | https://fulltank-backend.onrender.com/api |
 | Documentación de la API (Swagger UI) | https://fulltank-backend.onrender.com/swagger-ui.html |
-| Landing Page | **[pendiente: URL pública de la landing page]** |
 
 ## 6.2. Landing Page, Services & Applications Implementation
 
@@ -189,9 +187,6 @@ Ninguna credencial está en el repositorio. El primer administrador de la plataf
 | Sprint # | Sprint 1 |
 |---|---|
 | **Sprint Planning Background** | |
-| Date | 21/09/2026 *(por confirmar)* |
-| Time | **[pendiente: hora]** |
-| Location | **[pendiente: lugar o herramienta de la reunión]** |
 | Prepared By | Ponce Perales, Alberto Alejandro|
 | Attendees (to planning meeting) | Bonifacio Jaramillo, Samuel Jesus; Castro Pariona, Jefferson Ernesto; Mejia Aliaga, Katherine Maryory; Ponce Perales, Alberto Alejandro; Delgado Carrasco, Schneider Carlos Alberto; Lopez Goitia, Carlos Alberto; Rodriguez Parco, Joseph Pablo |
 | Sprint 0 Review Summary | No aplica: es el primer sprint. Antes del sprint el equipo redefinió el segmento objetivo y dejó como único segmento al Distribuidor Logístico de Combustible. |
@@ -199,7 +194,7 @@ Ninguna credencial está en el repositorio. El primer administrador de la plataf
 | **Sprint Goal & User Stories** | |
 | Sprint 1 Goal | Entregar al Distribuidor Logístico de Combustible el flujo completo de abastecimiento en la aplicación web: vincular a su comprador, registrar el tanque con su dispositivo, recibir la solicitud generada por el nivel bajo, aceptarla, asignar conductor y cisterna, registrar la entrega y confirmar el pago. Creemos que esto permite al distribuidor atender una reposición sin llamadas ni hojas de cálculo. Lo confirmaremos cuando un distribuidor complete ese flujo de inicio a fin en la aplicación desplegada. |
 | Sprint 1 Velocity | 97 *(capacidad planificada; al ser el primer sprint no hay velocidad previa)* |
-| Sum of Story Points | 97 |
+| Sum of Story Points | 90 |
 
 El sprint duró dos semanas, del 21/09/2026 al 02/10/2026, que es el período en el que se concentran los commits de los repositorios `backend` y `frontend`.
 
@@ -221,11 +216,6 @@ La matriz indica quién lideró (L) y quién colaboró (C) en cada aspecto del s
 
 El Sprint Backlog reúne las historias de usuario que dan forma al flujo de abastecimiento del distribuidor, las del comprador asociado que lo acompañan y las de la landing page. Los *story points* son los del Product Backlog (sección 3.3). El tablero del sprint está en Trello: https://trello.com/invite/b/69e2fd01ee5b055b2d967a45/ATTI05a9ebca4c1da02108fc92fa76bfa07e412172F6/fulltank
 
-<div align="center">
-  <img src="../assets/chapter-6/sprint-1/sprint-backlog-trello.png" alt="Sprint Backlog 1 en Trello" width="800"/>
-  <p><em>Figura 6.1: Sprint Backlog 1 en Trello.</em></p>
-</div>
-
 | User Story | SP | Task | Descripción de la tarea | Asignado a | Estado |
 |---|:---:|---|---|---|---|
 | US-51 Asociar tanque y dispositivo IoT | 3 | T01 | Web services: registrar y editar el tanque de un comprador con producto, umbral y dispositivo, en una transacción. | Samuel Bonifacio | Done |
@@ -236,7 +226,6 @@ El Sprint Backlog reúne las historias de usuario que dan forma al flujo de abas
 | | | T06 | Web: bandeja de solicitudes con el origen Automática o Manual. | Samuel Bonifacio | Done |
 | US-31 Ver listado de empresas / US-32 Ver detalles de empresa | 2 + 2 | T07 | Web services: compradores vinculados, búsqueda por RUC y vínculo explícito. | Samuel Bonifacio | Done |
 | | | T08 | Web: Clientes y tanques, registro de comprador y detalle con sitios, tanques y pedidos. | Samuel Bonifacio | Done |
-| US-10 Ver solicitudes pendientes / US-11 Aceptar solicitud / US-42 Rechazar solicitud | 2 + 3 + 2 | T09 | Web services: bandeja del distribuidor y aceptación en una transacción que crea la orden. | Samuel Bonifacio | Done |
 | | | T10 | Web: lista y detalle de solicitud con Aceptar y Rechazar con motivo. | Samuel Bonifacio | Done |
 | US-22 Validar disponibilidad y capacidad | 5 | T11 | Web services: reserva de conductor y cisterna con bloqueo, capacidad suficiente y sin traslape de ventana. | Samuel Bonifacio | Done |
 | US-49 Asignar recursos a despacho | 5 | T12 | Web services: asignación transaccional e idempotente (stock, flota, entrega y orden). | Samuel Bonifacio | Done |
@@ -266,6 +255,8 @@ El Sprint Backlog reúne las historias de usuario que dan forma al flujo de abas
 Al cierre del sprint quedaron tres tareas sin empezar (T03, T14 y T26) y una en curso (T32, cuya rama todavía no se integró a `main`). Por eso las historias US-51, US-49 y US-30 pasan parcialmente al siguiente sprint.
 
 #### 6.2.1.4. Development Evidence for Sprint Review
+
+La velocity real del Sprint 1 fue **80 story points**: 90 puntos sumados en las historias de la tabla del Sprint Backlog, menos 10 puntos de las historias que pasan parcialmente al siguiente sprint (US-51: 3, US-49: 5 y US-30: 2). La capacidad planificada se mantiene en 97 puntos.
 
 Durante el sprint se registraron 180 commits en la rama `main` del repositorio `backend` y 92 en la del repositorio `frontend`. Las tablas muestran los más representativos de cada producto; el historial completo está en GitHub.
 
@@ -362,7 +353,6 @@ Las 63 pruebas restantes son la prueba de arranque de la aplicación (6) y las d
 | Equipment | 5 | Registro de comprador con búsqueda por RUC, formulario y detalle de tanque, y refresco de las vistas del distribuidor. |
 | Fulfillment | 3 | Detalle de entrega con sus acciones, formulario de cisterna y *store* de despacho. |
 | IAM | 2 | Validaciones de inicio de sesión y registro, y manejo de errores de autenticación. |
-| Analytics, Dashboard, Inventory y Notification | 4 | Indicadores, secciones del tablero con carga y error independientes, inventario y bandeja de notificaciones. |
 | Aplicación | 1 | Arranque de la aplicación y rutas base. |
 
 <div align="center">
@@ -402,11 +392,6 @@ En este sprint se alcanzó el flujo completo del distribuidor en la aplicación 
 8. **Tablero y Analytics:** indicadores del mes, tanques críticos, entregas del día y tendencia de ventas.
 
 <div align="center">
-  <img src="../assets/chapter-6/sprint-1/execution-landing.png" alt="Landing page" width="800"/>
-  <p><em>Figura 6.4: Landing page.</em></p>
-</div>
-
-<div align="center">
   <img src="../assets/chapter-6/sprint-1/execution-clients-tanks.png" alt="Clientes y tanques" width="800"/>
   <p><em>Figura 6.5: Clientes y tanques, con el detalle de un tanque y sus lecturas.</em></p>
 </div>
@@ -431,7 +416,6 @@ En este sprint se alcanzó el flujo completo del distribuidor en la aplicación 
   <p><em>Figura 6.9: Pagos del distribuidor y tablero.</em></p>
 </div>
 
-- **Video de la ejecución:** **[pendiente: enlace del video]**
 
 #### 6.2.1.7. Services Documentation Evidence for Sprint Review
 
@@ -620,7 +604,6 @@ En este sprint se desplegaron los web services y la aplicación web, con la conf
 | Web Application | https://primefuel-frontend-three.vercel.app |
 | Web Services | https://fulltank-backend.onrender.com/api |
 | Swagger UI | https://fulltank-backend.onrender.com/swagger-ui.html |
-| Landing Page | **[pendiente: URL pública de la landing page]** |
 
 <div align="center">
   <img src="../assets/chapter-6/software-deployment/aiven.png" alt="Servicio MySQL en Aiven" width="800"/>

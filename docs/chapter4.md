@@ -1,6 +1,6 @@
 # Capítulo IV: Solution Software Design
 
-El presente capítulo describe el diseño de la solución de software de **FullTank**, elaborado por la startup **PrimeFuel**, aplicando los principios de **Domain-Driven Design (DDD)** y el modelo **C4** para la documentación de la arquitectura. El único segmento comercial objetivo es el **Distribuidor Logístico de Combustible**. El comprador asociado participa como actor operativo del servicio mediante un dispositivo IoT instalado en su tanque, pero no constituye un segmento independiente. Por ello, el flujo arquitectónico inicia en una lectura de nivel bajo y continúa con la generación idempotente del pedido, la aceptación del distribuidor, la asignación automática de conductor y cisterna, el despacho, la telemetría, el control de válvulas y el cierre de la entrega. El diseño se organiza en dos niveles complementarios: un nivel **estratégico**, donde se delimita el dominio, se descubren los *bounded contexts* y se establecen sus relaciones; y un nivel **táctico**, donde cada contexto se detalla en sus capas de dominio, interfaz, aplicación e infraestructura, junto con sus diagramas de componentes y de código.
+El presente capítulo describe el diseño de la solución de software de **FullTank**, elaborado por la startup **PrimeFuel**, aplicando los principios de **Domain-Driven Design (DDD)** y el modelo **C4** para la documentación de la arquitectura. El único segmento comercial objetivo es el **Distribuidor Logístico de Combustible**. El comprador asociado participa como actor operativo del servicio mediante un dispositivo IoT instalado en su tanque, pero no constituye un segmento independiente. Por ello, el flujo arquitectónico inicia en una lectura de nivel bajo y continúa con la generación idempotente del pedido, la aceptación del distribuidor, la asignación de conductor y cisterna, el despacho, la ejecución de la entrega y su cierre. El diseño se organiza en dos niveles complementarios: un nivel **estratégico**, donde se delimita el dominio, se descubren los *bounded contexts* y se establecen sus relaciones; y un nivel **táctico**, donde cada contexto se detalla en sus capas de dominio, interfaz, aplicación e infraestructura, junto con sus diagramas de componentes y de código.
 
 ## 4.1. Strategic-Level Domain-Driven Design
 
@@ -29,40 +29,42 @@ El recorrido de la sesión siguió el ciclo de vida de una reposición:
 
 #### 4.1.1.1. Candidate Context Discovery
 
-A partir de la sesión de Event Storming se identificaron los siguientes contextos candidatos del dominio de FullTank, cada uno con una responsabilidad claramente delimitada dentro del proceso de abastecimiento de combustible:
+Para descubrir los contextos se usó la técnica de *start with value*: se agruparon los eventos alrededor de las decisiones que generan valor para el distribuidor y luego se separaron las capacidades de soporte y las genéricas. Cada contexto resultante corresponde a un módulo del backend.
 
 | Bounded Context | Responsabilidad | Clasificación |
 |---|---|---|
 | **Replenishment** | Evalúa la política de umbral del tanque, abre y rearma episodios de nivel bajo y gestiona el ciclo de la solicitud de abastecimiento (pendiente, aceptada, rechazada o cancelada). | Core |
 | **Fulfillment** | Crea la entrega asignada y controla su ciclo físico (asignada, iniciada, en destino, descargando, completada, fallida o cancelada), con historial de transiciones y línea de tiempo. | Core |
 | **Ordering** | Mantiene la orden de combustible vinculada a una solicitud aceptada y su ciclo comercial hasta el pago. | Core |
-| **Equipment** | Registra los clientes del distribuidor, sus sitios y tanques, y el vínculo temporal entre dispositivo y tanque con sus credenciales. | Supporting |
+| **Equipment** | Vincula a los compradores con el distribuidor, registra sus sitios y tanques, y mantiene el vínculo temporal entre dispositivo y tanque con sus credenciales. | Supporting |
 | **Telemetry** | Recibe las lecturas del dispositivo, las autentica, las deduplica y publica solo las lecturas válidas. | Supporting |
 | **Fleet** | Registra conductores y cisternas, calcula su elegibilidad y reserva los recursos por ventana de tiempo validando la capacidad. | Supporting |
 | **Supply** | Expone el catálogo de productos por distribuidor y reserva el stock de una asignación para no sobrevender. | Supporting |
 | **Inventory** | Administra los productos de combustible del distribuidor, su precio y su stock disponible. | Supporting |
 | **Payment** | Registra el pago de una orden y su confirmación o reembolso. | Generic |
 | **Notification** | Genera la bandeja in-app de cada usuario a partir de los eventos de negocio. | Generic |
-| **Reporting** | Calcula indicadores de solo lectura para el distribuidor y el comprador. | Generic |
+| **Analytics** | Calcula indicadores de solo lectura para el distribuidor y el comprador, leyendo los demás contextos a través de una capa anticorrupción. | Generic |
 | **IAM** | Autentica con JWT, gestiona organizaciones, membresías, invitaciones y roles, y resuelve el tenant de cada petición. | Generic |
 
-Además de estos contextos, el backend tiene un módulo **Application Flows** que no es un *bounded context*, sino la raíz de composición: orquesta en una sola transacción la aceptación de una solicitud y la asignación de una entrega usando únicamente las interfaces públicas (paquete `api`) de cada contexto.
+Además de estos contextos, el backend tiene un módulo **Application Flows** que no es un *bounded context*, sino la raíz de composición: orquesta en una sola transacción la aceptación de una solicitud y la asignación de una entrega, usando sobre todo las interfaces públicas (paquete `api`) de cada contexto.
 
-La delimitación estratégica establece que **Equipment e IoT Tank Monitoring** es el contexto iniciador, **Ordering** es el núcleo transaccional, **Fulfillment** resuelve la asignación de recursos y el despacho, y **Notification**, **Reporting & Analytics** y **IAM** actúan como capacidades transversales. La telemetría de la cisterna y el control de válvulas se consideran capacidades de seguridad y trazabilidad vinculadas a Fulfillment, no funcionalidades aisladas de seguimiento GPS.
+El backend también contiene dos módulos que dependen de una aplicación para el conductor: *tracking* (ubicación e hitos de carga que el conductor reporta desde su teléfono) y *safety* (geocerca de la entrega y registro lógico de apertura y cierre de válvula, sin hardware). Esa aplicación no forma parte de esta versión y el capítulo I excluye la telemetría de la carga y el control de válvulas, por lo que ambos módulos quedan fuera del alcance y no se documentan en este capítulo.
 
 #### 4.1.1.2. Domain Message Flows Modeling
 
-Una vez definidos los contextos candidatos, el equipo modeló los flujos de mensajes del dominio que los conectan. Para cada flujo se identifican el comando que inicia la interacción, el evento de dominio que produce el contexto receptor y la política que reacciona a dicho evento, incluyendo los eventos de integración que cruzan los límites de cada contexto.
+Los eventos entre contextos usan tipos versionados (`replenishment.accepted.v1`, `delivery.completed.v1`, etc.) que se publican con un *outbox* transaccional y se consumen de forma idempotente con un *inbox*.
 
-- **Asociación del tanque:** un distribuidor registra al comprador asociado, el tanque y el dispositivo en *IAM* y *Equipment e IoT Tank Monitoring*. La configuración del umbral queda vinculada al dispositivo y al producto.
-- **Inicio automático:** el dispositivo publica una lectura; cuando el nivel es igual o inferior al umbral, *Equipment e IoT Tank Monitoring* emite `LowFuelLevelDetected`. Una política de integración solicita a *Ordering* crear una solicitud idempotente.
-- **Ciclo de vida del pedido:** *Ordering* valida comprador, producto, volumen, punto de entrega y distribuidor asociado; notifica la solicitud, registra la aceptación o rechazo y crea la orden atendible.
-- **Asignación de recursos:** *Fulfillment* recibe `OrderAccepted`, consulta la capacidad y disponibilidad de cisternas y conductores y devuelve una recomendación válida. La confirmación de la asignación publica `ResourcesAssigned`.
-- **Despacho seguro:** *Fulfillment* inicia el viaje y correlaciona telemetría, geocerca y estado de válvula. Una política permite o bloquea la descarga y publica `DeliveryDispatched`, `ValveOpeningAuthorized` o `ValveOpeningBlocked`.
-- **Cierre y trazabilidad:** la recepción publica `CargoReceived`; *Ordering* cierra la orden, *Notification* informa a las partes y *Reporting & Analytics* conserva los indicadores de tiempo, volumen, capacidad y excepciones.
-- **Validación financiera:** *Payment* valida que el monto total coincida con el precio del combustible solicitado antes de habilitar la aprobación de la orden en *Ordering*.
-- **Actualización de inventario:** *Ordering* descuenta el stock en *Inventory* al cerrar las órdenes, y *Catalog* consume datos de *Inventory* para mostrar disponibilidad.
-- **Comunicación transversal:** *Notification* reacciona a eventos de nivel, aceptación, asignación, alerta y entrega; *Reporting & Analytics* consume la bitácora completa para generar indicadores operativos y de trazabilidad.
+**Flujo 1 – Detección de nivel bajo y generación de la solicitud.** El dispositivo envía la lectura con su token. Telemetry la autentica mediante Equipment, descarta duplicados por dispositivo, canal y secuencia, y guarda en cuarentena las lecturas de credenciales desconocidas o revocadas. Si la lectura es válida, Equipment actualiza el nivel del tanque y Telemetry publica `ValidatedTankReadingEvent`. Replenishment evalúa la política: abre un episodio cuando el nivel cae al umbral (20 % por defecto) y, si la generación automática está activa, crea la solicitud `AUTOMATIC`.
+
+**Flujo 2 – Aceptación o rechazo y creación de la orden.** El distribuidor revisa las solicitudes de su organización. Al aceptar, Application Flows ejecuta en una transacción la aceptación, el consumo único de esa aceptación, la creación de la orden en Ordering y su vínculo con la solicitud. Si algún paso falla, no se conserva ningún cambio. La decisión se publica como evento y Notification la agrega a la bandeja de los miembros de la organización del comprador que hizo la solicitud.
+
+**Flujo 3 – Asignación de conductor y cisterna.** El distribuidor puede pedir primero una recomendación: el sistema propone la cisterna de menor capacidad que cubre el volumen y un conductor elegible sin reservas que se traslapen, o indica por qué no hay recursos. La recomendación no reserva nada. Luego el distribuidor consulta los conductores y cisternas elegibles y envía la asignación con un `commandId`. En una transacción se reserva el stock en Supply, se reservan el conductor y la cisterna en Fleet (con bloqueo de filas, capacidad suficiente y sin traslape de ventana), se crea la entrega `ASSIGNED` y la orden pasa a `DISPATCHED`. Reintentar con el mismo `commandId` devuelve la misma entrega.
+
+
+**Flujo 4 – Ejecución de la entrega, cierre y pago.** El distribuidor registra el inicio, la llegada y el cierre con el volumen entregado, que no puede superar el solicitado. Al completarse se liberan las reservas de flota, se concilia el stock y la orden pasa a `PENDING_PAYMENT`. El comprador registra el pago; al confirmarse, Payment publica `payment.completed.v1` y Ordering marca la orden como `PAID`.
+
+
+**Flujo 5 – Alta del comprador, su tanque y el dispositivo.** Este flujo es la condición previa de los anteriores. El distribuidor busca al comprador por su RUC exacto y lo vincula, o lo registra si no existe; en la misma transacción se crean su cuenta y su sitio de entrega. Después registra el tanque con su capacidad, el producto que se repondrá, el umbral y el identificador del dispositivo: Equipment crea el tanque y el vínculo con el dispositivo, y Replenishment guarda la política. Si el dispositivo ya está vinculado a otro tanque, la operación se rechaza completa.
 
 #### 4.1.1.3. Bounded Context Canvases
 
@@ -74,69 +76,84 @@ A continuación se presenta el diagrama de cada *bounded context* identificado, 
   <img src="../assets/chapter-4/event-storming/IAM.png" alt="Bounded context IAM" width="500"/>
 </div>
 
-2. **Bounded Context Catalog**
-
-<div align="center">
-  <img src="../assets/chapter-4/event-storming/Catalog.png" alt="Bounded context Catalog" width="500"/>
-</div>
-
-3. **Bounded Context Ordering**
+2. **Bounded Context Ordering**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Ordering.png" alt="Bounded context Ordering" width="500"/>
 </div>
 
-4. **Bounded Context Fulfillment**
+3. **Bounded Context Fulfillment**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Fullfillment.png" alt="Bounded context Fulfillment" width="500"/>
 </div>
 
-5. **Bounded Context Payment**
+4. **Bounded Context Payment**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Payment.png" alt="Bounded context Payment" width="500"/>
 </div>
 
-6. **Bounded Context Notification**
+5. **Bounded Context Notification**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Notification.png" alt="Bounded context Notification" width="500"/>
 </div>
 
-7. **Bounded Context Reporting & Analytics**
+6. **Bounded Context Analytics**
 
 <div align="center">
-  <img src="../assets/chapter-4/event-storming/Reporting.png" alt="Bounded context Reporting & Analytics" width="500"/>
+  <img src="../assets/chapter-4/event-storming/Reporting.png" alt="Bounded context Analytics" width="500"/>
 </div>
 
-8. **Bounded Context Inventory**
+7. **Bounded Context Inventory**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Inventory.png" alt="Bounded context Inventory" width="500"/>
 </div>
 
-9. **Bounded Context Equipment**
+8. **Bounded Context Equipment**
 
 <div align="center">
   <img src="../assets/chapter-4/event-storming/Equipment.png" alt="Bounded context Equipment" width="500"/>
 </div>
 
+Telemetry, Replenishment, Fleet y Supply surgieron después de la sesión y todavía no tienen canvas propio.
+
 ### 4.1.2. Context Mapping
 
-El *Context Mapping* describe cómo se relacionan los *bounded contexts* identificados y qué dependencias existen entre ellos. El diagrama completo del backend muestra la organización de todos los *bounded contexts* como módulos independientes dentro del sistema. En el flujo actualizado, **Equipment e IoT Tank Monitoring** inicia la interacción mediante eventos de nivel, **Ordering** actúa como núcleo transaccional y **Fulfillment** determina los recursos de transporte y ejecuta el despacho.
+El *Context Mapping* muestra cómo se relacionan los contextos. La regla principal del backend es que un contexto solo usa la **superficie pública** de otro (su paquete `api`), nunca su dominio ni su infraestructura. Esta regla se verifica con pruebas de ArchUnit sobre los módulos originales del backend.
 
-Las principales dependencias entre contextos incluyen:
+| Upstream | Downstream | Patrón | Mecanismo |
+|---|---|---|---|
+| IAM | Todos los contextos de negocio | Open Host Service / Conformist | `TenantAccess`, `MembershipAccess`, `MembershipDirectory` |
+| Equipment | Telemetry | Open Host Service / Customer-Supplier | `DeviceAuthentication`, `TankAssets`, `ProviderBuyerAccess` |
+| Telemetry | Replenishment | Published Language | `ValidatedTankReadingEvent` |
+| Equipment | Replenishment | Open Host Service | `TankAssets`, `CustomerDirectory`, `TankLevelManuallyUpdatedEvent` |
+| Replenishment | Equipment | Open Host Service | `TankRefillConfiguration`, `TankRefillLookup`, `ReplenishmentLookup` |
+| IAM | Equipment | Open Host Service | `BuyerCompanyDirectory`, `BuyerCompanyRegistration` |
+| Inventory | Equipment, Fulfillment, Analytics | Open Host Service | `FuelProductLookup` |
+| Inventory | Supply | Anti-Corruption Layer | `InventorySupplyCatalog` traduce `fuel_products` al modelo de Supply |
+| Supply | Replenishment, Application Flows | Open Host Service | `SupplyCatalog`, `SupplyReservations` |
+| Replenishment, Ordering, Fleet, Fulfillment | Application Flows | Open Host Service | `ReplenishmentLookup`, `ReplenishmentAcceptance`, `FuelOrderCreation`, `FleetReservations`, `DeliveryAssignments` |
+| Application Flows | Fulfillment | Anti-Corruption Layer | Implementa el puerto `DeliveryIntegration` para que Fulfillment no aplique por sí mismo los efectos del cierre sobre Fleet, Supply, Inventory y Ordering |
+| Inventory, Equipment | Ordering | Conformist | Ordering consulta el producto (precio) y el equipo legado directamente con sus query services |
+| Ordering | Payment, Equipment, Fulfillment | Open Host Service | `OrderLookup` |
+| Fleet | Fulfillment | Open Host Service | `FleetCatalog` (conductor, cisterna y ventana reservada) |
+| Payment | Ordering | Published Language | `payment.completed.v1` |
+| Replenishment, Fulfillment, Inventory | Notification | Published Language / Conformist | `replenishment.*.v1`, `delivery.*.v1`, `inventory.catalog-empty.v1` |
+| Ordering, Payment, Fulfillment | Analytics | Anti-Corruption Layer | Cada contexto expone un *facade* (`OrderingContextFacade`, `PaymentContextFacade`, `FulfillmentContextFacade`) y Analytics lo traduce a sus propios tipos con `ExternalOrderingService`, `ExternalPaymentService` y `ExternalFulfillmentService` |
+| Shared Kernel | Todos | Shared Kernel | `Volume`, `Unit`, `Result`, `ApplicationError`, `EventEnvelope`, outbox e inbox |
 
-- Publicación de lecturas y eventos de nivel bajo (*Equipment e IoT Tank Monitoring* → *Ordering*).
-- Validación de comprador, producto, volumen y distribuidor asociado (*Ordering* → *Catalog* / *Inventory*).
-- Solicitud de aceptación y emisión de `OrderAccepted` o `OrderRejected` (*Ordering* → *Notification*).
-- Recomendación y confirmación de conductor y cisterna (*Ordering* → *Fulfillment*).
-- Telemetría de cisterna, geocerca y autorización de válvula (*Fulfillment* → *Notification* / *Reporting & Analytics*).
-- Verificación de pagos antes de liberar la orden cuando el modelo comercial lo requiera (*Payment* → *Ordering*).
-- Alimentación de datos de pedidos, asignaciones, lecturas y entregas para reportes (*Ordering* / *Fulfillment* → *Reporting & Analytics*).
+Equipment y Replenishment se usan mutuamente: Replenishment lee los tanques de Equipment, y Equipment configura la política del tanque en Replenishment cuando el distribuidor lo registra. Se aceptó esa dependencia en ambos sentidos porque el alta del tanque debe ser atómica (tanque, vínculo del dispositivo y política) y cada contexto sigue usando solo la superficie pública del otro.
 
-Todas las interacciones entre *bounded contexts* se realizan a través de interfaces, evitando dependencias directas de implementación y favoreciendo el desacoplamiento.
+Durante el diseño se evaluaron tres alternativas:
+
+- **Separar Supply de Inventory.** Se mantuvieron separados porque Inventory administra el catálogo (CRUD del distribuidor) y Supply resuelve la concurrencia de las reservas. Juntarlos obligaría a que cada edición de producto compita con los bloqueos de reserva.
+- **Orquestación frente a coreografía para la asignación.** La asignación toca Replenishment, Supply, Fleet, Fulfillment y Ordering y debe ser todo o nada. Se eligió orquestarla en Application Flows dentro de una transacción local, en lugar de encadenar eventos con compensaciones, porque todos los contextos comparten la misma base de datos y así el rollback deshace cualquier paso fallido.
+- **Lectura directa frente a capa anticorrupción en Analytics.** La primera versión de los reportes leía los query services de Ordering, Payment y Fulfillment. Se extrajo Analytics como contexto propio con una capa anticorrupción para que un cambio en el modelo de esos contextos no rompa los indicadores.
+
+Algunas dependencias todavía acceden al modelo interno de otro contexto en lugar de su paquete `api`: Ordering consulta los query services de Inventory y Equipment; Fulfillment consulta el query service de Ordering; Supply lee los productos con el query service de Inventory; Equipment usa el tipo `FuelType` de Inventory; y Application Flows usa el servicio de comandos y el agregado de Replenishment, además de repositorios de Fleet, Inventory, Ordering y Equipment en `DeliveryIntegrationAdapter`. Las heredadas están registradas como deuda en la línea base de ArchUnit para que no aparezcan nuevas.
 
 ### 4.1.3. Software Architecture
 
@@ -173,19 +190,21 @@ En el diagrama se representan las relaciones entre estos elementos, destacando q
 
 #### 4.1.3.3. Software Architecture Container Level Diagrams
 
-En el nivel de contenedores, la atención se centra en cómo se organiza internamente el sistema en aplicaciones y fuentes de datos. El *container diagram* muestra los elementos principales de la arquitectura de FullTank, sus responsabilidades y la forma en que se comunican entre sí y con sistemas externos.
+FullTank se compone de los siguientes contenedores:
 
-La arquitectura lógica de FullTank se estructura en los siguientes contenedores:
+| Contenedor | Tecnología | Responsabilidad |
+|---|---|---|
+| Landing Page | HTML, CSS, JavaScript | Presenta la propuesta de valor, los planes y el contacto, y dirige al registro. |
+| Web Application | Angular 21, Angular Material, Chart.js, ngx-translate | SPA del distribuidor (panel, solicitudes, órdenes, clientes y tanques, flota, entregas, productos, pagos y analítica) y del comprador asociado (tanques, solicitudes, órdenes y pagos). Organizada por *bounded context* con las capas *domain*, *application*, *infrastructure* y *presentation*. |
+| Mobile Application | Flutter | App del distribuidor para operar en campo. Está planificada y no forma parte del Sprint 1; en los diagramas aparece con borde punteado. |
+| IAM, Equipment, Telemetry, Replenishment, Inventory, Supply, Ordering, Fleet, Fulfillment, Payment, Notification y Analytics | Spring Boot 4, Java 26 (módulos) | Un contenedor por *bounded context*. Cada uno expone sus endpoints bajo `/api` (salvo Supply, que solo usan otros contextos), es dueño de sus tablas y publica a los demás solo lo que está en su paquete `api` (interfaces y eventos). Replenishment, Ordering y Fulfillment forman el dominio core. |
+| Application Flows | Spring Boot 4, Java 26 (módulo) | Raíz de composición: orquesta en una transacción la aceptación de solicitudes y la asignación de entregas. |
+| FullTank Database | MySQL 8 | Esquema único versionado con Flyway (36 migraciones, numeradas de V1 a V37 sin la V31), con las tablas de cada contexto, el outbox (`event_publications`) y el inbox (`consumed_events`); Hibernate solo valida el esquema (`ddl-auto=validate`). |
+| Tank Monitoring Device | ESP32 + JSN-SR04T, C++ (Arduino) | Mide la distancia al combustible, calcula el volumen y lo envía a `POST /api/telemetry/readings` con su `X-Device-Token`. |
 
-- **Landing Page:** aplicación web estática que presenta la propuesta de valor del sistema, incluyendo secciones como descripción del servicio, beneficios, testimonios, precios, preguntas frecuentes y contacto. Está desarrollada con HTML, CSS y JavaScript, y orientada a usuarios no autenticados.
-- **FullTank Web Application (SPA):** aplicación web principal desarrollada en Vue.js 3 con Pinia como gestor de estado y Vue Router para navegación protegida por roles. El distribuidor utiliza módulos de tanques asociados, solicitudes IoT, aceptación, asignación de flota, despachos, telemetría, alertas y reportes; el comprador asociado consulta el nivel, el estado del pedido y la entrega.
-- **FullTank API:** backend desarrollado en ASP.NET Core 8 con Entity Framework Core que expone una API REST. Centraliza la lógica de negocio, reglas de validación y orquestación de procesos, organizados en los *bounded contexts* de IAM, Equipment e IoT Tank Monitoring, Ordering, Inventory, Catalog, Fulfillment, Notification, Payment y Reporting & Analytics.
-- **IoT Gateway and Device Ingestion:** componente encargado de recibir lecturas del dispositivo del tanque, validar identidad, normalizar unidades, almacenar temporalmente los mensajes y publicar eventos idempotentes como `LowFuelLevelDetected` hacia la API o el broker de mensajería.
-- **MySQL Database and Telemetry Store:** la base relacional conserva usuarios, compradores, tanques, pedidos, órdenes, asignaciones, flota, despachos, notificaciones y reportes. Las lecturas de nivel, ubicación, válvulas y eventos de entrega se conservan en un almacenamiento de telemetría o en tablas particionadas por dispositivo y viaje.
+Los contenedores de los *bounded contexts* y Application Flows se agrupan como **FullTank API** porque se compilan y despliegan juntos: son módulos de un solo proceso Spring Boot (monolito modular), no microservicios. Se modelan como contenedores para que el diagrama muestre qué contexto atiende a cada cliente, cómo se comunican entre sí y qué parte del esquema usa cada uno.
 
-En el diagrama se observa que los usuarios acceden inicialmente a la Landing Page, desde donde pueden registrarse o ingresar a la aplicación principal. La Web Application (SPA) se comunica con la API mediante HTTPS y JSON a través de Axios con interceptor JWT. El dispositivo IoT del tanque transmite a través del gateway y un canal seguro; la API valida la identidad del dispositivo y procesa `LowFuelLevelDetected` de forma idempotente antes de crear la solicitud en Ordering. La API persiste datos transaccionales en MySQL y telemetría en el almacenamiento de eventos. Adicionalmente, se integra con Email Service, Cloud Storage, PDF Generator Service y, cuando corresponda, un broker MQTT sobre TLS.
-
-Esta vista permite entender la distribución de responsabilidades entre la capa de presentación (Landing Page y SPA), la capa de lógica de negocio (API) y la capa de persistencia (Database), así como las principales decisiones tecnológicas adoptadas.
+La Web Application llama a cada contexto por HTTPS con JSON y un token JWT *Bearer*; la Mobile Application usará el mismo canal cuando se implemente. El dispositivo usa un canal separado hacia Telemetry: no tiene usuario ni JWT y se autentica con un token rotativo cuyo hash guarda Equipment. Entre contextos, las llamadas son en proceso a través de las interfaces `api`, y los eventos (línea punteada) viajan por el outbox. Telemetry, Equipment, Replenishment, Inventory, Ordering, Fleet, Fulfillment, Payment y Application Flows resuelven el tenant o la propiedad del recurso con IAM (`TenantAccess`, y `CurrentUserAccess` en Ordering); esas nueve flechas se omiten en esta vista para que sea legible y aparecen en el diagrama de componentes de IAM.
 
 <div align="center">
   <img src="../assets/chapter-4/c4-model/Containers-dark.png" alt="Container diagram" width="500"/>
@@ -194,7 +213,14 @@ Esta vista permite entender la distribución de responsabilidades entre la capa 
 
 #### 4.1.3.4. Software Architecture Deployment Diagrams
 
-El **Deployment Diagram** describe la distribución física de los contenedores en la infraestructura de despliegue, incluyendo los entornos de producción y desarrollo, los servicios de hosting de frontend y backend, la base de datos, el gateway de ingestión y los dispositivos IoT instalados en los tanques de los compradores asociados. El dispositivo debe poder almacenar lecturas durante una interrupción temporal y reenviarlas de manera idempotente cuando recupere la conectividad.
+La solución está desplegada con servicios administrados. El diagrama de producción muestra estos nodos:
+
+- **Vercel:** sirve el *build* de producción de la Web Application (`ng build`). Como es una SPA, todas las rutas se reescriben a `index.html`.
+- **Render:** ejecuta la API como un *Web Service* a partir del `Dockerfile` del repositorio. La imagen se construye en dos etapas (compilación con `eclipse-temurin:26-jdk` y ejecución con `eclipse-temurin:26-jre`) y los doce *bounded contexts* y Application Flows corren en el mismo proceso. Render define el puerto con la variable `PORT` y el perfil `prod` con `SPRING_PROFILES_ACTIVE`.
+- **Aiven:** servicio administrado de MySQL 8. La API se conecta con TLS obligatorio (`sslMode=REQUIRED`) y un *pool* de hasta tres conexiones; Flyway aplica las migraciones al iniciar.
+- **Hosting de la Landing Page:** sitio estático en HTML, CSS y JavaScript.
+- **Instalación del comprador:** el ESP32 montado en el tanque se conecta por Wi-Fi y envía sus lecturas a la API.
+- **Proveedor de correo:** servidor SMTP para el restablecimiento de contraseña.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/deploy-diagram.png" alt="Deploy Diagrams" width="500"/>
@@ -202,31 +228,16 @@ El **Deployment Diagram** describe la distribución física de los contenedores 
 
 ## 4.2. Tactical-Level Domain-Driven Design
 
-En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Catalog**, **Equipment e IoT Tank Monitoring**, **Fulfillment**, **Ordering**, **Payment** y **Reporting**, profundizando en sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia runtime disponible. La documentación se basa en los artefactos de diseño y en la evidencia funcional conservada en este repositorio; las capacidades IoT, de asignación automática y de control de válvulas que todavía no cuenten con evidencia runtime se identifican explícitamente como evolución arquitectónica propuesta.
+En este nivel se documentan los bounded contexts **IAM**, **Notification**, **Inventory**, **Equipment**, **Fulfillment**, **Ordering**, **Payment**, **Analytics**, **Telemetry**, **Replenishment**, **Fleet** y **Supply**, además del módulo Application Flows (sección 4.1.1.1), con sus capas **Domain**, **Interface**, **Application** e **Infrastructure**, sus agregados principales y la evidencia disponible. La documentación se basa en el código del backend y en las pruebas y la documentación OpenAPI descritas en el capítulo VI. Los módulos de seguimiento del conductor y de geocerca y válvula no se documentan porque están fuera del alcance (sección 4.1.1.1).
+
 
 ### 4.2.1. Bounded Context: IAM
 
-IAM (Identity and Access Management) centraliza la identidad y el control de acceso de FullTank. Gestiona el registro de usuarios, compradores asociados y Distribuidores Logísticos de Combustible, el inicio de sesión, la emisión de tokens JWT, la recuperación de contraseña, los roles y las reglas de ownership que protegen los recursos de cada organización. El contexto mantiene su propio modelo de usuarios, compañías, roles y tokens de recuperación.
-
-#### Cross-Cutting Bounded Context Software Architecture Component Level Diagrams.
-
-En el nivel de componentes se detalla la descomposición interna de los contenedores, enfocándose principalmente en el contenedor **FullTank API**, donde reside la lógica de negocio del sistema.
-
-El *component diagram* organiza la arquitectura interna siguiendo los *bounded contexts* definidos en el dominio. Cada uno representa un módulo backend con responsabilidades específicas:
-
-- **Identity & Access BC:** gestiona el registro de usuarios (compradores asociados y distribuidores), autenticación mediante credenciales de correo electrónico y contraseña, autorización basada en roles, emisión de tokens JWT, recuperación de contraseñas y administración de perfiles. Redirige al usuario según su rol tras el inicio de sesión.
-- **Catalog BC:** *bounded context* que permite gestionar los productos y las condiciones de abastecimiento ofrecidas por el distribuidor. Consume datos de *Inventory* para validar disponibilidad y de *Equipment e IoT Tank Monitoring* para comprobar que el producto sea compatible con el tanque asociado.
-- **Equipment e IoT Tank Monitoring BC:** gestiona compradores asociados, tanques, dispositivos, umbrales y lecturas. Valida la identidad del dispositivo, normaliza la medición y publica `LowFuelLevelDetected` sin crear directamente la orden, manteniendo la responsabilidad transaccional en *Ordering*.
-- **Inventory BC:** *bounded context* orientado al proveedor que administra el inventario de combustible, incluyendo niveles de stock disponible y precio por litro según tipo de combustible. Valida la información de los ítems al momento de registro o actualización y notifica al administrador ante cambios relevantes.
-- **Ordering BC:** orquesta el ciclo de vida completo de las solicitudes y órdenes, desde `LowFuelLevelDetected` o una solicitud manual de contingencia hasta su aceptación, rechazo, despacho, confirmación y cierre. Garantiza la idempotencia del pedido generado por IoT, valida producto, volumen y distribuidor asociado y notifica a los actores según corresponda.
-- **Payment BC:** gestiona el registro de pagos mediante comprobantes (vouchers), valida que el monto total coincida con el precio del combustible solicitado y habilita la aprobación de órdenes una vez verificado el respaldo financiero.
-- **Fulfillment BC:** administra los recursos logísticos del distribuidor, incluyendo cisternas y conductores. Recomienda o confirma la asignación según capacidad, producto, disponibilidad, habilitación y ruta; controla el ciclo de la entrega y libera los recursos cuando la orden se cierra.
-- **Notification BC:** genera notificaciones dentro del sistema en respuesta a eventos relevantes del dominio, como cambios en el estado de las órdenes (creación, aprobación, rechazo, despacho, entrega, cierre). Permite a los usuarios visualizar su historial de notificaciones y marcarlas como leídas.
-- **Reporting & Analytics BC:** procesa la bitácora de eventos IoT, pedidos, asignaciones, telemetría, válvulas y entregas para generar indicadores de tiempo de atención, utilización de flota, trazabilidad, excepciones y cumplimiento, además de los reportes descargables.
-
-En el diagrama se refleja cómo la Web Application consume los servicios de cada componente backend mediante endpoints REST organizados por contexto. Cada *bounded context* accede a la base de datos para gestionar la información correspondiente a su dominio. En el flujo actualizado, *Equipment e IoT Tank Monitoring* publica eventos de nivel bajo hacia *Ordering*; *Ordering* solicita aceptación y coordina con *Fulfillment* la recomendación de recursos; *Fulfillment* consume telemetría de la cisterna, aplica las políticas de válvulas y publica eventos de entrega; *Notification* reacciona a los cambios de estado y alertas; y *Reporting* consume la bitácora completa para generar agregados analíticos. Algunos componentes se integran con sistemas externos: el gateway IoT o broker MQTT, el servicio de correo, el almacenamiento de evidencias y el generador de PDFs.
-
-De esta manera, los *component diagrams* permiten entender cómo la arquitectura se organiza internamente en módulos coherentes con el dominio, cómo se relacionan entre sí y cómo colaboran para implementar la funcionalidad completa de FullTank.
+| Elemento | Descripción |
+|---|---|
+| Propósito | Autenticar a los usuarios, gestionar organizaciones y membresías, y resolver el tenant de cada petición. |
+| Actores | Distribuidor (registro, onboarding e invitaciones), comprador asociado (inicio de sesión) y administrador de plataforma. |
+| Relación con otros contextos | Es upstream de todos los contextos de negocio mediante `TenantAccess`, `MembershipAccess`, `MembershipDirectory` y `LegacyCompanyDirectory`; Equipment y Fulfillment usan además `BuyerCompanyDirectory`, y Equipment registra compradores con `BuyerCompanyRegistration`. Usa el servicio SMTP para el restablecimiento de contraseña. |
 
 <div align="center">
   <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-bounded-context.png" alt="Bounded context IAM" width="100%"/>
@@ -235,36 +246,65 @@ De esta manera, los *component diagrams* permiten entender cómo la arquitectura
 
 #### 4.2.1.1. Domain Layer
 
-El dominio está formado por los agregados User, BuyerCompany y ProviderCompany, además de la entidad Role y el value object Roles. User representa la identidad autenticable, sus roles y el vínculo con una compañía compradora o proveedora. BuyerCompany y ProviderCompany representan los perfiles empresariales que pertenecen al contexto IAM.
+IAM combina dos modelos de identidad. El modelo de **organizaciones** (`Organization`, `Membership`, `OrganizationInvitation`) define a qué tenant pertenece cada usuario y con qué rol; es el que usan los contextos nuevos. El modelo de **compañías** (`BuyerCompany`, `ProviderCompany`) se conserva porque órdenes, pagos y flota todavía se relacionan por `companyId` y `providerId`. Las invariantes principales son que una membresía revocada no da acceso, que solo un `OWNER` o `ADMIN` puede invitar y nunca al rol `OWNER`, que una invitación solo se acepta si está pendiente y no venció, y que el conjunto de roles de un usuario es válido.
 
-Los comandos son SignUpCommand, SignInCommand, CreateBuyerCompanyCommand, CreateProviderCompanyCommand y SeedRolesCommand. Las consultas son GetAllUsersQuery, GetUserByIdQuery, GetUserByUsernameQuery, GetAllBuyerCompaniesQuery, GetBuyerCompanyByIdQuery, GetAllProviderCompaniesQuery y GetProviderCompanyByIdQuery. UserRepository, RoleRepository, BuyerCompanyRepository y ProviderCompanyRepository son puertos de persistencia que mantienen el dominio independiente de JPA.
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `User` | Aggregate Root | Usuario con credenciales, roles y vínculo con su compañía (`companyId`) o distribuidor (`providerId`). Expone `addRole()` y `addRoles()`. |
+| `Role` | Entity | Rol asignable (`ROLE_BUYER`, `ROLE_PROVIDER`, `ROLE_ADMIN`); valida el conjunto de roles y define el rol por defecto. |
+| `Organization` | Aggregate Root | Organización con nombre, RUC, tipo (`DISTRIBUTOR` o `CUSTOMER`) y estado activo. Expone `activate()` y `deactivate()`. |
+| `Membership` | Aggregate Root | Relación usuario–organización con rol (`OWNER`, `ADMIN`, `MEMBER`). Expone `revoke()` y `reactivate()`. |
+| `OrganizationInvitation` | Aggregate Root | Invitación por correo con token y vencimiento. Expone `isUsable()`, `accept()` y `revoke()`. |
+| `BuyerCompany` | Aggregate Root | Compañía del comprador en el modelo heredado (RUC, sector, contacto). |
+| `ProviderCompany` | Aggregate Root | Compañía del distribuidor en el modelo heredado (RUC, dirección, tipos de combustible ofrecidos). |
+| `Roles`, `OrganizationType`, `MembershipRole`, `InvitationStatus` | Value Objects | Restringen los valores válidos de rol, tipo de organización, rol de membresía y estado de invitación. |
+| `SignUpCommand`, `SignInCommand`, `OnboardOrganizationCommand`, `CreateOrganizationCommand`, `GrantMembershipCommand`, `RevokeMembershipCommand`, `InviteMemberCommand`, `AcceptInvitationCommand`, `RevokeInvitationCommand`, `CreateBuyerCompanyCommand`, `CreateProviderCompanyCommand`, `SeedRolesCommand` | Domain Commands | Intenciones de registro, autenticación, onboarding, membresía, invitación y alta de compañías. |
+| `GetUserByIdQuery`, `GetUserByUsernameQuery`, `GetAllUsersQuery`, `GetOrganizationByIdQuery`, `GetMembershipsByUserIdQuery`, `GetInvitationByIdQuery`, `GetInvitationByTokenQuery`, `GetBuyerCompanyByIdQuery`, `GetAllBuyerCompaniesQuery`, `GetProviderCompanyByIdQuery`, `GetAllProviderCompaniesQuery` | Domain Queries | Consultas de usuarios, organizaciones, membresías, invitaciones y compañías. |
+| `UserRepository`, `RoleRepository`, `OrganizationRepository`, `MembershipRepository`, `OrganizationInvitationRepository`, `BuyerCompanyRepository`, `ProviderCompanyRepository` | Domain Repositories | Puertos de persistencia de cada agregado. |
 
 #### 4.2.1.2. Interface Layer
 
-AuthenticationController transforma los recursos HTTP mediante assemblers y delega en los servicios de aplicación. Expone:
-
-- POST /api/v1/authentication/sign-up
-- POST /api/v1/authentication/sign-in
-- POST /api/v1/authentication/password-reset/request
-- POST /api/v1/authentication/password-reset/confirm
-
-BuyerCompaniesController expone la creación, consulta y actualización de compañías compradoras; ProviderCompaniesController expone las operaciones equivalentes para compañías proveedoras; UsersController expone consultas administrativas y consultas propias. Los resources representan los contratos REST y los assemblers convierten entre recursos y comandos o entidades.
-
-Las reglas de autorización usan `@PreAuthorize`, `CurrentUserAccess` y los roles `ROLE_ADMIN`, `ROLE_BUYER` y `ROLE_PROVIDER`. Los endpoints de autenticación son públicos; las consultas y actualizaciones de recursos requieren JWT y validación de ownership o rol.
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `AuthenticationController` | REST Controller | `/api/authentication`: `sign-up`, `sign-in`, `password-reset/request` y `password-reset/confirm`. |
+| `OnboardingController` | REST Controller | `POST /api/onboarding`: crea la organización (de tipo distribuidor o cliente) y la membresía `OWNER` del usuario. |
+| `InvitationsController` | REST Controller | Invita miembros a una organización (solo `OWNER` o `ADMIN`, con rol `ADMIN` o `MEMBER`), acepta una invitación por token y la revoca. |
+| `MyOrganizationsController` | REST Controller | `GET /api/me/organizations`: organizaciones y rol del usuario autenticado. |
+| `UsersController` | REST Controller | Consulta de usuarios (`/api/users`). |
+| `AdminUsersController` | REST Controller | `POST /api/admin/users/{userId}/promote`: otorga `ROLE_ADMIN`; solo para administradores. |
+| `BuyerCompaniesController`, `ProviderCompaniesController` | REST Controllers | CRUD de compañías del modelo heredado; el distribuidor no puede editar su propia calificación. |
+| `SignUpResource`, `SignInResource`, `AuthenticatedUserResource`, `UserResource`, `OnboardOrganizationResource`, `OrganizationResource`, `OrganizationMembershipResource`, `InviteMemberResource`, `InvitationResource`, `PasswordResetRequestResource`, `PasswordResetConfirmResource`, `CreateBuyerCompanyResource`, `BuyerCompanyResource`, `CreateProviderCompanyResource`, `ProviderCompanyResource` | REST Resources | Cuerpos de entrada y representaciones de salida. |
+| `SignUpCommandFromResourceAssembler`, `SignInCommandFromResourceAssembler`, `AuthenticatedUserResourceFromEntityAssembler`, `UserResourceFromEntityAssembler`, `OrganizationResourceFromDomainAssembler`, `InvitationResourceFromDomainAssembler`, `CreateBuyerCompanyCommandFromResourceAssembler`, `BuyerCompanyResourceFromEntityAssembler`, `CreateProviderCompanyCommandFromResourceAssembler`, `ProviderCompanyResourceFromEntityAssembler` | Assemblers | Convierten recursos en comandos y agregados en recursos. |
+| `IamContextFacade` | Context Facade | Expone a otros módulos la consulta de usuarios y de compañías heredadas (compradora y distribuidora). |
 
 #### 4.2.1.3. Application Layer
 
-UserCommandServiceImpl coordina el registro y el inicio de sesión. En el registro valida exactamente un rol de comprador o proveedor, crea el usuario y el perfil empresarial correspondiente dentro de una transacción y devuelve el recurso autenticado. PasswordResetService genera tokens de un solo uso, almacena únicamente el hash, aplica expiración y envía las instrucciones mediante SMTP.
-
-BuyerCompanyCommandServiceImpl, ProviderCompanyCommandServiceImpl y RoleCommandServiceImpl coordinan los comandos específicos de compañías y roles. UserQueryServiceImpl, BuyerCompanyQueryServiceImpl y ProviderCompanyQueryServiceImpl resuelven las consultas del directorio.
-
-Flujo principal: Controller → servicio de aplicación → agregado IAM → puerto de repositorio. La autenticación agrega HashingService y TokenService como puertos de salida para BCrypt y JWT.
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `UserCommandService` / `UserCommandServiceImpl` | Command Service | Registro con contraseña cifrada y organización propia, e inicio de sesión que devuelve el JWT. |
+| `OnboardingCommandService` / `OnboardingCommandServiceImpl` | Command Service | Crea la organización y la membresía `OWNER` en la misma transacción. |
+| `InvitationCommandService` / `InvitationCommandServiceImpl` | Command Service | Emite invitaciones con vigencia de 7 días, las acepta y las revoca. |
+| `MembershipCommandService`, `OrganizationCommandService`, `RoleCommandService` (+ `Impl`) | Command Services | Otorgan o revocan membresías, crean organizaciones y siembran los roles. |
+| `BuyerCompanyCommandService`, `ProviderCompanyCommandService` (+ `Impl`) | Command Services | Alta y edición de compañías heredadas. |
+| `PasswordResetService` | Command Service | Genera un token de un solo uso con vencimiento, envía el enlace por correo y confirma la nueva contraseña. |
+| `UserQueryService`, `OrganizationQueryService`, `MembershipQueryService`, `InvitationQueryService`, `BuyerCompanyQueryService`, `ProviderCompanyQueryService` (+ `Impl`) | Query Services | Resuelven las consultas del dominio. |
+| `TokenService`, `HashingService` | Outbound Service Ports | Contratos para emitir y validar el JWT y para cifrar contraseñas. |
+| `ApplicationReadyEventHandler` | Event Handler | Siembra los roles al iniciar la aplicación. |
 
 #### 4.2.1.4. Infrastructure Layer
 
-UserPersistenceEntity, RolePersistenceEntity, BuyerCompanyPersistenceEntity, ProviderCompanyPersistenceEntity y PasswordResetTokenEntity representan las tablas `users`, `roles`, `user_roles`, `buyer_companies`, `provider_companies`, `provider_company_fuel_types` y `password_reset_tokens`. Los assemblers transforman entre entidades JPA y objetos de dominio; los repositorios Spring Data son implementados por los adaptadores de persistencia.
-
-WebSecurityConfiguration configura Spring Security. BearerAuthorizationRequestFilter valida el token JWT, UserDetailsServiceImpl carga la identidad, CurrentUserAccess aplica las reglas de ownership, BCryptHashingService protege las contraseñas y BearerTokenService gestiona los tokens.
+| Clase / Componente | Tipo | Propósito |
+|---|---|---|
+| `WebSecurityConfiguration` | Security Configuration | Cadena de seguridad *stateless*; deja públicas la autenticación, Swagger, la ingesta de telemetría y el alta de compañías. |
+| `BearerAuthorizationRequestFilter`, `UnauthorizedRequestHandlerEntryPoint`, `UsernamePasswordAuthenticationTokenBuilder` | Security Components | Leen el JWT de cada petición, arman la autenticación y responden 401. |
+| `TokenServiceImpl` / `BearerTokenService` | JWT Adapter | Emiten y validan el JWT (jjwt) con el secreto `AUTHORIZATION_JWT_SECRET`; vigencia de 7 días. |
+| `HashingServiceImpl` / `BCryptHashingService` | Hashing Adapter | Cifran contraseñas con BCrypt. |
+| `UserDetailsServiceImpl`, `UserDetailsImpl` | Spring Security Adapters | Cargan el usuario y sus roles para Spring Security. |
+| `TenantAccessImpl`, `MembershipAccessImpl`, `MembershipDirectoryImpl`, `LegacyCompanyDirectoryImpl` | Public API Implementations | Resuelven desde el principal el distribuidor, la organización y los miembros activos, comprueban si el usuario puede administrar la organización (`canManageOrganization`) y mapean compañías heredadas. |
+| `BuyerCompanyDirectoryImpl`, `BuyerCompanyRegistrationImpl` | Public API Implementations | Buscan una compañía compradora por id o por RUC exacto, y registran una nueva (o reutilizan una existente) junto con su organización para que el distribuidor pueda vincularla. |
+| `CurrentUserAccess` | Authorization Helper | Verificaciones de propiedad usadas en `@PreAuthorize` por controladores heredados. |
+| `UserPersistenceEntity`, `RolePersistenceEntity`, `OrganizationPersistenceEntity`, `MembershipPersistenceEntity`, `OrganizationInvitationPersistenceEntity`, `BuyerCompanyPersistenceEntity`, `ProviderCompanyPersistenceEntity`, `PasswordResetTokenEntity` | JPA Entities | Tablas `users`, `roles`, `user_roles`, `organizations`, `memberships`, `organization_invitations`, `buyer_companies`, `provider_companies` y `password_reset_tokens`. |
+| `*PersistenceAssembler`, `*RepositoryImpl`, `*PersistenceRepository` | Assemblers, Adapters y Spring Data | Convierten entre dominio y JPA e implementan los puertos de repositorio. |
 
 #### 4.2.1.5. Bounded Context Software Architecture Component Level Diagram
 
@@ -283,7 +323,12 @@ La vista de componentes muestra la separación entre Interfaces, Application, Do
 
 ##### 4.2.1.6.2. Bounded Context Database Design Diagram.
 
-![Database Design Diagram - IAM Bounded Context](../assets/chapter-4/database/baseDatos_identity.png)
+| Tabla | Contenido principal |
+|---|---|
+| `users`, `roles`, `user_roles` | Usuario con contraseña cifrada y compañía o distribuidor vinculado, catálogo de roles y su relación. |
+| `organizations`, `memberships`, `organization_invitations` | Organización (RUC único y tipo), membresía con rol (única por organización y usuario) e invitación con token y vencimiento. |
+| `buyer_companies`, `provider_companies`, `provider_company_fuel_types` | Compañías del modelo heredado y tipos de combustible que ofrece el distribuidor. |
+| `password_reset_tokens` | Hash del token de recuperación, usuario y vencimiento. |
 
 #### 4.2.1.7. Runtime Evidence
 
@@ -300,19 +345,19 @@ La vista de componentes muestra la separación entre Interfaces, Application, Do
 
 | Elemento | Descripción |
 | :------: | :---------: |
-| Propósito | Centralizar las notificaciones internas que reciben los usuarios ante eventos relevantes de solicitudes IoT, órdenes, entregas o pagos. |
-| Actores | Compradores asociados, distribuidores y componentes autenticados que crean o consultan notificaciones. |
-| Relación con otros contextos | Consulta la identidad del destinatario mediante IAM y conserva `referenceId` como referencia al evento externo, sin asumir el ciclo de vida de órdenes o usuarios. |
+| Propósito | Generar la bandeja de notificaciones in-app de cada usuario a partir de los eventos de negocio (solicitudes, órdenes, entregas y pagos). |
+| Actores | Compradores asociados y distribuidores, que consultan su propia bandeja y marcan sus notificaciones como leídas. |
+| Relación con otros contextos | Consume los eventos `replenishment.*.v1`, `delivery.*.v1` e `inventory.catalog-empty.v1` (Published Language / Conformist) y resuelve a los destinatarios con `MembershipDirectory` de IAM, que entrega solo a los miembros activos. Conserva `referenceId` como referencia al hecho de origen, sin asumir el ciclo de vida de órdenes o usuarios. |
 
 #### 4.2.2.1. Domain Layer
 
-El core de Notification es el agregado raíz `Notification`. Su invariantes principal es que toda notificación nace como no leída (`read = false`) y solo el agregado puede cambiar ese estado mediante `markAsRead()`. El agregado recibe un comando de creación, conserva el destinatario, el tipo, el contenido y la referencia opcional al evento que originó la notificación.
+El core de Notification es el agregado raíz `Notification`. Su invariantes principal es que toda notificación nace como no leída (`read = false`) y solo el agregado puede cambiar ese estado mediante `markAsRead()`. El agregado nace de un comando de reparto (`NotificationFanoutCommand`) y conserva el destinatario, la organización, el tipo, el contenido, el identificador del evento de origen, el canal (hoy solo `IN_APP`), el estado de entrega (`DELIVERED` o `FAILED`) y el número de intentos. Un mismo evento no genera dos filas para el mismo usuario y canal (restricción única sobre `event_id`, `user_id` y `channel`).
 
 |     Clase     |      Tipo      |                                  Propósito                                 |
 | :-----------: | :------------: | :------------------------------------------------------------------------: |
-| `Notification` | Aggregate Root | Gestiona el destinatario, tipo, título, mensaje, estado de lectura, referencia del evento y fecha de creación. Expone `markAsRead()` como comportamiento del dominio. |
-| `NotificationType` | Value Object | Restringe los tipos de notificación soportados, como `NEW_REQUEST`, `ORDER_ACCEPTED`, `PAYMENT_COMPLETED` y `GENERAL`. |
-| `CreateNotificationCommand` | Domain Command | Define los datos normalizados necesarios para crear una notificación dirigida a un usuario. |
+| `Notification` | Aggregate Root | Gestiona el destinatario, tipo, título, mensaje, estado de lectura, referencia del evento y fecha de creación. Expone `markAsRead()` y `recordFailedAttempt()`. |
+| `NotificationType` | Value Object | Restringe los tipos de notificación (por ejemplo `NEW_REQUEST`, `ORDER_ACCEPTED`, `DELIVERY_COMPLETED`, `PAYMENT_COMPLETED` y `GENERAL`). Lo acompañan `NotificationChannel` y `NotificationDeliveryStatus`. |
+| `NotificationFanoutCommand` | Domain Command | Define los datos de una notificación dirigida a un destinatario a partir de un evento. |
 | `MarkNotificationAsReadCommand` | Domain Command | Identifica la notificación cuyo estado debe cambiar a leído. |
 | `GetNotificationByIdQuery` | Domain Query | Define la consulta de una notificación por su identificador. |
 | `GetNotificationsByUserIdQuery` | Domain Query | Define la consulta de todas las notificaciones asociadas a un usuario. |
@@ -323,20 +368,19 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
-| `NotificationsController` | REST Controller | Expone la API `/api/v1/notifications`: creación, consulta por id, consultas por usuario/compañía/proveedor y marcado como leído. También valida que la creación tenga exactamente un destinatario y aplica las reglas de acceso. |
-| `CreateNotificationResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una notificación. |
+| `MeNotificationsController` | REST Controller | `/api/me/notifications`: lista las notificaciones del usuario autenticado, las no leídas (`/unread`) y marca una propia como leída (`/{notificationId}/read`). Un usuario nunca ve la bandeja de otro. |
 | `NotificationResource` | REST Resource (DTO) | Define la representación JSON que se devuelve al cliente. |
-| `CreateNotificationCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de creación en `CreateNotificationCommand`. |
 | `NotificationResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado de dominio en `NotificationResource` para la respuesta HTTP. |
 
 #### 4.2.2.3. Application Layer
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
-| `NotificationCommandService` | Command Service (Interface) | Define el contrato para crear notificaciones y marcar una notificación como leída. |
-| `NotificationCommandServiceImpl` | Command Service Implementation | Construye el agregado, lo persiste, recupera notificaciones existentes y ejecuta `markAsRead()`. Devuelve un error de dominio cuando el identificador no existe. |
+| `NotificationCommandService` | Command Service (Interface) | Define el contrato para repartir notificaciones y marcar una como leída. |
+| `NotificationCommandServiceImpl` | Command Service Implementation | Construye el agregado, lo persiste y ejecuta `markAsRead()`. Devuelve un error de dominio cuando el identificador no existe. |
 | `NotificationQueryService` | Query Service (Interface) | Define el contrato para consultar por id, usuario y estado de lectura. |
 | `NotificationQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega el acceso de datos al puerto `NotificationRepository`. |
+| `NotificationFanoutListener` | Event Listener | Consume cada evento de negocio una sola vez (*inbox*), obtiene los miembros activos de la organización destinataria y guarda una notificación por cada uno. |
 
 #### 4.2.2.4. Infrastructure Layer
 
@@ -359,15 +403,16 @@ El core de Notification es el agregado raíz `Notification`. Su invariantes prin
 
 ##### 4.2.2.6.2. Bounded Context Database Design Diagram.
 
-![Database Design Diagram - Notification Bounded Context](../assets/chapter-4/database/baseDatos_notification.png)
+| Tabla | Contenido principal |
+|---|---|
+| `notifications` | `id`, `user_id`, `organization_id`, `type`, `title`, `message`, `is_read`, `reference_id`, `event_id`, `channel`, `delivery_status`, `attempts`, `last_attempt_at`; único `(event_id, user_id, channel)`. |
 
 #### 4.2.2.7. Runtime Evidence.
 
 | Operación | Resultado |
 | :-------: | :-------: |
-| Crear notificación | `201 Created` |
-| Consultar por id, usuario y no leídas | `200 OK` |
-| Marcar como leída | `200 OK` |
+| Consultar mis notificaciones y las no leídas | `200 OK` |
+| Marcar una notificación propia como leída | `200 OK` |
 | Consultar no leídas después de marcar | `200 OK`, colección vacía |
 | Acceso de proveedor al endpoint de comprador | `403 Forbidden` |
 | Swagger sin token | `401 Unauthorized` |
@@ -391,7 +436,7 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 |     Clase     |      Tipo      |                                  Propósito                                 |
 | :-----------: | :------------: | :------------------------------------------------------------------------: |
 | `FuelProduct` | Aggregate Root | Gestiona nombre, tipo de combustible, precio, unidad, stock disponible, capacidad, proveedor y estado de publicación. Expone `updateStock()` y `update()` como comportamiento del dominio. |
-| `FuelType` | Value Object | Restringe los tipos de combustible válidos: diésel, gasolinas, GLP y GNV. |
+| `FuelType` | Value Object | Restringe los tipos de combustible válidos: `DIESEL`, `GASOLINE`, las gasolinas de 84, 90, 95 y 97 octanos, `GLP` y `GNV`. |
 | `CreateFuelProductCommand` | Domain Command | Define los datos iniciales de un producto de combustible. |
 | `UpdateFuelProductCommand` | Domain Command | Define los datos editables del producto y su estado de publicación. |
 | `UpdateFuelProductStockCommand` | Domain Command | Define el nuevo stock disponible para un producto existente. |
@@ -405,7 +450,7 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 | Clase / Componente | Tipo | Propósito |
 | :----------------: | :--: | :-------: |
-| `FuelProductsController` | REST Controller | Expone la API `/api/v1/fuel-products`: creación, consultas, actualización general, actualización de stock y eliminación. Valida el rol de comprador y la propiedad del proveedor antes de operar. |
+| `FuelProductsController` | REST Controller | Expone la API `/api/fuel-products`: creación, consultas (todos, por id y por distribuidor), actualización general, actualización de stock (`POST /{fuelProductId}/update-stock`), eliminación y el aviso de catálogo vacío (`POST /provider/{providerId}/empty-catalog-alert`), que origina `inventory.catalog-empty.v1`. Valida la propiedad del distribuidor antes de operar. |
 | `CreateFuelProductResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear un producto. |
 | `FuelProductResource` | REST Resource (DTO) | Define la representación JSON de un producto para el catálogo o el proveedor. |
 | `UpdateFuelProductResource` | REST Resource (DTO) | Define los datos de actualización general del producto. |
@@ -445,7 +490,9 @@ El core de Inventory es el agregado raíz `FuelProduct`. Este agregado concentra
 
 ##### 4.2.3.6.2. Bounded Context Database Design Diagram.
 
-![Database Design Diagram - Inventory Bounded Context](../assets/chapter-4/database/baseDatos_catalogo.png)
+| Tabla | Contenido principal |
+|---|---|
+| `fuel_products` | `id`, `provider_id`, `name`, `fuel_type`, `price_per_unit`, `unit`, `available_stock`, `capacity`, `active`. |
 
 #### 4.2.3.7. Runtime Evidence.
 
@@ -498,13 +545,7 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_identity.png" alt="Frontend Identity & Access"/>
 </div>
 
-- **Catalog Frontend** — Responsabilidad: maneja las vistas de gestión del inventario de recursos ofrecidos por el proveedor.
-
-<div align="center">
-  <img src="../assets/chapter-4/class-diagrams/frontend_catalog.png" alt="Frontend Catalog"/>
-</div>
-
-- **Ordering Frontend** — Responsabilidad: maneja las vistas del ciclo de vida completo de pedidos: recepción de solicitudes IoT, aceptación, rechazo, asignación, despacho, confirmación de entrega y cierre.
+- **Ordering Frontend** — Responsabilidad: maneja las vistas del ciclo de vida completo de pedidos: solicitudes de abastecimiento, aceptación, rechazo, asignación, despacho, confirmación de entrega y pago.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_ordering.png" alt="Frontend Ordering"/>
@@ -516,7 +557,7 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_payment.png" alt="Frontend Payment"/>
 </div>
 
-- **Fulfillment Frontend** — Responsabilidad: maneja las vistas de gestión de cisternas y conductores, las recomendaciones automáticas de recursos, la telemetría del viaje y la asignación de despacho a órdenes aceptadas.
+- **Fulfillment Frontend** — Responsabilidad: maneja las vistas de gestión de cisternas y conductores, la recomendación de conductor y cisterna, la asignación a órdenes aceptadas y el seguimiento del estado de la entrega.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_fullfillment.png" alt="Frontend Fulfillment"/>
@@ -528,13 +569,13 @@ El diagrama completo del frontend muestra la organización general de la capa de
   <img src="../assets/chapter-4/class-diagrams/frontend_notification.png" alt="Frontend Notification"/>
 </div>
 
-- **Reporting & Analytics Frontend** — Responsabilidad: maneja las vistas de visualización de métricas, gráficos de consumo o ventas, y la descarga de reportes.
+- **Analytics Frontend** — Responsabilidad: maneja las vistas de indicadores del distribuidor y del comprador (gráficos de consumo y ventas).
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_reporting.png" alt="Frontend Reporting & Analytics"/>
 </div>
 
-- **Equipment e IoT Tank Monitoring Frontend** — Responsabilidad: maneja las vistas para asociar compradores y tanques, configurar umbrales, consultar lecturas IoT y visualizar el estado del pedido generado automáticamente.
+- **Equipment Frontend** — Responsabilidad: maneja las vistas para buscar y registrar compradores por RUC, registrar tanques con su dispositivo, configurar el umbral y consultar las lecturas.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/frontend_equipment.png" alt="Frontend Equipment"/>
@@ -561,9 +602,9 @@ El sistema sigue una arquitectura por capas organizada por *bounded contexts*, d
   <img src="../assets/chapter-4/class-diagrams/backend.png" alt="Diagrama del backend" width="100%"/>
 </div>
 
-El diagrama completo del backend muestra la organización de todos los *bounded contexts* como módulos independientes dentro del sistema. Se visualizan las dependencias entre contextos, donde el *bounded context* de **Ordering** actúa como núcleo del sistema y coordina a los demás contextos mediante interfaces.
+El diagrama completo del backend muestra la organización de todos los *bounded contexts* como módulos independientes dentro del sistema. Se visualizan las dependencias entre contextos, donde **Application Flows** actúa como raíz de composición y coordina en una transacción la aceptación de solicitudes y la asignación de entregas mediante las interfaces `api` de cada contexto.
 
-*Diagrama del Backend dividido por contextos:*
+*Diagrama del Backend dividido por contextos:* los diagramas siguientes corresponden a la primera versión del modelo; Telemetry, Replenishment, Fleet y Supply no tienen diagrama propio.
 
 - **Identity & Access Backend** — Responsabilidad: gestiona el registro de usuarios, autenticación, autorización y control de acceso.
 
@@ -571,13 +612,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/Bounded%20Context%20Evidence/iam/iam-class-layer.png" alt="Backend IAM: capas y clases" width="100%"/>
 </div>
 
-- **Catalog Backend** — Responsabilidad: gestiona el inventario de recursos disponibles, incluyendo stock y características relevantes.
-
-<div align="center">
-  <img src="../assets/chapter-4/class-diagrams/backend_catalog.png" alt="Backend Catalog"/>
-</div>
-
-- **Ordering Backend** — Responsabilidad: orquesta el ciclo de vida completo de la solicitud y el pedido, incluyendo la creación idempotente iniciada por IoT, la aceptación, el rechazo y la coordinación con Fulfillment.
+- **Ordering Backend** — Responsabilidad: orquesta el ciclo de vida completo de la solicitud y el pedido, creada al aceptar una solicitud de abastecimiento, su confirmación, cancelación y pago.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_ordering.png" alt="Backend Ordering"/>
@@ -589,7 +624,7 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_payment.png" alt="Backend Payment"/>
 </div>
 
-- **Fulfillment Backend** — Responsabilidad: gestiona cisternas, conductores, reglas de capacidad y disponibilidad, asignación de recursos, telemetría del viaje y seguridad contextual de válvulas.
+- **Fulfillment Backend** — Responsabilidad: gestiona el ciclo físico de la entrega con su historial de transiciones.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_fullfilment.png" alt="Backend Fulfillment"/>
@@ -601,13 +636,13 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
   <img src="../assets/chapter-4/class-diagrams/backend_notification.png" alt="Backend Notification"/>
 </div>
 
-- **Reporting & Analytics Backend** — Responsabilidad: agrega información histórica para generar métricas, análisis y reportes.
+- **Analytics Backend** — Responsabilidad: calcula indicadores de solo lectura leyendo Ordering, Payment y Fulfillment mediante una capa anticorrupción.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_reporting.png" alt="Backend Reporting & Analytics"/>
 </div>
 
-- **Equipment e IoT Tank Monitoring Backend** — Responsabilidad: gestiona la asociación del dispositivo al tanque del comprador, los umbrales, las lecturas, la validación de identidad y la publicación de `LowFuelLevelDetected` hacia Ordering.
+- **Equipment Backend** — Responsabilidad: gestiona los compradores vinculados, sus sitios y tanques, el vínculo temporal del dispositivo con el tanque y sus credenciales. Las lecturas las recibe Telemetry y la política de umbral la evalúa Replenishment.
 
 <div align="center">
   <img src="../assets/chapter-4/class-diagrams/backend_equipment.png" alt="Backend Equipment"/>
@@ -621,488 +656,260 @@ El diagrama completo del backend muestra la organización de todos los *bounded 
 
 #### 4.2.4.2. Software Architecture Database Design Diagram.
 
-La base de datos relacional almacena todos los datos del dominio del sistema. Las tablas se organizan en correspondencia directa con los *bounded contexts* definidos en el diseño orientado a objetos. A continuación, se detalla qué tablas pertenecen a cada contexto y cuál es su responsabilidad dentro del modelo de datos.
+La base de datos relacional es un esquema único de MySQL versionado con Flyway (36 migraciones, V1 a V37 sin la V31). Cada *bounded context* es dueño de sus tablas y los demás solo acceden a ellas mediante la interfaz `api` del contexto. A continuación se indica qué tablas pertenecen a cada contexto; las columnas de cada una están en la subsección de base de datos de su contexto (4.2.1 a 4.2.13).
 
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos.png" alt="Diagrama de base de datos" width="100%"/>
-  <p><em>Figura 4.5: Diagrama general de la base de datos de FullTank.</em></p>
-</div>
+| Contexto | Tablas |
+|---|---|
+| IAM | `users`, `roles`, `user_roles`, `organizations`, `memberships`, `organization_invitations`, `buyer_companies`, `provider_companies`, `provider_company_fuel_types`, `password_reset_tokens` |
+| Equipment | `customer_accounts`, `customer_sites`, `tanks`, `tank_configurations`, `device_bindings`, `device_credentials`, `equipment` |
+| Telemetry | `telemetry_readings` |
+| Replenishment | `refill_policies`, `refill_episodes`, `replenishment_requests` |
+| Inventory | `fuel_products` |
+| Supply | `supply_reservations`, `supply_stock_locks` |
+| Fleet | `drivers`, `vehicles` (cisternas), `fleet_reservations` |
+| Fulfillment | `deliveries`, `delivery_state_transitions`, `delivery_business_journals` |
+| Ordering | `fuel_orders` |
+| Payment | `payments` |
+| Notification | `notifications` |
+| Analytics | Ninguna (solo lectura) |
+| Shared Kernel | `event_publications` (*outbox*) y `consumed_events` (*inbox*) |
 
-**Identity & Access — Base de datos**
+Las tablas `provider_ratings` (V32) y `fuel_requests` (V34) ya no existen.
 
-*Responsabilidad:* almacena la identidad autenticable, sus roles, las compañías vinculadas y los tokens de recuperación.
+> El diagrama general `baseDatos.png` y los diagramas por contexto (`baseDatos_identity.png`, `baseDatos_catalogo.png`, `baseDatos_ordering.png`, `baseDatosPayment.png`, `baseDatos_notification.png` y `baseDatos_analysis.png`) corresponden al modelo de la primera versión. Por eso no se incluyen en esta sección y cada contexto describe su esquema en una tabla.
 
-- **users:** usuario autenticable (`id`, `username`, `password`, `company_id`, `provider_id`, auditoría).
-- **roles:** catálogo de roles (`id`, `name`), relacionado con usuarios mediante **user_roles**.
-- **buyer_companies:** perfil de compañía compradora (`id`, `name`, `ruc`, `sector`, `address`, `contact_email`, `phone`).
-- **provider_companies:** perfil de compañía proveedora (`id`, `name`, `ruc`, `rating`, `address`, `phone`, `description`), con **provider_company_fuel_types** para los tipos ofrecidos.
-- **password_reset_tokens:** hash del token, usuario asociado y fecha de expiración.
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_identity.png" alt="Tablas de Identity & Access"/>
-</div>
-
-**Catalog — Base de datos**
-
-*Responsabilidad:* almacena el inventario disponible de cada proveedor, incluyendo stock y características relevantes.
-
-- **INVENTORY:** registro de stock por tipo de recurso (`id_inventory`, `id_provider` FK, `fuel_type`, `quantity_liters`, `price_per_liter`, `updated_at`).
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_catalogo.png" alt="Tablas de Catalog"/>
-</div>
-
-**Ordering — Base de datos**
-
-*Responsabilidad:* almacena el ciclo de vida completo de solicitudes y órdenes, incluyendo el detalle de ítems y los cambios de estado.
-
-- **REQUEST:** solicitud creada por el cliente (`id_request`, `id_client` FK, `id_provider` FK, `fuel_type`, `quantity_liters`, `delivery_address`, `requested_date`, `estimated_delivery`, `status`, `notes`, `created_at`).
-- **REQUEST_DETAIL:** detalle del pedido con desglose de valores (`id_detail`, `id_request` FK, `fuel_type`, `quantity_liters`, `unit_price`, `subtotal`).
-- **ORDER:** orden generada a partir de una solicitud aprobada (`id_order`, `id_request` FK, `status`, `approved_at`, `dispatched_at`, `delivered_at`, `closed_at`, `rejection_reason`, `created_at`).
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_ordering.png" alt="Tablas de Ordering"/>
-</div>
-
-**Payment — Base de datos**
-
-*Responsabilidad:* almacena los registros de pago asociados a las órdenes.
-
-- **PAYMENT:** comprobante de pago vinculado a una orden (`id_payment`, `id_order` FK, `operation_code`, `amount`, `bank_name`, `voucher_url`, `payment_date`, `status`, `registered_at`).
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatosPayment.png" alt="Tablas de Payment"/>
-</div>
-
-**Fulfillment — Base de datos**
-
-*Responsabilidad:* almacena los recursos logísticos y su asignación a órdenes.
-
-- **deliveries:** entrega asociada a una orden (`id`, `order_id` FK, `provider_id` FK, `driver_id` FK, `vehicle_id` FK, `status`, `scheduled_date`, `dispatched_at`, `delivered_at`, `notes`, auditoría).
-- **vehicles:** vehículo logístico del proveedor (`id`, `provider_id` FK, `license_plate` UNIQUE, `brand`, `model`, `capacity`, `unit`, `status`, auditoría).
-- **drivers:** conductor del proveedor (`id`, `provider_id` FK, `first_name`, `last_name`, `license_number` UNIQUE, `phone_number`, `email`, `status`, auditoría).
-
-La documentación adopta los nombres `deliveries`, `vehicles` y `drivers` usados por el diseño táctico de Fulfillment; no se conserva un diagrama gráfico actualizado de este esquema.
-
-**Notification — Base de datos**
-
-*Responsabilidad:* almacena las notificaciones generadas por eventos del sistema.
-
-- **NOTIFICATION:** notificación asociada a un usuario (`id_notification`, `id_user` FK, `id_order` FK, `type`, `message`, `is_read`, `created_at`).
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_notification.png" alt="Tablas de Notification"/>
-</div>
-
-**Reporting & Analytics — Base de datos**
-
-*Responsabilidad:* almacena la información de reportes generados a partir de datos históricos.
-
-- **REPORT:** reporte generado por un usuario (`id_report`, `id_user` FK, `type`, `pdf_url`, `generated_at`).
-
-<div align="center">
-  <img src="../assets/chapter-4/database/baseDatos_analysis.png" alt="Tablas de Reporting & Analytics"/>
-</div>
-
-### 4.2.5. Bounded Context: Catalog
+### 4.2.5. Bounded Context: Equipment
 
 | Elemento | Descripción |
-| :------: | :---------: |
-| Propósito | Gestionar las valoraciones que las empresas compradoras asignan a los proveedores de combustible, permitiendo registrar, consultar y actualizar la calificación de cada proveedor. |
-| Actores | Empresas compradoras que califican a los proveedores, proveedores que reciben las valoraciones y usuarios autenticados que consultan la información disponible. |
-| Relación con otros contextos | Se integra con **IAM** para comprobar la existencia de las empresas compradoras y proveedoras, así como para validar que la empresa compradora pertenezca al usuario autenticado. En la implementación actual, la información comercial de productos, stock y precios se administra en **Inventory**, mientras Catalog conserva la valoración del proveedor mediante `companyId`, `providerId` y `rating`. |
+|---|---|
+| Propósito | Registrar a los compradores vinculados al distribuidor, sus sitios de entrega y sus tanques, y mantener el vínculo temporal entre cada tanque y el dispositivo IoT que lo mide, junto con las credenciales del dispositivo. Es el contexto donde empieza el flujo IoT: sin tanque y dispositivo vinculados no hay lecturas que atribuir ni solicitudes que generar. |
+| Actores | Distribuidor (busca o registra al comprador por RUC, registra el tanque y su dispositivo), comprador asociado (consulta sus tanques) y el dispositivo ESP32 (se autentica con su credencial, a través de Telemetry). |
+| Relación con otros contextos | Es upstream de Telemetry: expone `DeviceAuthentication` (autentica el token del dispositivo en un instante dado y devuelve el tanque y la organización a los que pertenece), `TankAssets` y `ActiveBinding`. Es upstream de Replenishment mediante `TankAssets`, `CustomerDirectory` y `TankLevelManuallyUpdatedEvent`, y a la vez configura la política del tanque en Replenishment (`TankRefillConfiguration`) durante el alta. Usa IAM (`TenantAccess`, `BuyerCompanyDirectory`, `BuyerCompanyRegistration`) para resolver al distribuidor y al comprador. |
 
-El alcance táctico implementado actualmente para **Catalog** se concentra en la valoración de proveedores. Aunque a nivel estratégico el contexto participa en la experiencia de consulta y evaluación de proveedores, la persistencia propia del módulo `catalog` está representada por las calificaciones realizadas por las empresas compradoras. La información de productos ofrecidos por cada proveedor se obtiene de otros contextos, principalmente **Inventory**, evitando duplicar responsabilidades dentro del modelo.
+<div align="center">
+  <img src="../assets/chapter-4/event-storming/Equipment.png" alt="Canvas del bounded context Equipment" width="500"/>
+  <p><em>Canvas del Bounded Context Equipment (Event Storming).</em></p>
+</div>
 
 #### 4.2.5.1. Domain Layer.
 
-El núcleo del bounded context **Catalog** está representado por el agregado raíz `ProviderRating`. Este agregado modela la valoración que una empresa compradora asigna a una empresa proveedora y mantiene los identificadores de ambas organizaciones junto con el valor de la calificación.
+Equipment tiene dos subdominios. El primero modela al cliente y su activo físico (`CustomerAccount`, `CustomerSite`, `Tank`, `TankConfiguration`). El segundo, `devicebinding`, modela la relación en el tiempo entre un dispositivo y un tanque (`DeviceBinding`) y la credencial con la que el dispositivo se autentica (`DeviceCredential`). El agregado `Equipment` es el modelo heredado de equipos de la primera versión; se conserva porque `tanks.legacy_equipment_id` lo referencia.
 
-La principal invariante del dominio establece que una valoración únicamente puede encontrarse dentro del rango de **1 a 5**. Esta regla se controla mediante el método `changeRating()`, utilizado tanto durante la creación del agregado como durante la modificación posterior de una calificación existente. De esta manera, la validez de la valoración permanece protegida por el propio modelo de dominio y no depende exclusivamente de la validación realizada en la capa REST.
-
-El dominio también define `ProviderRatingRepository` como puerto de persistencia. Esta interfaz permite recuperar una valoración mediante su identificador, localizar la calificación asociada a una combinación específica de empresa compradora y proveedor, realizar consultas filtradas y persistir el agregado sin introducir dependencias hacia Spring Data JPA.
+Las invariantes principales son: la capacidad del tanque debe ser positiva y el nivel no puede superar la capacidad (tampoco al reconfigurarla); una lectura validada solo se aplica con su instante de observación; un dispositivo tiene como máximo un vínculo abierto por canal (restricción única sobre `device_id`, `channel` y `active_slot`); solo un vínculo abierto puede cerrarse o moverse a otro tanque y el cierre no puede ser anterior al inicio de su vigencia; y solo una credencial activa puede revocarse.
 
 | Clase | Tipo | Propósito |
-| :---: | :--: | :-------- |
-| `ProviderRating` | Aggregate Root | Representa la valoración realizada por una empresa compradora hacia un proveedor. Gestiona `companyId`, `providerId` y `rating`, y protege el rango permitido de 1 a 5 mediante `changeRating()`. |
-| `ProviderRatingRepository` | Domain Repository | Define el puerto de persistencia utilizado por Catalog. Permite consultar por identificador, por combinación comprador-proveedor, realizar búsquedas filtradas y persistir las valoraciones. |
-
-Una característica importante de este agregado es que no incorpora directamente objetos pertenecientes a IAM. En lugar de mantener referencias a `BuyerCompany` o `ProviderCompany`, almacena únicamente sus identificadores. Esto mantiene el límite del bounded context y evita trasladar al dominio de Catalog responsabilidades relacionadas con la administración de empresas o usuarios.
+|---|---|---|
+| `CustomerAccount` | Aggregate Root | Cuenta del comprador dentro de la organización del distribuidor (nombre, RUC, contacto, referencia a la compañía heredada). Expone `deactivate()`. |
+| `CustomerSite` | Aggregate Root | Sitio de entrega de una cuenta (nombre y dirección). Expone `deactivate()`. |
+| `Tank` | Aggregate Root | Tanque del comprador con capacidad, nivel, unidad, combustible, clasificación y fuente del último nivel (`MANUAL` o `VALIDATED`). Expone `applyConfiguration()`, `updateLevelManually()`, `applyValidatedReading()` y `deactivate()`. |
+| `TankConfiguration` | Aggregate Root | Historial versionado de la configuración del tanque (versión, combustible y capacidad). |
+| `DeviceBinding` | Aggregate Root | Vínculo temporal dispositivo–canal–tanque con vigencia (`validFrom`, `validTo`). Expone `isOpen()`, `covers()`, `overlaps()`, `revoke()` y `moveTo()`. |
+| `DeviceCredential` | Aggregate Root | Credencial del dispositivo. Guarda solo el hash del token y su versión; expone `isActive()` y `revoke()`. |
+| `Equipment` | Aggregate Root | Equipo del modelo heredado (tipo, combustible, capacidad). Expone `update()` y `receiveFuel()`. |
+| `TankClassification`, `EquipmentType`, `BindingStatus`, `CredentialStatus`, `DeviceAuthenticationOutcome` | Value Objects | Restringen la clasificación del tanque (`NATIVE`, `LEGACY_MAPPABLE`), el tipo de equipo, el estado del vínculo (`ACTIVE`, `CLOSED`, `REVOKED`), el de la credencial (`ACTIVE`, `REVOKED`) y el resultado de autenticar (`AUTHENTICATED`, `UNKNOWN_CREDENTIAL`, `REVOKED_CREDENTIAL`, `NO_ACTIVE_BINDING`). |
+| `RegisterCustomerCommand`, `RegisterSiteCommand`, `RegisterTankCommand`, `UpdateTankConfigurationCommand`, `CreateEquipmentCommand`, `UpdateEquipmentCommand`, `BindDeviceCommand`, `MoveDeviceCommand`, `RevokeDeviceCommand`, `ProvisionDeviceCredentialCommand`, `RotateDeviceCredentialCommand`, `RevokeDeviceCredentialCommand` | Domain Commands | Intenciones de alta de cliente, sitio, tanque y equipo, y de vínculo y credenciales del dispositivo. |
+| `GetCustomerByIdQuery`, `GetCustomersByOrganizationQuery`, `GetSitesByCustomerQuery`, `GetTankByIdQuery`, `GetTanksByOrganizationQuery`, `GetEquipmentByIdQuery`, `GetEquipmentByCompanyIdQuery`, `GetAllEquipmentQuery`, `GetActiveBindingQuery`, `GetBindingsByDeviceQuery` | Domain Queries | Consultas de clientes, sitios, tanques, equipos y vínculos. |
+| `DeviceBoundEvent`, `DeviceMovedEvent`, `DeviceRevokedEvent` | Domain Events | Hechos del ciclo de vida del vínculo. |
+| `CustomerAccountRepository`, `CustomerSiteRepository`, `TankRepository`, `TankConfigurationRepository`, `EquipmentRepository`, `DeviceBindingRepository`, `DeviceCredentialRepository` | Domain Repositories | Puertos de persistencia de cada agregado. |
+| `DeviceTokenHasher` | Domain Service | Calcula el hash del token del dispositivo para no almacenarlo en claro. |
 
 #### 4.2.5.2. Interface Layer.
 
-La capa de interfaces expone las funcionalidades del bounded context mediante `ProviderRatingsController`, disponible a través de la ruta base `/api/v1/provider-ratings`.
-
-El controlador permite consultar valoraciones utilizando filtros opcionales por empresa compradora o proveedor, crear nuevas calificaciones y actualizar el valor de una calificación existente. Durante las operaciones de escritura también realiza validaciones relacionadas con IAM para comprobar que las empresas involucradas existan.
-
-Adicionalmente, las operaciones de creación y actualización utilizan `CurrentUserAccess` mediante `@PreAuthorize`, garantizando que el usuario autenticado únicamente pueda registrar o modificar valoraciones en nombre de una empresa compradora que le pertenezca.
-
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------- |
-| `ProviderRatingsController` | REST Controller | Expone la API `/api/v1/provider-ratings`. Gestiona la consulta, creación y actualización de valoraciones, además de validar la existencia de comprador y proveedor y aplicar las reglas de autorización. |
-| `ProviderRatingResource` | REST Resource (DTO) | Representa los datos intercambiados mediante HTTP: `id`, `companyId`, `providerId` y `rating`. Es utilizado como recurso de entrada y salida de la API. |
-
-Las operaciones implementadas actualmente son:
-
-| Método | Endpoint | Descripción |
-| :----: | :------- | :---------- |
-| `GET` | `/api/v1/provider-ratings` | Obtiene las valoraciones registradas. Acepta opcionalmente `companyId` y `providerId` como parámetros de filtrado. |
-| `POST` | `/api/v1/provider-ratings` | Registra una nueva valoración de una empresa compradora hacia un proveedor. |
-| `PUT` | `/api/v1/provider-ratings/{id}` | Modifica únicamente el valor de una calificación existente. La empresa compradora y el proveedor asociados no pueden ser modificados. |
-
-Antes de registrar o actualizar una valoración, el controlador valida que `companyId`, `providerId` y `rating` hayan sido proporcionados y que el valor de `rating` se encuentre entre 1 y 5. También comprueba mediante `BuyerCompanyRepository` y `ProviderCompanyRepository` que las empresas involucradas realmente existan.
-
-Durante la creación se verifica adicionalmente que la misma empresa compradora no haya calificado previamente al mismo proveedor. Si dicha combinación ya existe, la API rechaza la creación para conservar una única valoración por relación comprador-proveedor.
+|---|---|---|
+| `CustomersController` | REST Controller | `/api/customers`: registra y lista cuentas de cliente y sus sitios de entrega. |
+| `TanksController` | REST Controller | `/api/tanks`: registra, lista y consulta tanques. |
+| `EquipmentController` | REST Controller | `/api/equipment`: alta, actualización y consulta de equipos del modelo heredado. |
+| Operaciones del distribuidor | REST Controllers | `/api/provider/buyer-companies` (listar los compradores vinculados, buscar por RUC exacto con `/lookup` y registrar o vincular un comprador) y `/api/provider/tanks` (asociar tanque, producto y dispositivo, editar umbral, dispositivo y generación automática, consultar y listar). Solo operan sobre compradores vinculados al distribuidor autenticado. |
+| `CreateCustomerResource`, `CustomerResource`, `CreateSiteResource`, `SiteResource`, `RegisterTankResource`, `TankResource`, `CreateEquipmentResource`, `UpdateEquipmentResource`, `EquipmentResource` | REST Resources | Cuerpos de entrada y representaciones de salida. |
+| `CustomerResourceFromDomainAssembler`, `SiteResourceFromDomainAssembler`, `TankResourceFromDomainAssembler`, `CreateEquipmentCommandFromResourceAssembler`, `UpdateEquipmentCommandFromResourceAssembler`, `EquipmentResourceFromEntityAssembler` | Assemblers | Convierten recursos en comandos y agregados en recursos. |
 
 #### 4.2.5.3. Application Layer.
 
-En la implementación actual del bounded context **Catalog** no existe una capa Application materializada mediante Command Services o Query Services independientes.
-
-A diferencia de otros contextos como Notification o Inventory, los casos de uso de Catalog son coordinados directamente por `ProviderRatingsController`, que utiliza el puerto de dominio `ProviderRatingRepository` y los repositorios de IAM necesarios para realizar las validaciones de las empresas involucradas.
-
-Esta decisión representa una implementación simplificada del patrón por capas. El dominio continúa aislado de la infraestructura gracias a `ProviderRatingRepository`, pero la coordinación de los casos de uso permanece actualmente en el controlador.
-
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------- |
-| `ProviderRatingsController` | Use Case Coordinator | Coordina actualmente los casos de uso de consulta, creación y actualización de valoraciones y delega la persistencia al puerto `ProviderRatingRepository`. |
-| `ProviderRatingRepository` | Domain Port | Proporciona al coordinador las operaciones necesarias para consultar y persistir el agregado sin depender directamente de Spring Data JPA. |
-
-Como evolución de la arquitectura, la coordinación realizada actualmente por el controlador podría trasladarse a servicios de aplicación específicos, por ejemplo un `ProviderRatingCommandService` y un `ProviderRatingQueryService`. Sin embargo, dichos componentes no forman parte de la implementación actual, por lo que no se incluyen como elementos existentes del diseño.
+|---|---|---|
+| `CustomerCommandService` / `CustomerCommandServiceImpl` | Command Service | Registra cuentas de cliente y sitios dentro del tenant del distribuidor. |
+| `TankCommandService` / `TankCommandServiceImpl` | Command Service | Registra tanques y actualiza su configuración, generando una nueva versión de `TankConfiguration`. |
+| `TankReadingServiceImpl` | Application Service | Aplica una lectura validada al nivel del tanque. |
+| `EquipmentCommandService` / `EquipmentCommandServiceImpl` | Command Service | Casos de uso del modelo heredado de equipos. |
+| `DeviceBindingCommandService` / `DeviceBindingCommandServiceImpl` | Command Service | Vincula, mueve y revoca el dispositivo de un tanque; rechaza el vínculo si el dispositivo ya está abierto en otro tanque. |
+| `DeviceCredentialServiceImpl` | Application Service | Aprovisiona, rota y revoca credenciales; solo guarda el hash del token. |
+| `CustomerQueryService`, `TankQueryService`, `EquipmentQueryService`, `DeviceBindingQueryService` (+ `Impl`) | Query Services | Resuelven las consultas del dominio. |
 
 #### 4.2.5.4. Infrastructure Layer.
 
-La capa de infraestructura implementa la persistencia del bounded context utilizando **Spring Data JPA** y una base de datos MySQL.
-
-`ProviderRatingPersistenceEntity` representa la información almacenada en la tabla `provider_ratings`. La entidad conserva los identificadores de la empresa compradora y del proveedor junto con la calificación asignada. Asimismo, hereda los campos de auditoría utilizados por la plataforma para registrar las fechas de creación y modificación.
-
-La tabla establece una restricción de unicidad sobre la combinación `company_id` y `provider_id`. Como consecuencia, una empresa compradora puede mantener una sola valoración para un proveedor determinado. Si desea cambiar su evaluación, debe actualizar la valoración existente en lugar de crear una nueva.
-
-`ProviderRatingRepositoryImpl` funciona como adaptador entre el dominio y Spring Data JPA. Este componente implementa `ProviderRatingRepository`, transforma las entidades persistentes en agregados de dominio y realiza el proceso inverso al momento de almacenar cambios.
-
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------- |
-| `ProviderRatingPersistenceEntity` | JPA Entity | Representa la tabla `provider_ratings`. Persiste `companyId`, `providerId` y `rating`, además de los campos de auditoría heredados. |
-| `ProviderRatingPersistenceRepository` | Spring Data JPA Repository | Extiende `JpaRepository` y proporciona consultas por empresa compradora, proveedor y combinación comprador-proveedor. |
-| `ProviderRatingRepositoryImpl` | Repository Adapter | Implementa el puerto `ProviderRatingRepository`, adapta las operaciones del dominio hacia Spring Data JPA y transforma entre el agregado y la entidad persistente. |
-
-Las consultas soportadas por la infraestructura permiten recuperar todas las valoraciones registradas, las valoraciones realizadas por una empresa compradora, las valoraciones recibidas por un proveedor y una valoración específica correspondiente a una combinación comprador-proveedor.
+|---|---|---|
+| `CustomerAccountPersistenceEntity`, `CustomerSitePersistenceEntity`, `TankPersistenceEntity`, `TankConfigurationPersistenceEntity`, `EquipmentPersistenceEntity`, `DeviceBindingPersistenceEntity`, `DeviceCredentialPersistenceEntity` | JPA Entities | Tablas `customer_accounts`, `customer_sites`, `tanks`, `tank_configurations`, `equipment`, `device_bindings` y `device_credentials`. |
+| `*PersistenceAssembler`, `*RepositoryImpl`, `*PersistenceRepository` | Assemblers, Adapters y Spring Data | Convierten entre dominio y JPA e implementan los puertos de repositorio. |
+| `DeviceAuthenticationImpl` | Public API Implementation | Compara el hash del token con las credenciales y busca el vínculo que cubre el instante de captura. Devuelve el resultado de autenticación con el tanque y la organización. |
+| `TankAssetsImpl`, `CustomerDirectoryImpl`, `ActiveBindingImpl` | Public API Implementations | Exponen a otros contextos la consulta de tanques, clientes y vínculos activos. |
 
 #### 4.2.5.5. Bounded Context Software Architecture Component Level Diagrams.
 
-A nivel de componentes, el bounded context **Catalog** recibe solicitudes HTTP mediante `ProviderRatingsController`. El controlador utiliza `ProviderRatingRepository`, definido en el dominio, para consultar y persistir las valoraciones.
+![Backend component overview - Equipment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
 
-La implementación de dicho puerto corresponde a `ProviderRatingRepositoryImpl`, que delega las operaciones de persistencia en `ProviderRatingPersistenceRepository`. Este último utiliza Spring Data JPA para comunicarse con la base de datos MySQL.
-
-Catalog también mantiene una integración con **IAM** mediante `BuyerCompanyRepository` y `ProviderCompanyRepository`. Esta interacción se utiliza únicamente para validar la existencia de las empresas involucradas. La autorización de las operaciones de escritura se complementa mediante `CurrentUserAccess`.
-
-El flujo principal de componentes puede representarse de la siguiente manera:
-
-```text
-Cliente / Swagger UI
-        |
-        v
-ProviderRatingsController
-        |
-        +-----------------------> IAM
-        |                         |- BuyerCompanyRepository
-        |                         |- ProviderCompanyRepository
-        |                         `- CurrentUserAccess
-        |
-        v
-ProviderRatingRepository
-        |
-        v
-ProviderRatingRepositoryImpl
-        |
-        v
-ProviderRatingPersistenceRepository
-        |
-        v
-      MySQL
-```
+> No existe un diagrama de componentes exclusivo de Equipment; se enlaza la vista global disponible.
 
 #### 4.2.5.6. Bounded Context Software Architecture Code Level Diagrams.
 
-Los diagramas a nivel de código del bounded context **Catalog** representan las clases que conforman su modelo de dominio y la estructura de persistencia utilizada para almacenar las valoraciones.
-
 ##### 4.2.5.6.1. Bounded Context Domain Layer Class Diagram.
 
-El modelo de dominio de Catalog está compuesto principalmente por el agregado `ProviderRating` y el puerto `ProviderRatingRepository`.
+![Backend class overview - Equipment](../assets/chapter-4/class-diagrams/backend_equipment.png)
 
-`ProviderRating` contiene los atributos `id`, `companyId`, `providerId` y `rating`. Su operación de dominio `changeRating()` garantiza que el valor asignado permanezca entre 1 y 5.
-
-`ProviderRatingRepository` actúa como contrato entre el dominio y la infraestructura, ofreciendo operaciones de consulta y persistencia sin exponer detalles relacionados con JPA.
-
-La estructura del dominio puede representarse de la siguiente manera:
-
-```text
-+------------------------------------------------+
-|                ProviderRating                  |
-+------------------------------------------------+
-| - id: Long                                     |
-| - companyId: Long                              |
-| - providerId: Long                             |
-| - rating: Integer                              |
-+------------------------------------------------+
-| + ProviderRating(companyId, providerId, rating)|
-| + changeRating(rating): void                   |
-+------------------------------------------------+
-                      |
-                      | utiliza
-                      v
-+------------------------------------------------+
-|           ProviderRatingRepository             |
-+------------------------------------------------+
-| + findById(id)                                 |
-| + findByCompanyIdAndProviderId(...)            |
-| + findAll(companyId, providerId)               |
-| + save(rating)                                 |
-+------------------------------------------------+
-```
-
-La representación textual anterior es la evidencia de código disponible para Catalog en este repositorio. No se conserva un archivo UML gráfico específico adicional.
+> No existe un UML de dominio actualizado de Equipment; la vista enlazada es la disponible.
 
 ##### 4.2.5.6.2. Bounded Context Database Design Diagram.
 
-La persistencia propia de Catalog se concentra en la tabla `provider_ratings`.
+Equipment es dueño de estas tablas:
 
-Esta tabla almacena la relación entre la empresa compradora y el proveedor evaluado. No almacena directamente datos personales o empresariales pertenecientes a IAM, sino únicamente sus identificadores. Del mismo modo, tampoco almacena los productos o niveles de stock del proveedor, debido a que estos pertenecen al bounded context Inventory.
+| Tabla | Contenido principal |
+|---|---|
+| `customer_accounts` | `id`, `organization_id`, `legacy_company_id` (único), `name`, `ruc`, `address`, `contact_email`, `phone`, `active`. |
+| `customer_sites` | `id`, `customer_account_id`, `organization_id`, `name`, `address`, `active`. |
+| `tanks` | `id`, `organization_id`, `customer_account_id`, `site_id`, `name`, `classification`, `fuel_type`, `capacity_amount`/`capacity_unit`, `level_amount`/`level_unit`, `level_source`, `level_observed_at`, `configuration_version`, `legacy_equipment_id` (único), `active`. |
+| `tank_configurations` | `id`, `tank_id`, `version`, `fuel_type`, `capacity_amount`/`capacity_unit`, `recorded_at`. |
+| `device_bindings` | `id`, `organization_id`, `tank_id`, `device_id`, `channel`, `status`, `valid_from`, `valid_to`, `active_slot`; único `(device_id, channel, active_slot)`. |
+| `device_credentials` | `id`, `device_id`, `channel`, `token_hash` (único), `token_version`, `status`, `revoked_at`. |
+| `equipment` | Equipos del modelo heredado. |
 
-| Campo | Descripción |
-| :---: | :---------- |
-| `id` | Identificador único de la valoración y clave primaria. |
-| `company_id` | Identificador de la empresa compradora que realiza la valoración. |
-| `provider_id` | Identificador del proveedor evaluado. |
-| `rating` | Valor numérico de la calificación, restringido por el dominio al rango de 1 a 5. |
-| `created_at` | Fecha y hora en que se creó el registro. |
-| `updated_at` | Fecha y hora de la última modificación del registro. |
-
-Existe una restricción única para la combinación `company_id` y `provider_id`. Esto garantiza que una empresa compradora no registre más de una valoración independiente para el mismo proveedor.
-
-La estructura de persistencia puede representarse de la siguiente manera:
-
-```text
-+--------------------------------------+
-|           provider_ratings           |
-+--------------------------------------+
-| PK  id                               |
-|     company_id                       |
-|     provider_id                      |
-|     rating                           |
-|     created_at                       |
-|     updated_at                       |
-+--------------------------------------+
-| UNIQUE(company_id, provider_id)      |
-+--------------------------------------+
-```
-
-La tabla y el esquema textual anterior constituyen la evidencia de base de datos disponible para Catalog en este repositorio.
+> No se conserva un diagrama gráfico de este modelo; la tabla anterior es su especificación.
 
 #### 4.2.5.7. Runtime Evidence.
 
-La validación en tiempo de ejecución del bounded context Catalog se realiza desde **Swagger UI** mediante los endpoints disponibles en `/api/v1/provider-ratings`.
-
-Las pruebas permiten verificar tanto los casos exitosos como las principales reglas de validación, autorización y consistencia implementadas en el backend.
-
-| Operación | Resultado esperado |
-| :-------: | :----------------: |
-| Consultar todas las valoraciones | `200 OK` |
-| Consultar valoraciones filtradas por `companyId` | `200 OK` |
-| Consultar valoraciones filtradas por `providerId` | `200 OK` |
-| Consultar por `companyId` y `providerId` simultáneamente | `200 OK` |
-| Crear una valoración válida entre 1 y 5 | `201 Created` |
-| Crear nuevamente una valoración para la misma combinación comprador-proveedor | `409 Conflict` |
-| Crear una valoración menor que 1 o mayor que 5 | `400 Bad Request` |
-| Crear una valoración con comprador o proveedor inexistente | `400 Bad Request` |
-| Actualizar correctamente el valor de una valoración | `200 OK` |
-| Intentar cambiar `companyId` o `providerId` durante una actualización | `400 Bad Request` |
-| Actualizar una valoración inexistente | `404 Not Found` |
-| Crear o modificar una valoración para una empresa que no pertenece al usuario autenticado | `403 Forbidden` |
-| Realizar una operación protegida sin autenticación | `401 Unauthorized` |
-
-La evidencia visual de Swagger para Catalog no está incluida en este repositorio; la tabla anterior conserva los escenarios que deben verificarse cuando se disponga del entorno ejecutable.
+La evidencia de Equipment son las pruebas automatizadas del backend (sección 6.2.1.5): 7 pruebas sobre el vínculo temporal del dispositivo, el aprovisionamiento de credenciales y el modelo del tanque, y las 23 pruebas de las operaciones del distribuidor, que cubren la búsqueda por RUC, el alta y la edición de tanques con el caso de otro distribuidor. Las 19 operaciones de Equipment están documentadas en Swagger UI (sección 6.2.1.7).
 
 ### 4.2.6. Bounded Context: Fulfillment
 
 | Elemento | Descripción |
-| :------: | :---------: |
-| Propósito | Coordinar los recursos logísticos del distribuidor (cisternas y conductores) y gestionar el ciclo de vida de la entrega física del combustible desde que la orden es despachada hasta que se confirma su recepción o su fallo. |
-| Actores | Distribuidores, que administran su flota y ejecutan las entregas; compradores asociados, que consultan el estado de su entrega; administradores, que consultan el total de entregas de la plataforma. |
-| Relación con otros contextos | Al crear una entrega valida la propiedad del distribuidor contra IAM, consulta la orden en **Ordering**, valida la capacidad y disponibilidad de la cisterna y del conductor, y registra la asignación. Durante el viaje consume telemetría, geocercas y estado de válvula; al completarla, conserva la evidencia de recepción y publica el evento para que Ordering cierre la orden, Inventory actualice el stock y Notification informe a los actores. La implementación actual utiliza llamadas directas del monolito modular; la evolución propuesta introduce eventos idempotentes para la ingestión IoT.
+|---|---|
+| Propósito | Gestionar el ciclo físico de la entrega de combustible, desde que se asigna conductor y cisterna hasta que se completa, falla o se cancela, con un historial inmutable de transiciones y una línea de tiempo. |
+| Actores | Distribuidor, que asigna y ejecuta las entregas, y comprador asociado, que consulta el estado de la suya. |
+| Relación con otros contextos | La asignación la orquesta Application Flows, que reserva stock en Supply y recursos en Fleet y luego crea la entrega. Fulfillment lee conductor, cisterna y ventana reservada mediante `FleetCatalog`, y publica `delivery.assigned`, `started`, `arrived`, `completed` y `failed` (`api.events`) que consumen Notification y el diario de negocio. Al cerrar la entrega, el puerto `DeliveryIntegration`, implementado en Application Flows, libera la flota, concilia el stock y deja la orden pendiente de pago. Analytics lo lee mediante `FulfillmentContextFacade`. |
+
+<div align="center">
+  <img src="../assets/chapter-4/event-storming/Fullfillment.png" alt="Canvas del bounded context Fulfillment" width="500"/>
+  <p><em>Canvas del Bounded Context Fulfillment (Event Storming).</em></p>
+</div>
 
 #### 4.2.6.1. Domain Layer.
 
-El core de Fulfillment es el agregado raíz `Delivery`, que orquesta el ciclo de vida de una entrega y valida las transiciones de estado (`SCHEDULED → DISPATCHED → DELIVERED`, o `→ FAILED`). `Vehicle` y `Driver` son agregados raíz independientes que representan los recursos logísticos del proveedor; su ciclo de vida (alta, edición, baja) es autónomo y no depende de `Delivery`, aunque esta última los referencia por identificador al momento de asignarlos a una entrega.
+El core es el agregado `Delivery`. Su estado físico (`DeliveryPhysicalState`) solo admite estas transiciones: `ASSIGNED → STARTED → ARRIVED → DELIVERING → COMPLETED`, y desde cualquier estado no terminal se puede ir a `FAILED` o `CANCELLED`. `COMPLETED`, `FAILED` y `CANCELLED` son terminales. Al completar, el volumen entregado debe ser mayor que cero y no puede superar el volumen solicitado. Cada transición queda registrada en `DeliveryStateTransition` con su versión del agregado y no se modifica después. Hay una sola entrega por orden (restricción única `uk_deliveries_order_id`).
 
-En el Event Storming original (ver evidencia de sesión) estos agregados se modelaron como `Transport` y `Dispatch`; en la implementación final del backend se materializaron como `Vehicle` y `Delivery` respectivamente, mientras que `Driver` conservó su nombre. La regla de negocio "envío gratis cuando la orden se cierra", capturada en la sesión de Event Storming, no tiene traducción visible en el código actual: ni `Delivery` ni el módulo de Payment aplican una lógica de tarifas o descuentos de envío.
+Conductor y cisterna ya no pertenecen a este contexto: viven en Fleet y `Delivery` solo guarda sus identificadores. `DeliveryStatus` (`SCHEDULED`, `DISPATCHED`, `DELIVERED`, `FAILED`) es el estado de la primera versión; se conserva en la tabla por compatibilidad y el estado vigente es el físico.
 
-|     Clase     |      Tipo      |                                  Propósito                                 |
-| :-----------: | :------------: | :--------------------------------------------------------------------------------------------------------------------------------------: |
-| `Delivery` | Aggregate Root | Gestiona orden, proveedor, conductor, vehículo, estado y fechas de despacho/entrega de una entrega. Expone `dispatch()`, `complete()` y `fail(String)` como comportamiento del dominio. |
-| `Vehicle` | Aggregate Root | Gestiona placa, marca, modelo, capacidad, unidad y disponibilidad del vehículo de un proveedor. Expone `update()` para modificar sus datos. |
-| `Driver` | Aggregate Root | Gestiona nombre, apellido, número de licencia, contacto y disponibilidad del conductor de un proveedor. Expone `update()` para modificar sus datos. |
-| `DeliveryStatus` | Value Object | Restringe los estados válidos de una entrega: `SCHEDULED`, `DISPATCHED`, `DELIVERED`, `FAILED`. |
-| `CreateDeliveryCommand` | Domain Command | Define los datos necesarios para programar una entrega: orden, proveedor, conductor, vehículo, fecha programada y notas. |
-| `DispatchDeliveryCommand` | Domain Command | Identifica la entrega que pasa a estado despachado. |
-| `CompleteDeliveryCommand` | Domain Command | Identifica la entrega que se marca como entregada. |
-| `FailDeliveryCommand` | Domain Command | Identifica la entrega que falla, junto con el motivo. |
-| `GetAllDeliveriesQuery` | Domain Query | Define la consulta de todas las entregas registradas. |
-| `GetDeliveryByIdQuery` | Domain Query | Define la consulta de una entrega por su identificador. |
-| `GetDeliveryByOrderIdQuery` | Domain Query | Define la consulta de la entrega asociada a una orden. |
-| `DeliveryRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Delivery` sin depender de JPA. |
-| `VehicleRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Vehicle`, incluida la consulta por proveedor. |
-| `DriverRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `Driver`, incluida la consulta por proveedor. |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `Delivery` | Aggregate Root | Entrega con orden, distribuidor, conductor, cisterna, estado físico, fechas de cada etapa, volumen solicitado y entregado, versión y `assignmentCommandId` (idempotencia). Expone `assign()`, `start()`, `arrive()`, `beginDelivering()`, `completePhysical()`, `failPhysical()` y `cancel()`. |
+| `DeliveryStateTransition` | Entity | Registro inmutable de cada cambio de estado (origen, destino, instante y versión). |
+| `DeliveryPhysicalState`, `DeliveryStatus` | Value Objects | Estados físicos con su tabla de transiciones permitidas, y estado heredado de la primera versión. |
+| `CreateDeliveryCommand`, `AssignDeliveryCommand`, `StartDeliveryCommand`, `ArriveDeliveryCommand`, `CompletePhysicalDeliveryCommand`, `FailDeliveryCommand`, `CancelDeliveryCommand` | Domain Commands | Intenciones de crear la entrega y de avanzar o cerrar su ciclo. |
+| `GetDeliveryByIdQuery`, `GetAllDeliveriesQuery` | Domain Queries | Consultas de entregas. |
+| `DeliveryRepository`, `DeliveryStateTransitionRepository` | Domain Repositories | Puertos de persistencia. |
 
 #### 4.2.6.2. Interface Layer.
 
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------: |
-| `DeliveriesController` | REST Controller | Expone la API `/api/v1/deliveries`: creación, despacho, completado, fallo y consultas (todas, por proveedor, por id, por orden). Aplica `@PreAuthorize` con `CurrentUserAccess` para restringir la creación y el listado global al proveedor dueño o al rol `ADMIN`. |
-| `VehiclesController` | REST Controller | Expone la API `/api/v1/vehicles`: CRUD completo filtrado por `providerId`, validando propiedad del proveedor en cada operación. |
-| `DriversController` | REST Controller | Expone la API `/api/v1/drivers`: CRUD completo filtrado por `providerId`, validando propiedad del proveedor en cada operación. |
-| `FulfillmentController` | REST Controller (marcador) | Clase vacía sin rutas activas; no expone endpoints. Es un remanente documental, igual que otros marcadores detectados en el resto de la plataforma. |
-| `CreateDeliveryResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para programar una entrega. |
-| `DeliveryResource` | REST Resource (DTO) | Define la representación JSON de una entrega devuelta al cliente. |
-| `FailDeliveryResource` | REST Resource (DTO) | Define el cuerpo JSON con el motivo del fallo de una entrega. |
-| `VehicleResource` | REST Resource (DTO) | Define la representación JSON de entrada/salida de un vehículo. |
-| `DriverResource` | REST Resource (DTO) | Define la representación JSON de entrada/salida de un conductor. |
-| `CreateDeliveryCommandFromResourceAssembler` | Assembler / Transformer | Convierte `CreateDeliveryResource` en `CreateDeliveryCommand`. |
-| `DeliveryResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado `Delivery` en `DeliveryResource` para la respuesta HTTP. |
+|---|---|---|
+| `DeliveriesController` | REST Controller | `/api/deliveries`: `assign`, `start`, `arrive`, `complete`, `fail` y `cancel` como subrecursos con `POST`, consulta de una entrega, de sus `transitions` y listado de las entregas del distribuidor. |
+| `DeliveryTimelineController` | REST Controller | `GET /api/deliveries/{deliveryId}/timeline`: cronología de la entrega. |
+| `CompleteDeliveryResource`, `FailDeliveryResource`, `DeliveryResource`, `DeliveryTransitionResource`, `DeliveryTimelineItemResource` | REST Resources | Volumen entregado y motivo de fallo en la entrada; entrega, transiciones y cronología en la salida. |
+
+La creación de la entrega (`POST /api/deliveries`) y la recomendación de recursos (`GET /api/deliveries/recommendation`) no están en este contexto sino en Application Flows, porque cruzan varios contextos (sección 4.1.1.2, flujo 3).
 
 #### 4.2.6.3. Application Layer.
 
-Solo `Delivery` tiene una capa de aplicación explícita, porque es el único agregado del contexto con reglas de negocio que cruzan otros bounded contexts (Ordering, Inventory, Equipment). `Vehicle` y `Driver` no tienen command/query services: sus controladores (`VehiclesController`, `DriversController`) invocan directamente sus repositorios de dominio, sin capa intermedia; es una simplificación consistente con lo observado en el resto de la plataforma (`provider-ratings` sigue el mismo patrón).
-
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------: |
-| `DeliveryCommandService` | Command Service (Interface) | Define el contrato para crear, despachar, completar y fallar una entrega. |
-| `DeliveryCommandServiceImpl` | Command Service Implementation | Orquesta la creación de la entrega: valida que conductor y cisterna pertenezcan al distribuidor y estén disponibles, valida capacidad y compatibilidad contra la cantidad y producto solicitados, evita entregas duplicadas por orden, registra la recomendación o asignación y al completar libera los recursos y publica la evidencia de recepción. |
-| `DeliveryQueryService` | Query Service (Interface) | Define el contrato para consultar por id, por orden y el listado completo. |
-| `DeliveryQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas delegando en `DeliveryRepository`. |
+|---|---|---|
+| `DeliveryLifecycleServiceImpl` | Command Service | Ejecuta las transiciones sobre el agregado, registra el historial y publica el evento de cada una. Al completar valida el volumen y llama al puerto `DeliveryIntegration`. |
+| `DeliveryQueryService` / `DeliveryQueryServiceImpl` | Query Service | Consulta de entregas, transiciones y línea de tiempo, siempre dentro del tenant del distribuidor. |
+| `DeliveryBusinessJournalListener` | Event Listener | Registra en el diario de negocio un renglón por cada evento de entrega, de forma idempotente por `source_event_id`. |
 
 #### 4.2.6.4. Infrastructure Layer.
 
 | Clase / Componente | Tipo | Propósito |
-| :----------------: | :--: | :-------: |
-| `DeliveryPersistenceEntity` | JPA Entity | Representa la tabla `deliveries`: orden, proveedor, conductor, vehículo, estado (enum como texto), fechas de despacho/entrega, fecha programada y notas. |
-| `VehiclePersistenceEntity` | JPA Entity | Representa la tabla `vehicles`: proveedor, placa (única), marca, modelo, capacidad, unidad y estado. |
-| `DriverPersistenceEntity` | JPA Entity | Representa la tabla `drivers`: proveedor, nombre, apellido, número de licencia (único), teléfono, correo y estado. |
-| `DeliveryPersistenceAssembler` | Assembler / Mapper | Convierte entre `Delivery` y `DeliveryPersistenceEntity`. |
-| `VehiclePersistenceAssembler` | Assembler / Mapper | Convierte entre `Vehicle` y `VehiclePersistenceEntity`. |
-| `DriverPersistenceAssembler` | Assembler / Mapper | Convierte entre `Driver` y `DriverPersistenceEntity`. |
-| `DeliveryPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por orden y por proveedor. |
-| `VehiclePersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y la consulta de vehículos por proveedor. |
-| `DriverPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y la consulta de conductores por proveedor. |
-| `DeliveryRepositoryImpl` | Repository Adapter | Implementa `DeliveryRepository` y adapta sus operaciones a Spring Data JPA. |
-| `VehicleRepositoryImpl` | Repository Adapter | Implementa `VehicleRepository` y adapta sus operaciones a Spring Data JPA. |
-| `DriverRepositoryImpl` | Repository Adapter | Implementa `DriverRepository` y adapta sus operaciones a Spring Data JPA. |
+|---|---|---|
+| `DeliveryPersistenceEntity`, `DeliveryStateTransitionPersistenceEntity`, `DeliveryBusinessJournalEntity` | JPA Entities | Tablas `deliveries`, `delivery_state_transitions` y `delivery_business_journals`. |
+| `DeliveryPersistenceAssembler`, `DeliveryRepositoryImpl`, `DeliveryPersistenceRepository` y sus equivalentes para transiciones | Assembler, Adapter y Spring Data | Convierten entre dominio y JPA e implementan los puertos. |
+| `DeliveryAssignmentsImpl`, `DeliveryTrackingLookupImpl` | Public API Implementations | Exponen a otros contextos la consulta de entregas y de sus asignaciones. |
 
 #### 4.2.6.5. Bounded Context Software Architecture Component Level Diagrams.
 
 ![Backend component overview - Fulfillment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
 
-> El repositorio no conserva un diagrama de componentes exclusivo de Fulfillment; se enlaza la vista global disponible.
+> No existe un diagrama de componentes exclusivo de Fulfillment; se enlaza la vista global disponible.
 
 #### 4.2.6.6. Bounded Context Software Architecture Code Level Diagrams.
 
 ##### 4.2.6.6.1. Bounded Context Domain Layer Class Diagram.
 
-![Backend class overview - Fulfillment](../assets/chapter-4/class-diagrams/backend_fullfilment.png)
-
-> El repositorio conserva la vista backend disponible para Fulfillment, no un UML de dominio separado.
+> El diagrama de clases anterior de Fulfillment (`backend_fullfilment.png`) corresponde al modelo de la primera versión, con `Vehicle`, `Driver` y `DeliveryStatus` dentro del contexto, y ya no representa el código. Se retiró de esta sección hasta contar con uno nuevo que muestre `Delivery`, `DeliveryStateTransition` y `DeliveryPhysicalState`.
 
 ##### 4.2.6.6.2. Bounded Context Database Design Diagram.
 
-*Responsabilidad:* almacena los recursos logísticos del proveedor y su asignación a las entregas de cada orden.
+| Tabla | Contenido principal |
+|---|---|
+| `deliveries` | `id`, `order_id` (único), `provider_id`, `driver_id`, `vehicle_id` (la cisterna), `status`, `physical_state`, `scheduled_date`, `dispatched_at`, `started_at`, `arrived_at`, `delivering_at`, `delivered_at`, `requested_volume`, `delivered_volume`, `assignment_command_id` (único), `version`, `notes`. |
+| `delivery_state_transitions` | `id`, `delivery_id`, `from_state`, `to_state`, `occurred_at`, `aggregate_version`. |
+| `delivery_business_journals` | `id`, `source_event_id` (único), `delivery_id`, `provider_id`, `type`, `occurred_at`, `summary`, `ref_id`. |
 
-- **deliveries:** `id` (PK), `order_id` (FK → orders), `provider_id` (FK → providers), `driver_id` (FK → drivers), `vehicle_id` (FK → vehicles), `status` (`SCHEDULED`/`DISPATCHED`/`DELIVERED`/`FAILED`), `scheduled_date`, `dispatched_at`, `delivered_at`, `notes`, `created_at`, `updated_at`.
-- **vehicles:** `id` (PK), `provider_id` (FK → providers), `license_plate` (único), `brand`, `model`, `capacity`, `unit`, `status`, `created_at`, `updated_at`.
-- **drivers:** `id` (PK), `provider_id` (FK → providers), `first_name`, `last_name`, `license_number` (único), `phone_number`, `email`, `status`, `created_at`, `updated_at`.
-
-> La tabla anterior es la especificación textual del diseño de base de datos de Fulfillment. No se conserva un diagrama gráfico específico de este modelo.
+> No se conserva un diagrama gráfico de este modelo; la tabla es su especificación.
 
 #### 4.2.6.7. Runtime Evidence.
 
-| Operación | Resultado esperado |
-| :-------: | :-------: |
-| Crear entrega con conductor/vehículo disponibles y del mismo proveedor | `201 Created` |
-| Crear entrega con conductor o vehículo de otro proveedor | `409 Conflict` |
-| Crear entrega con capacidad de vehículo insuficiente | `409 Conflict` |
-| Crear entrega duplicada para la misma orden | `409 Conflict` |
-| Despachar / completar / fallar entrega | `200 OK` |
-| Consultar entrega por id, por orden y por proveedor | `200 OK` |
-| Listar todas las entregas (rol distinto de `ADMIN`) | `403 Forbidden` |
-| CRUD de vehículos y conductores del proveedor dueño | `200`/`201`/`204` según operación |
-| Acceso a vehículos/conductores de otro proveedor | `404 Not Found` |
-| Swagger sin token | `401 Unauthorized` |
+Las 10 operaciones de Fulfillment están en Swagger UI (sección 6.2.1.7). Las 29 pruebas del contexto (sección 6.2.1.5) verifican la máquina de estados de la entrega, el volumen entregado, el historial inmutable y la línea de tiempo. Las 8 de Application Flows verifican la asignación transaccional, el *rollback* ante un fallo y la idempotencia por `commandId`.
 
 ### 4.2.7. Bounded Context: Ordering
 
 | Elemento | Descripción |
 |---|---|
-| Propósito | Gestionar la solicitud y la orden de combustible desde el evento IoT de nivel bajo o una operación manual de contingencia hasta su aceptación, asignación, despacho, confirmación y cierre. |
-| Actores | Dispositivo IoT y comprador asociado que originan la solicitud; distribuidores que aceptan o rechazan; Fulfillment que asigna recursos y ejecuta el despacho. |
-| Relación con otros contextos | Consume `LowFuelLevelDetected` desde Equipment e IoT Tank Monitoring, consulta Inventory para validar producto y disponibilidad, solicita recursos a Fulfillment, notifica estados mediante Notification y es consumido por Payment y Reporting mediante el `orderId` y el `tripId`. La evolución propuesta utiliza eventos idempotentes en lugar de crear solicitudes duplicadas. |
+| Propósito | Mantener la orden de combustible que nace de una solicitud de abastecimiento aceptada y llevarla por su ciclo comercial hasta el pago. |
+| Actores | Distribuidor, que acepta la solicitud (lo que crea la orden), y comprador asociado, que consulta sus órdenes y paga. |
+| Relación con otros contextos | Application Flows crea la orden mediante `FuelOrderCreation` al aceptar una solicitud de Replenishment. Consulta el producto y su precio en Inventory (`FuelProductQueryService`, dependencia heredada registrada en la línea base de ArchUnit). Expone `OrderLookup` a Payment, Equipment y Fulfillment. Consume `payment.completed.v1` (`OrderingPaymentCompletionAdapter`) para marcar la orden como pagada. Analytics la lee mediante `OrderingContextFacade`. |
+
+<div align="center">
+  <img src="../assets/chapter-4/event-storming/Ordering.png" alt="Canvas del bounded context Ordering" width="500"/>
+  <p><em>Canvas del Bounded Context Ordering (Event Storming).</em></p>
+</div>
 
 #### 4.2.7.1. Domain Layer
 
-El core de Ordering es el agregado raíz `FuelOrder`. Su invariante principal reside en el value object `OrderStatus`: cada método del agregado protege las transiciones válidas del ciclo de vida, por ejemplo `dispatch()` lanza excepción si el estado no es `PENDING`, y `receive()` exige que la orden esté `DISPATCHED`. `confirm()` y `cancel()`, en cambio, no validan el estado previo antes de aplicarse.
+El core es el agregado `FuelOrder`. La solicitud ya no se modela aquí: pasó a Replenishment como `ReplenishmentRequest` (sección 4.2.11) y la tabla `fuel_requests` se eliminó en la migración V34. `FuelOrder` solo conserva el `requestId` de la solicitud que la originó.
+
+El agregado protege su ciclo de vida: `confirm()` exige estado `PENDING`; `cancel()` solo se permite desde `PENDING` o `CONFIRMED`; `dispatch()` exige que la orden esté pendiente de asignación; `receive()` exige `DISPATCHED`; y `markPaid()` rechaza una orden cancelada.
 
 | Clase | Tipo | Propósito |
 |---|---|---|
-| `FuelOrder` | Aggregate Root | Gestiona comprador asociado, distribuidor, tanque, dispositivo de origen, producto, volumen requerido, precio total, dirección, fecha, origen IoT y estado de asignación. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()` como comportamiento del dominio. |
-| `OrderStatus` | Value Object | Restringe los estados de la orden: `PENDING_ACCEPTANCE`, `ACCEPTED`, `RESOURCE_ASSIGNED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED`, `CANCELLED`. |
-| `RequestStatus` | Value Object | Restringe los estados de la solicitud: `PENDING`, `ACCEPTED`, `REJECTED`, `DUPLICATE`, `EXPIRED`. |
-| `CreateFuelOrderCommand` | Domain Command | Define los datos necesarios para crear una orden (comprador, distribuidor, tanque, dispositivo, producto, cantidad, dirección, fecha y `sourceEventId`). |
-| `ConfirmFuelOrderCommand` | Domain Command | Identifica la orden que debe confirmarse. |
-| `CancelFuelOrderCommand` | Domain Command | Identifica la orden que debe cancelarse. |
-| `GetAllFuelOrdersQuery` | Domain Query | Define la consulta de todas las órdenes. |
-| `GetFuelOrderByIdQuery` | Domain Query | Define la consulta de una orden por identificador. |
-| `GetFuelOrdersByCompanyIdQuery` | Domain Query | Define la consulta de órdenes de una empresa compradora. |
-| `GetFuelOrdersByProviderIdQuery` | Domain Query | Define la consulta de órdenes de un proveedor. |
-| `FuelOrderRepository` | Domain Repository | Expone el puerto de persistencia que utiliza `FuelOrder` sin depender de JPA o Spring Data. |
-
-> Nota: la solicitud (`FuelRequest`) no llegó a modelarse como agregado de dominio propio; su comportamiento vive directamente en la entidad de persistencia y en `FuelRequestService` (ver 4.2.7.3 y 4.2.7.4).
+| `FuelOrder` | Aggregate Root | Orden con solicitud de origen, comprador, distribuidor, producto, volumen solicitado, precio total, dirección, fecha programada y estado. Expone `confirm()`, `cancel()`, `dispatch()`, `receive()` y `markPaid()`. |
+| `OrderStatus` | Value Object | Estados de la orden: `PENDING`, `CONFIRMED`, `DISPATCHED`, `PENDING_PAYMENT`, `PAID`, `IN_PROGRESS`, `DELIVERED` y `CANCELLED`. |
+| `CreateFuelOrderCommand`, `ConfirmFuelOrderCommand`, `CancelFuelOrderCommand` | Domain Commands | Intenciones de crear, confirmar y cancelar una orden. |
+| `GetAllFuelOrdersQuery`, `GetFuelOrderByIdQuery`, `GetFuelOrdersByCompanyIdQuery`, `GetFuelOrdersByProviderIdQuery` | Domain Queries | Consultas de órdenes. |
+| `FuelOrderRepository` | Domain Repository | Puerto de persistencia. |
 
 #### 4.2.7.2. Interface Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
-| `FuelOrdersController` | REST Controller | Expone la API `/api/v1/fuel-orders`: creación, confirmación, cancelación y consulta por id, compañía o proveedor. Valida propiedad de compañía/proveedor mediante `CurrentUserAccess`. |
-| `FuelRequestsController` | REST Controller | Expone la API `/api/v1/fuel-requests`: creación, listado, consulta por id, aceptación y rechazo. |
-| `OrderingController` | REST Controller (placeholder) | Clase vacía, usada solo como marcador de documentación/diagrama; no define endpoints. |
-| `CreateFuelOrderResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una orden directamente. |
-| `FuelOrderResource` | REST Resource (DTO) | Define la representación JSON de una orden para la respuesta HTTP. |
-| `CreateFuelRequestResource` | REST Resource (DTO) | Define el cuerpo JSON de entrada para crear una solicitud. |
-| `FuelRequestResource` | REST Resource (DTO) | Define la representación JSON de una solicitud para la respuesta HTTP. |
-| `RejectFuelRequestResource` | REST Resource (DTO) | Define el motivo de rechazo enviado por el proveedor. |
-| `CreateFuelOrderCommandFromResourceAssembler` | Assembler / Transformer | Convierte el recurso HTTP de creación en `CreateFuelOrderCommand`. |
-| `FuelOrderResourceFromEntityAssembler` | Assembler / Transformer | Convierte el agregado `FuelOrder` en `FuelOrderResource` para la respuesta HTTP. |
-
-> Nota: a diferencia de `FuelOrderResource`, la conversión de `FuelRequestPersistenceEntity` a `FuelRequestResource` no tiene un assembler dedicado; se resuelve con un método estático privado dentro de `FuelRequestsController`.
+| `FuelOrdersController` | REST Controller | `/api/fuel-orders`: creación directa, `confirm` y `cancel` como subrecursos, y consulta por id, por empresa compradora y por distribuidor. Valida la propiedad con `CurrentUserAccess`. |
+| `CreateFuelOrderResource`, `FuelOrderResource` | REST Resources | Entrada de la creación y representación de la orden. |
+| `CreateFuelOrderCommandFromResourceAssembler`, `FuelOrderResourceFromEntityAssembler` | Assemblers | Convierten recurso en comando y agregado en recurso. |
 
 #### 4.2.7.3. Application Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
-| `FuelOrderCommandService` | Command Service (Interface) | Define el contrato para crear, confirmar y cancelar órdenes. |
-| `FuelOrderCommandServiceImpl` | Command Service Implementation | Consulta `FuelProductQueryService` de Inventory para calcular el precio, construye el agregado, lo persiste y delega las transiciones de estado al propio `FuelOrder`. Devuelve `Result<FuelOrder, ApplicationError>`. |
-| `FuelOrderQueryService` | Query Service (Interface) | Define el contrato para consultar por id, compañía, proveedor o colección completa. |
-| `FuelOrderQueryServiceImpl` | Query Service Implementation | Ejecuta las consultas y delega la recuperación al puerto `FuelOrderRepository`. |
-| `FuelRequestService` | Command/Query Service (clase concreta, sin interfaz) | Concentra `create`, `accept`, `reject` y `findAll`/`findById` de las solicitudes. La creación debe aceptar eventos IoT idempotentes mediante `sourceEventId`; `accept` construye un `CreateFuelOrderCommand`, crea la `FuelOrder` vinculada por `requestId` y actualiza la solicitud a `APPROVED`, todo en una única transacción. |
-
-> Nota: a diferencia de `FuelOrderCommandService`/`FuelOrderQueryService`, `FuelRequestService` no sigue el patrón interfaz + implementación; es una única clase concreta anotada con `@Service`.
+| `FuelOrderCommandService` / `FuelOrderCommandServiceImpl` | Command Service | Consulta el precio en Inventory, construye el agregado, lo persiste y delega las transiciones al propio `FuelOrder`. Devuelve `Result<FuelOrder, ApplicationError>`. |
+| `FuelOrderCreationImpl` | Public API Implementation | Implementa `FuelOrderCreation`, la entrada que usa Application Flows para crear la orden dentro de la transacción de aceptación. |
+| `FuelOrderQueryService` / `FuelOrderQueryServiceImpl` | Query Service | Consultas por id, empresa, distribuidor o colección completa. |
+| `OrderingPaymentCompletionAdapter` | Event Consumer | Consume `payment.completed.v1` de forma idempotente y marca la orden como `PAID`. |
 
 #### 4.2.7.4. Infrastructure Layer
 
 | Clase / Componente | Tipo | Propósito |
 |---|---|---|
-| `FuelOrderPersistenceEntity` | JPA Entity | Representa la tabla `fuel_orders`; persiste `status` como `OrderStatus` en formato `VARCHAR`. |
-| `FuelRequestPersistenceEntity` | JPA Entity | Representa la tabla `fuel_requests`; actúa como modelo único (sin contraparte de dominio) consumido directamente por `FuelRequestService`. |
-| `FuelOrderPersistenceAssembler` | Assembler / Mapper | Convierte entre `FuelOrder` y `FuelOrderPersistenceEntity`, manteniendo el dominio libre de anotaciones JPA. |
-| `FuelOrderPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `companyId` y `providerId`. |
-| `FuelRequestPersistenceRepository` | Spring Data JPA Repository | Ejecuta la persistencia y las consultas por `buyerCompanyId` y `providerId`; se usa directamente, sin puerto de dominio intermedio. |
-| `FuelOrderRepositoryImpl` | Repository Adapter | Implementa el puerto `FuelOrderRepository` y adapta sus operaciones a Spring Data JPA. |
+| `FuelOrderPersistenceEntity` | JPA Entity | Tabla `fuel_orders`; el estado se guarda como `VARCHAR`. |
+| `FuelOrderPersistenceAssembler`, `FuelOrderRepositoryImpl`, `FuelOrderPersistenceRepository` | Assembler, Adapter y Spring Data | Convierten entre dominio y JPA e implementan el puerto. |
+| `OrderLookupImpl` | Public API Implementation | Implementa `OrderLookup` para Payment, Equipment y Fulfillment. |
 
 #### 4.2.7.5. Bounded Context Software Architecture Component Level Diagrams.
 Component Diagram - Ordering Bounded Context
@@ -1118,26 +925,15 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 ##### 4.2.7.6.2. Bounded Context Database Design Diagram.
 
-![Database Design Diagram - Ordering Bounded Context](../assets/chapter-4/database/baseDatos_ordering.png)
+| Tabla | Contenido principal |
+|---|---|
+| `fuel_orders` | `id`, `request_id`, `company_id`, `provider_id`, `fuel_product_id`, `requested_quantity`, `total_price`, `status`, `delivery_address`, `scheduled_date` y auditoría. |
+
+> El diagrama `baseDatos_ordering.png` muestra las tablas `REQUEST`, `REQUEST_DETAIL` y `ORDER` de la primera versión y ya no corresponde al esquema; se retiró de esta sección.
 
 #### 4.2.7.7. Runtime Evidence.
 
-| Operación | Resultado |
-|---|---|
-| Registrar usuario proveedor (sign-up) | 201 Created |
-| Registrar usuario comprador (sign-up) | 201 Created |
-| Crear producto de combustible (Inventory, como proveedor) | 201 Created |
-| Procesar `LowFuelLevelDetected` con tanque y distribuidor asociados | 201 Created, solicitud `PENDING` |
-| Reprocesar el mismo `sourceEventId` IoT | 200 OK o solicitud existente, sin duplicar pedido |
-| Crear solicitud (`fuel-requests`), estado inicial | 201 Created, `PENDING` |
-| Aceptar solicitud (`accept`), genera orden automáticamente | 200 OK, orden `PENDING` con `totalPrice` calculado |
-| Confirmar orden (`confirm`) | 200 OK, `CONFIRMED` |
-| Consultar orden por id | 200 OK |
-| Consultar órdenes por compañía | 200 OK |
-| Consultar órdenes por proveedor | 200 OK |
-| Crear orden directa (sin solicitud previa) | 201 Created, `requestId: null` |
-| Cancelar orden ya confirmada | 200 OK, `CANCELLED` (sin validación de estado previo) |
-| Token JWT con firma inválida (secreto distinto al del servidor) | 401 Unauthorized |
+Las 7 operaciones de Ordering están en Swagger UI (sección 6.2.1.7). Las 40 pruebas de contrato recorren el flujo completo de orden a pago, el aislamiento entre organizaciones y la autorización por rol. La prueba de Payment verifica que el pago se desacople de la orden mediante el evento de pago completado. Las capturas siguientes muestran las consultas y operaciones sobre `/api/fuel-orders`:
 
 <img src="../assets/chapter-4/bc/ordering/GET_companyID.png" alt="Get Company ID"/>
 <img src="../assets/chapter-4/bc/ordering/GET_orderID.png" alt="Get Order ID"/>
@@ -1148,46 +944,56 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 ### 4.2.8. Bounded Context: Payment
 
+| Elemento | Descripción |
+|---|---|
+| Propósito | Registrar el pago de una orden y su confirmación o reembolso. |
+| Actores | Comprador asociado, que registra el pago, y distribuidor, que lo confirma o reembolsa y consulta los pagos de sus órdenes. |
+| Relación con otros contextos | Consulta la orden mediante `OrderLookup` de Ordering. Al completarse un pago publica `payment.completed.v1`, que Ordering consume. Analytics lo lee mediante `PaymentContextFacade` y Notification genera los avisos de pago. |
+
+<div align="center">
+  <img src="../assets/chapter-4/event-storming/Payment.png" alt="Canvas del bounded context Payment" width="500"/>
+  <p><em>Canvas del Bounded Context Payment (Event Storming).</em></p>
+</div>
+
 #### 4.2.8.1. Domain Layer.
 
-|     Clase     |      Tipo      |                                  Propósito                                 |
-|:-------------:|:--------------:|:--------------------------------------------------------------------------:|
-|    Payment    | Aggregate Root | Entidad principal que gestiona la información del pago y su ciclo de vida. |
-| PaymentStatus |  Value Object  |                 Representar los estados posibles del pago.                 |
-| PaymentMethod |  Value Object  |           Identificar el método utilizado para realizar el pago.           |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `Payment` | Aggregate Root | Pago con orden, empresa, monto, estado, método, referencia de transacción y fecha de pago. Expone `complete(reference)`, `refund()` y `fail()`. |
+| `PaymentStatus` | Value Object | Estados del pago: `PENDING`, `COMPLETED`, `FAILED` y `REFUNDED`. |
+| `PaymentMethod` | Value Object | Método de pago: `BANK_TRANSFER`, `CREDIT_CARD`, `DEBIT_CARD` y `CASH`. |
+| `CreatePaymentCommand`, `CompletePaymentCommand`, `RefundPaymentCommand` | Domain Commands | Intenciones de registrar, completar y reembolsar un pago. |
+| `GetAllPaymentsQuery`, `GetPaymentByIdQuery`, `GetPaymentByOrderIdQuery`, `GetPaymentsByCompanyIdQuery` | Domain Queries | Consultas de pagos. |
+| `PaymentRepository` | Domain Repository | Puerto de persistencia. |
 
 #### 4.2.8.2. Interface Layer.
 
-|          Clase          |       Tipo      |                                                     Propósito                                                    |
-|:-----------------------:|:---------------:|:----------------------------------------------------------------------------------------------------------------:|
-|      PaymentStatus      | REST Controller |              Exponer los endpoints HTTP para gestionar la creación, estado y consulta de los pagos.              |
-| CompletePaymentResource |   DTO (Record)  |      Representar los datos de entrada requeridos por el cliente para solicitar la creación de un nuevo pago.     |
-| CreatePaymentResource   | DTO (Record)    | Representar el dato enviado por el cliente necesario para marcar un pago como completado.                        |
-| PaymentResource         | DTO (Record)    | Representar los datos de salida con la información detallada del pago que se devuelve como respuesta al cliente. |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `PaymentsController` | REST Controller | `/api/payments`: registrar, `complete` y `refund` como subrecursos, y consultar todos, por id, por orden, por empresa y por distribuidor. |
+| `CreatePaymentResource`, `CompletePaymentResource`, `PaymentResource` | REST Resources (Record) | Datos para registrar un pago, referencia para completarlo y representación de salida. |
+| `CreatePaymentCommandFromResourceAssembler`, `PaymentResourceFromEntityAssembler` | Assemblers | Convierten recurso en comando y agregado en recurso. |
 
 #### 4.2.8.3. Application Layer.
 
-|           Clase           |       Tipo      |                                                     Propósito                                                     |
-|:-------------------------:|:---------------:|:-----------------------------------------------------------------------------------------------------------------:|
-|   PaymentCommandService   |    Interface    |                      Definir los casos de uso para las operaciones que modifican información.                     |
-| PaymentCommandServiceImpl | Command Handler | Implementar la lógica real que ejecuta las operaciones de modificación coordinando el dominio y la base de datos. |
-| PaymentQueryService       | Interface       | Definir los casos de uso para las operaciones de solo lectura.                                                    |
-| PaymentQueryServiceImpl   | Command Handler | Implementar la lógica para ejecutar las consultas y devolver la información de los pagos sin alterar ningún dato. |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `PaymentCommandService` / `PaymentCommandServiceImpl` | Command Service | Registra, completa y reembolsa el pago, verifica la orden con `OrderLookup` y publica `payment.completed.v1`. |
+| `PaymentQueryService` / `PaymentQueryServiceImpl` | Query Service | Consultas de solo lectura de pagos. |
 
 #### 4.2.8.4. Infrastructure Layer.
 
-|             Clase            |            Tipo            |                                                              Propósito                                                             |
-|:----------------------------:|:--------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-|     PaymentRepositoryImpl    |     Repository Adapter     |                         Actúa como un adaptador que conecta las operaciones de negocio con Spring Data JPA.                        |
-| PaymentPersistenceAssembler  |     Assembler / Mapper     | Funciona como un traductor bidireccional, transformando los objetos del modelo de dominio a entidades de persistencia y viceversa. |
-| PaymentPersistenceEntity     | JPA Entity                 | Representa la estructura de la tabla payments en la base de datos relacional.                                                      |
-| PaymentPersistenceRepository | Spring Data JPA Repository | Encargada de ejecutar las consultas SQL automáticas y personalizadas directamente sobre la base de datos.                          |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `PaymentPersistenceEntity` | JPA Entity | Tabla `payments`. |
+| `PaymentPersistenceAssembler` | Assembler / Mapper | Traduce entre `Payment` y la entidad JPA. |
+| `PaymentRepositoryImpl`, `PaymentPersistenceRepository` | Adapter y Spring Data | Implementan el puerto del dominio. |
 
 #### 4.2.8.5. Bounded Context Software Architecture Component Level Diagrams.
 
 ![Backend component overview - Payment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
 
-> No se conserva un diagrama de componentes exclusivo de Payment; se enlaza la vista global disponible.
+> No existe un diagrama de componentes exclusivo de Payment; se enlaza la vista global disponible.
 
 #### 4.2.8.6. Bounded Context Software Architecture Code Level Diagrams.
 
@@ -1197,55 +1003,340 @@ Domain Layer Class Diagram - Ordering Bounded Context
 
 ##### 4.2.8.6.2. Bounded Context Database Design Diagram.
 
-![Database Design Diagram - Payment](../assets/chapter-4/database/baseDatosPayment.png)
+| Tabla | Contenido principal |
+|---|---|
+| `payments` | `id`, `order_id`, `company_id`, `amount`, `status`, `payment_method`, `transaction_reference`, `paid_at`. |
 
-### 4.2.9. Bounded Context: Reporting
+#### 4.2.8.7. Runtime Evidence.
+
+Las 8 operaciones de Payment están en Swagger UI (sección 6.2.1.7). Las 3 pruebas del contexto y las pruebas de contrato del flujo de orden a pago verifican el registro, la confirmación y el desacople mediante el evento.
+
+### 4.2.9. Bounded Context: Analytics
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Calcular indicadores de solo lectura para la plataforma, el distribuidor y el comprador. No es dueño de ninguna tabla. |
+| Actores | Administrador de plataforma, distribuidor y comprador asociado. |
+| Relación con otros contextos | Lee Ordering, Payment y Fulfillment a través de una capa anticorrupción: cada contexto expone un *facade* (`OrderingContextFacade`, `PaymentContextFacade`, `FulfillmentContextFacade`) y Analytics lo traduce a sus tipos con `ExternalOrderingService`, `ExternalPaymentService` y `ExternalFulfillmentService`. |
+
+<div align="center">
+  <img src="../assets/chapter-4/event-storming/Reporting.png" alt="Canvas del bounded context Analytics" width="500"/>
+  <p><em>Canvas del Bounded Context Analytics (Event Storming).</em></p>
+</div>
 
 #### 4.2.9.1. Domain Layer.
 
-|           Clase           |     Tipo     |                                             Propósito                                             |
-|:-------------------------:|:------------:|:-------------------------------------------------------------------------------------------------:|
-|   GetBuyerAnalyticsQuery  | Domain Query |  Define la estructura de la consulta para solicitar las analíticas y métricas de los compradores. |
-| GetPlatformSummaryQuery   | Domain Query |  Define la estructura de la consulta para obtener el resumen general del estado de la plataforma. |
-| GetProviderAnalyticsQuery | Domain Query | Define la estructura de la consulta para solicitar las analíticas y métricas de los proveedores.  |
-| BuyerAnalytics            | Value Object | Modela los datos de valor inmutables que representan las analíticas consolidadas de un comprador. |
-| MonthlyAmount             | Value Object | Modela los montos monetarios agrupados por periodo mensual para reportes y estadísticas.          |
-| PlatformSummary           | Value Object | Modela los indicadores y datos globales que componen el resumen general de la plataforma.         |
-| ProviderAnalytics         | Value Object | Modela los datos de valor inmutables que representan las analíticas y métricas de un proveedor.   |
+Analytics no tiene agregados: su dominio son consultas y *value objects* inmutables.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `GetPlatformSummaryQuery`, `GetProviderAnalyticsQuery`, `GetBuyerAnalyticsQuery` | Domain Queries | Piden el resumen de la plataforma y los indicadores de un distribuidor o de una empresa compradora. |
+| `PlatformSummary`, `ProviderAnalytics`, `BuyerAnalytics` | Value Objects | Indicadores consolidados de cada actor. |
+| `MonthlyAmount` | Value Object | Monto agrupado por mes. |
 
 #### 4.2.9.2. Interface Layer.
 
-|                       Clase                       |       Tipo      |                                                       Propósito                                                      |
-|:-------------------------------------------------:|:---------------:|:--------------------------------------------------------------------------------------------------------------------:|
-|                AnalyticsController                | REST Controller |       Expone los endpoints HTTP para gestionar y recibir las solicitudes de consulta de analíticas y resúmenes.      |
-|               BuyerAnalyticsResource              |  REST Resource  |            Define la estructura de datos JSON que se expone al cliente para las analíticas de compradores.           |
-|              PlatformSummaryResource              |  REST Resource  |         Define la estructura de datos JSON que se expone al cliente para el resumen general de la plataforma.        |
-|             ProviderAnalyticsResource             |  REST Resource  |            Define la estructura de datos JSON que se expone al cliente para las analíticas de proveedores.           |
-|   BuyerAnalyticsResourceFromValueObjectAssembler  |    Assembler    |    Convierte el objeto de valor del dominio (BuyerAnalytics) al recurso de presentación (BuyerAnalyticsResource).    |
-|  PlatformSummaryResourceFromValueObjectAssembler  |    Assembler    |   Convierte el objeto de valor del dominio (PlatformSummary) al recurso de presentación (PlatformSummaryResource).   |
-| ProviderAnalyticsResourceFromValueObjectAssembler |    Assembler    | Convierte el objeto de valor del dominio (ProviderAnalytics) al recurso de presentación (ProviderAnalyticsResource). |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `AnalyticsController` | REST Controller | `/api/analytics`: `GET /platform`, `GET /providers/{providerId}` y `GET /buyers/{companyId}`. |
+| `PlatformSummaryResource`, `ProviderAnalyticsResource`, `BuyerAnalyticsResource` | REST Resources | Representaciones JSON de los indicadores. |
+| `PlatformSummaryResourceFromValueObjectAssembler`, `ProviderAnalyticsResourceFromValueObjectAssembler`, `BuyerAnalyticsResourceFromValueObjectAssembler` | Assemblers | Convierten el *value object* en recurso. |
 
 #### 4.2.9.3. Application Layer.
 
-|           Clase           |             Tipo             |                                                           Propósito                                                          |
-|:-------------------------:|:----------------------------:|:----------------------------------------------------------------------------------------------------------------------------:|
-|   AnalyticsQueryService   |         Query Service        | Define el contrato de los servicios de consulta para coordinar el procesamiento de las solicitudes de reportes y analíticas. |
-| AnalyticsQueryServiceImpl | Query Service Implementation | Implementa la lógica de negocio descrita por el contrato para procesar y resolver las consultas de analíticas en el sistema. |
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `AnalyticsQueryService` / `AnalyticsQueryServiceImpl` | Query Service | Resuelve las consultas pidiendo los datos a los servicios externos de la capa anticorrupción y calculando los indicadores. |
+| `ExternalOrderingService`, `ExternalPaymentService`, `ExternalFulfillmentService` | Anti-Corruption Layer | Traducen los *facades* de Ordering, Payment y Fulfillment al modelo de Analytics. |
 
 #### 4.2.9.4. Infrastructure Layer.
 
-La infraestructura de Reporting consume los datos persistidos de órdenes y pagos para construir las consultas analíticas y generar los reportes descritos por `AnalyticsQueryService`. El diagrama backend disponible documenta este módulo como parte de la infraestructura de Reporting.
-
-![Backend class overview - Reporting](../assets/chapter-4/class-diagrams/backend_reporting.png)
+Analytics no persiste datos. Su infraestructura es la capa anticorrupción de la sección anterior, que llama a los *facades* de los otros contextos dentro del mismo proceso.
 
 #### 4.2.9.5. Bounded Context Software Architecture Component Level Diagrams.
 
-![Backend component overview - Reporting](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+![Backend component overview - Analytics](../assets/chapter-4/c4-model/BackendComponents-dark.png)
 
-> No se conserva un diagrama de componentes exclusivo de Reporting; se enlaza la vista global disponible.
+> No existe un diagrama de componentes exclusivo de Analytics; se enlaza la vista global disponible.
 
 #### 4.2.9.6. Bounded Context Software Architecture Code Level Diagrams.
+
 ##### 4.2.9.6.1. Bounded Context Domain Layer Class Diagrams.
-![Backend class overview - Reporting](../assets/chapter-4/class-diagrams/backend_reporting.png)
+
+![Backend class overview - Analytics](../assets/chapter-4/class-diagrams/backend_reporting.png)
+
 ##### 4.2.9.6.2. Bounded Context Database Design Diagram.
-![Database Design Diagram - Reporting](../assets/chapter-4/database/baseDatos_analysis.png)
+
+Analytics no tiene tablas. La tabla `REPORT` que mostraba el diagrama `baseDatos_analysis.png` pertenece a la primera versión y no existe en el esquema actual; la imagen se retiró de esta sección.
+
+#### 4.2.9.7. Runtime Evidence.
+
+Las 3 operaciones de Analytics están en Swagger UI (sección 6.2.1.7); las pruebas de contrato y las de operaciones del distribuidor cubren la consulta de indicadores.
+
+### 4.2.10. Bounded Context: Telemetry
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Recibir las lecturas de nivel que envía el dispositivo del tanque, autenticarlas, deduplicarlas y publicar solo las válidas. Solo observa: no aplica umbrales ni crea pedidos. |
+| Actores | Dispositivo ESP32 (envía las lecturas) y distribuidor (consulta las lecturas de los tanques de sus compradores). |
+| Relación con otros contextos | Autentica al dispositivo con `DeviceAuthentication` de Equipment. Publica `ValidatedTankReadingEvent`, que consumen Replenishment (evalúa la política de reposición) y Equipment (actualiza el nivel del tanque). |
+
+#### 4.2.10.1. Domain Layer.
+
+La invariante central es la autenticidad: una lectura nace `ACCEPTED` solo si el dispositivo se autenticó contra una credencial activa y un vínculo abierto en el instante de captura; si no, queda `QUARANTINED` con el motivo y nunca se publica. Una lectura se identifica de forma única por dispositivo, canal y número de secuencia, y la ingesta valida primero la versión del esquema (hoy solo la 1).
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `TelemetryReading` | Aggregate Root | Lectura con dispositivo, canal, secuencia, nivel con su unidad, instantes de captura y recepción, tanque y organización atribuidos, calidad y motivo de cuarentena. Expone `isAccepted()`. |
+| `ReadingQuality` | Value Object | `ACCEPTED` o `QUARANTINED`. |
+| `IngestTelemetryCommand` | Domain Command | Datos de una lectura entrante junto con el token del dispositivo. |
+| `TelemetryReadingRepository` | Domain Repository | Puerto de persistencia, con la búsqueda por dispositivo, canal y secuencia. |
+| `ValidatedTankReadingEvent` | Published Event (`api.events`) | Lectura validada y atribuida a un tanque. Es el lenguaje publicado hacia otros contextos. |
+
+#### 4.2.10.2. Interface Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `TelemetryController` | REST Controller | `POST /api/telemetry/readings`: recibe la lectura. Se autentica con la cabecera `X-Device-Token` y no con JWT. La consulta de lecturas para el distribuidor es `GET /api/provider/tanks/{tankId}/readings`. |
+| `IngestReadingResource`, `ReadingAckResource` | REST Resources | Cuerpo de la lectura y acuse de recibo. |
+| `ReadingAckFromResultAssembler` | Assembler | Convierte el resultado de la ingesta en el acuse. |
+
+#### 4.2.10.3. Application Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `TelemetryIngestServiceImpl` | Command Service | Valida el esquema, autentica antes de deduplicar (para que un emisor no autenticado no pueda ocupar la secuencia de un dispositivo real), descarta repeticiones, guarda la lectura y, si es válida, publica `ValidatedTankReadingEvent`. Si dos copias compiten, la restricción única evita duplicados. |
+| `ValidatedTankReadingConsumer` | Event Consumer | Atiende la lectura validada dentro del contexto. |
+
+#### 4.2.10.4. Infrastructure Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `TelemetryReadingPersistenceEntity` | JPA Entity | Tabla `telemetry_readings`, con restricción única `(device_id, channel, sequence_number)`. |
+| `TelemetryReadingPersistenceAssembler`, `TelemetryReadingRepositoryImpl`, `TelemetryReadingPersistenceRepository` | Assembler, Adapter y Spring Data | Implementan el puerto del dominio. |
+
+#### 4.2.10.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Backend component overview - Telemetry](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> No existe un diagrama de componentes exclusivo de Telemetry; se enlaza la vista global disponible.
+
+#### 4.2.10.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.10.6.1. Bounded Context Domain Layer Class Diagram.
+
+> No existe un UML de dominio de Telemetry.
+
+##### 4.2.10.6.2. Bounded Context Database Design Diagram.
+
+| Tabla | Contenido principal |
+|---|---|
+| `telemetry_readings` | `id`, `device_id`, `channel`, `sequence_number`, `schema_version`, `level_amount`/`level_unit`, `captured_at`, `received_at`, `tank_id`, `organization_id`, `quality`, `quarantine_reason`. |
+
+#### 4.2.10.7. Runtime Evidence.
+
+Las 2 operaciones de Telemetry están en Swagger UI (sección 6.2.1.7). Las 6 pruebas del contexto verifican la ingesta, los duplicados, la cuarentena y la aplicación de la lectura al tanque.
+
+### 4.2.11. Bounded Context: Replenishment
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Decidir cuándo un tanque necesita reposición y gestionar el ciclo de la solicitud de abastecimiento hasta que el distribuidor la acepta, la rechaza o se cancela. |
+| Actores | Distribuidor (configura la política, revisa su bandeja y decide) y comprador asociado (crea solicitudes manuales y las cancela). |
+| Relación con otros contextos | Consume `ValidatedTankReadingEvent` de Telemetry. Lee los tanques de Equipment (`TankAssets`, `CustomerDirectory`) y es leído por Equipment mediante `TankRefillConfiguration`, `TankRefillLookup` y `ReplenishmentLookup`. Consulta el precio en Supply (`SupplyCatalog`). Expone `ReplenishmentAcceptance` y `ReplenishmentLookup` a Application Flows, que orquesta la aceptación. Publica `replenishment.*.v1` para Notification. |
+
+#### 4.2.11.1. Domain Layer.
+
+`RefillPolicyEvaluator` es un servicio de dominio puro: dado el nivel, los umbrales, el episodio abierto y si ya hay una solicitud activa, decide sin tocar infraestructura. Aplica dos reglas: el nivel bajo es el 20 % de la capacidad (configurable por tanque) y el episodio solo se rearma cuando el nivel sube 10 puntos por encima (histéresis), de modo que el ruido cerca del umbral no genere solicitudes duplicadas. Un episodio abierto, o una solicitud pendiente, impide abrir otro. La clave del episodio se deriva de la lectura que lo disparó, así una lectura reenviada no abre un segundo episodio.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `RefillPolicy` | Aggregate Root | Política de un tanque: umbral bajo, histéresis, nivel objetivo, producto, distribuidor y generación automática. Expone `reconfigure()`, `thresholds()` y `canGenerateRequests()`. |
+| `RefillEpisode` | Aggregate Root | Episodio de nivel bajo, `OPEN` hasta que el nivel se recupera y pasa a `REARMED`. Expone `markRequestEmitted()` y `rearm()`. |
+| `ReplenishmentRequest` | Aggregate Root | Solicitud de abastecimiento con tanque, producto, volumen, precio, origen (`MANUAL` o `AUTOMATIC`), dirección y fecha de entrega. Expone `accept()`, `reject(reason)`, `cancel()`, `attachOrder()` y `consumeAcceptance()` (la aceptación se consume una sola vez). |
+| `RefillThresholds`, `RefillDecision`, `RefillDecisionType`, `RefillEpisodeStatus`, `ReplenishmentSource`, `ReplenishmentStatus` | Value Objects | Umbrales, decisión explicable de cada evaluación (`OPEN_EPISODE`, `REARM_EPISODE`, `NO_ACTION` y la supresión por solicitud activa) y estados (`PENDING`, `ACCEPTED`, `REJECTED`, `CANCELLED`). |
+| `RefillPolicyEvaluator` | Domain Service | Evaluación determinista de la política con un instante inyectado. |
+| `ConfigureRefillPolicyCommand`, `EvaluateRefillPolicyCommand`, `CreateReplenishmentRequestCommand`, `AcceptReplenishmentRequestCommand`, `RejectReplenishmentRequestCommand`, `CancelReplenishmentRequestCommand`, `ConsumeReplenishmentAcceptanceCommand`, `AttachReplenishmentOrderCommand` | Domain Commands | Intenciones sobre la política y la solicitud. |
+| `GetRefillPolicyByTankQuery`, `GetRefillEpisodesByTankQuery`, `GetReplenishmentRequestByIdQuery`, `GetReplenishmentRequestsByOrganizationQuery` | Domain Queries | Consultas de política, episodios y solicitudes. |
+| `RefillPolicyRepository`, `RefillEpisodeRepository`, `ReplenishmentRequestRepository` | Domain Repositories | Puertos de persistencia. |
+
+#### 4.2.11.2. Interface Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `RefillPoliciesController` | REST Controller | `PUT` y `GET /api/tanks/{tankId}/refill-policy` y `GET /api/tanks/{tankId}/refill-episodes`; el distribuidor consulta los episodios en `/api/provider/tanks/{tankId}/refill-episodes`. |
+| `ReplenishmentRequestsController` | REST Controller | `/api/replenishment-requests`: crear, listar, bandeja del distribuidor (`/inbox`), consultar, `reject` y `cancel`. La aceptación (`accept`) está en Application Flows. |
+| `ConfigureRefillPolicyResource`, `RefillPolicyResource`, `RefillEpisodeResource`, `CreateReplenishmentRequestResource`, `RejectReplenishmentRequestResource`, `ReplenishmentRequestResource` | REST Resources | Entradas y salidas de la API. |
+| `RefillPolicyResourceFromDomainAssembler`, `RefillEpisodeResourceFromDomainAssembler`, `ReplenishmentRequestResourceFromDomainAssembler` | Assemblers | Convierten agregados en recursos. |
+
+#### 4.2.11.3. Application Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `RefillPolicyCommandService` / `RefillPolicyCommandServiceImpl` | Command Service | Configura la política de un tanque y evalúa una lectura: abre o rearma el episodio y, si la generación automática está activa, crea la solicitud `AUTOMATIC`. |
+| `RefillPolicyEvaluationConsumer` | Event Consumer | Atiende `ValidatedTankReadingEvent` de forma idempotente y dispara la evaluación. |
+| `ReplenishmentCommandService` / `ReplenishmentCommandServiceImpl` | Command Service | Crea, rechaza, cancela y vincula la orden a una solicitud. |
+| `RefillPolicyQueryService`, `ReplenishmentQueryService` (+ `Impl`) | Query Services | Consultas de política, episodios y solicitudes. |
+
+#### 4.2.11.4. Infrastructure Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `RefillPolicyPersistenceEntity`, `RefillEpisodePersistenceEntity`, `ReplenishmentRequestPersistenceEntity` | JPA Entities | Tablas `refill_policies`, `refill_episodes` y `replenishment_requests`. |
+| `*PersistenceAssembler`, `*RepositoryImpl`, `*PersistenceRepository` | Assemblers, Adapters y Spring Data | Implementan los puertos del dominio. |
+| `ReplenishmentAcceptanceImpl`, `ReplenishmentLookupImpl` | Public API Implementations | Exponen la aceptación y la consulta a Application Flows y Equipment. |
+
+#### 4.2.11.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Backend component overview - Replenishment](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> No existe un diagrama de componentes exclusivo de Replenishment; se enlaza la vista global disponible.
+
+#### 4.2.11.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.11.6.1. Bounded Context Domain Layer Class Diagram.
+
+> No existe un UML de dominio de Replenishment.
+
+##### 4.2.11.6.2. Bounded Context Database Design Diagram.
+
+| Tabla | Contenido principal |
+|---|---|
+| `refill_policies` | `tank_id` (único), `organization_id`, `provider_id`, `fuel_product_id`, `low_level_percent`, `hysteresis_percent`, `target_level_percent`, `auto_generate_enabled`, `policy_version`. |
+| `refill_episodes` | `episode_key` (único), `tank_id`, `status`, `open_slot` (único, impide dos episodios abiertos), `opened_level`, `opened_level_percent`, `requested_volume`, `target_level`, `request_id`, `request_emitted`, `opened_at`, `closed_at`. |
+| `replenishment_requests` | `episode_key` (único), `organization_id`, `provider_id`, `tank_id`, `fuel_product_id`, `quantity`, `unit_price`, `source`, `status`, `rejection_reason`, `acceptance_consumed`, `order_id`, `delivery_address`, `delivery_date`. |
+
+#### 4.2.11.7. Runtime Evidence.
+
+Las 10 operaciones de Replenishment están en Swagger UI (sección 6.2.1.7). Sus 40 pruebas verifican la evaluación del umbral y la histéresis, la generación automática sin duplicados, la aceptación que crea la orden, la bandeja del distribuidor y la fecha de entrega en hora de Lima.
+
+### 4.2.12. Bounded Context: Fleet
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Registrar conductores y cisternas, calcular su elegibilidad y reservarlos por ventana de tiempo sin traslapes y con capacidad suficiente. |
+| Actores | Distribuidor, dueño de su flota. |
+| Relación con otros contextos | Application Flows reserva recursos mediante `FleetReservations`. Fulfillment lee los recursos con `FleetCatalog`. Resuelve el tenant con IAM. |
+
+#### 4.2.12.1. Domain Layer.
+
+Un conductor o una cisterna solo es elegible si está disponible y activo. La reserva usa ventanas semiabiertas `[inicio, fin)`: dos reservas se traslapan solo si cada una empieza antes de que termine la otra, así que las reservas contiguas son válidas. El volumen reservado debe ser positivo y solo una reserva activa puede liberarse.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `Driver` | Aggregate Root | Conductor del distribuidor. Expone `update()`, `deactivate()` y `activate()`. |
+| `Tanker` | Aggregate Root | Cisterna con placa, capacidad y estado; la capacidad debe ser positiva. Expone `update()`, `deactivate()` y `activate()`. |
+| `FleetReservation` | Aggregate Root | Reserva de conductor y cisterna para una ventana y un volumen. Expone `overlaps()`, `isActive()`, `release()` y `expireIfPast()`. |
+| `DriverStatus`, `TankerStatus`, `FleetReservationStatus`, `ReservationWindow` | Value Objects | Estados del conductor (`AVAILABLE`, `ASSIGNED`, `SUSPENDED`, `INACTIVE`), de la cisterna (`AVAILABLE`, `IN_ROUTE`, `MAINTENANCE`, `SUSPENDED`, `INACTIVE`), de la reserva (`ACTIVE`, `RELEASED`, `EXPIRED`) y la ventana de tiempo. |
+| `RegisterDriverCommand`, `UpdateDriverCommand`, `RegisterTankerCommand`, `UpdateTankerCommand`, `ReserveFleetCommand` | Domain Commands | Altas, ediciones y reserva. |
+| `DriverRepository`, `TankerRepository`, `FleetReservationRepository` | Domain Repositories | Puertos de persistencia. |
+
+#### 4.2.12.2. Interface Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `DriversController` | REST Controller | `/api/drivers`: registrar, listar, consultar, actualizar, `activate`, `deactivate`, `eligible` y `{driverId}/eligibility`. |
+| `TankersController` | REST Controller | `/api/tankers`: las mismas operaciones para cisternas. |
+| `DriverInputResource`, `DriverResource`, `TankerInputResource`, `TankerResource`, `EligibilityResource` | REST Resources | Entradas y salidas. |
+
+#### 4.2.12.3. Application Layer.
+
+Fleet implementa sus servicios directamente en la capa de infraestructura (`FleetRegistryImpl`, `FleetReservationServiceImpl`, `EligibilityQueryImpl`, `FleetCatalogImpl`), detrás de las interfaces del paquete `api`; no tiene una capa `application` propia.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `FleetRegistry` | Public API | Registro y edición de conductores y cisternas. |
+| `FleetReservations` | Public API | Reserva y liberación con bloqueo de filas, capacidad suficiente y sin traslape de ventana. |
+| `EligibilityQuery`, `FleetCatalog` | Public API | Elegibilidad y consulta de recursos y ventana reservada. |
+| `ResourceEnabledEvent`, `ResourceDisabledEvent` | Published Events | Hechos de activación y desactivación de un recurso. |
+
+#### 4.2.12.4. Infrastructure Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `DriverPersistenceEntity`, `TankerPersistenceEntity`, `FleetReservationPersistenceEntity` | JPA Entities | Tablas `drivers`, `vehicles` (la cisterna) y `fleet_reservations`. |
+| `*PersistenceAssembler`, `*RepositoryImpl`, `*PersistenceRepository` | Assemblers, Adapters y Spring Data | Implementan los puertos del dominio. |
+| `FleetRegistryImpl`, `FleetReservationServiceImpl`, `EligibilityQueryImpl`, `FleetCatalogImpl` | Public API Implementations | Implementan las interfaces `api`. |
+
+#### 4.2.12.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Backend component overview - Fleet](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> No existe un diagrama de componentes exclusivo de Fleet; se enlaza la vista global disponible.
+
+#### 4.2.12.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.12.6.1. Bounded Context Domain Layer Class Diagram.
+
+> No existe un UML de dominio de Fleet.
+
+##### 4.2.12.6.2. Bounded Context Database Design Diagram.
+
+| Tabla | Contenido principal |
+|---|---|
+| `drivers` | `id`, `provider_id`, `user_id`, nombre, licencia (única), contacto, `status`, `active`, `deactivated_at`. |
+| `vehicles` | Cisternas: `id`, `provider_id`, placa (única), marca, modelo, `capacity`, `unit`, `status`, `active`, `deactivated_at`. |
+| `fleet_reservations` | `id`, `provider_id`, `driver_id`, `tanker_id`, `reference` (única), `window_start`, `window_end`, `volume`, `unit`, `status`, `version`; índice por recurso y ventana. |
+
+#### 4.2.12.7. Runtime Evidence.
+
+Las 16 operaciones de Fleet están en Swagger UI (sección 6.2.1.7). Sus 41 pruebas verifican la elegibilidad, el registro y la edición, las ventanas de reserva, los traslapes y las reservas concurrentes.
+
+### 4.2.13. Bounded Context: Supply
+
+| Elemento | Descripción |
+|---|---|
+| Propósito | Exponer el catálogo de productos por distribuidor y reservar el stock de una asignación para no sobrevender. |
+| Actores | No tiene API REST: lo usan otros contextos. |
+| Relación con otros contextos | Traduce el catálogo de Inventory con una capa anticorrupción (`InventorySupplyCatalog`). Replenishment y Application Flows lo usan mediante `SupplyCatalog` y `SupplyReservations`. |
+
+#### 4.2.13.1. Domain Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `SupplyReservation` | Aggregate Root | Reserva de stock de un producto con cantidad, precio unitario y referencia. Expone `release()` y `reconcile()`. |
+| `ReservationStatus` | Value Object | Estado de la reserva. |
+| `ReserveSupplyCommand` | Domain Command | Intención de reservar stock. |
+| `SupplyReservationRepository` | Domain Repository | Puerto de persistencia. |
+
+#### 4.2.13.2. Interface Layer.
+
+Supply no expone endpoints; su interfaz son `SupplyCatalog` y `SupplyReservations` del paquete `api`.
+
+#### 4.2.13.3. Application Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `SupplyReservationServiceImpl` | Command Service | Reserva stock bajo un bloqueo por distribuidor y producto, de modo que dos asignaciones simultáneas no comprometan el mismo stock. |
+
+#### 4.2.13.4. Infrastructure Layer.
+
+| Clase | Tipo | Propósito |
+|---|---|---|
+| `SupplyReservationPersistenceEntity`, `SupplyStockLockPersistenceEntity` | JPA Entities | Tablas `supply_reservations` y `supply_stock_locks`. |
+| `SupplyReservationRepositoryImpl`, `SupplyReservationPersistenceRepository`, `SupplyStockLockPersistenceRepository`, `SupplyStockLockInitializer` | Adapters, Spring Data e inicializador | Implementan el puerto y crean los bloqueos. |
+| `InventorySupplyCatalog` | Anti-Corruption Layer | Traduce `fuel_products` al modelo de Supply. |
+| `SupplyReservationsImpl` | Public API Implementation | Implementa `SupplyReservations`. |
+
+#### 4.2.13.5. Bounded Context Software Architecture Component Level Diagrams.
+
+![Backend component overview - Supply](../assets/chapter-4/c4-model/BackendComponents-dark.png)
+
+> No existe un diagrama de componentes exclusivo de Supply; se enlaza la vista global disponible.
+
+#### 4.2.13.6. Bounded Context Software Architecture Code Level Diagrams.
+
+##### 4.2.13.6.1. Bounded Context Domain Layer Class Diagram.
+
+> No existe un UML de dominio de Supply.
+
+##### 4.2.13.6.2. Bounded Context Database Design Diagram.
+
+| Tabla | Contenido principal |
+|---|---|
+| `supply_reservations` | `id`, `provider_id`, `fuel_product_id`, `quantity`, `unit`, `unit_price`, `reference`, `status`. |
+| `supply_stock_locks` | `id`, `provider_id`, `fuel_product_id`; único `(provider_id, fuel_product_id)`. |
+
+#### 4.2.13.7. Runtime Evidence.
+
+Supply no tiene operaciones en Swagger UI. Sus 3 pruebas verifican el catálogo por distribuidor y la reserva de stock; las de Application Flows verifican que la reserva se deshaga si falla la asignación.

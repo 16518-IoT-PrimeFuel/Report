@@ -1,6 +1,6 @@
 # Capítulo V: Solution UI/UX Design
 
-Este capítulo define la experiencia de usuario y la interfaz de FullTank para su segmento objetivo, el **Distribuidor Logístico de Combustible**, y para el comprador asociado como usuario secundario de consulta. Cubre la guía de estilo, la arquitectura de información, la landing page, la aplicación web (Angular), la aplicación móvil del distribuidor (Flutter) y el diseño del dispositivo IoT que mide el nivel del tanque.
+Este capítulo define la experiencia de usuario y la interfaz de FullTank para su segmento objetivo, el **Distribuidor Logístico de Combustible**, y para el comprador asociado como usuario secundario de consulta. Cubre la guía de estilo, la arquitectura de información, la landing page, la aplicación web, la aplicación móvil Flutter para el personal del distribuidor y el diseño del dispositivo IoT que mide el nivel del tanque. El conductor registra las entregas desde el móvil; el operador gestiona solicitudes y recursos. La aplicación móvil está fuera del Sprint 1 y su integración con la API sigue en desarrollo.
 
 Las decisiones de este capítulo se apoyan en la persona principal (Marco, jefe de operaciones del distribuidor), en su journey y empathy map (sección 2.3) y en las historias de usuario priorizadas del Product Backlog (sección 3.3).
 
@@ -61,7 +61,7 @@ Poppins acompaña la forma geométrica del logotipo y se usa solo en títulos; I
 - **Navegación:** barra inferior con cinco destinos (ver 5.2.5).
 - **Tamaño táctil:** mínimo 48 × 48 dp para cualquier elemento interactivo.
 - **Contenido:** las solicitudes y entregas se muestran como tarjetas con cliente, volumen, fecha y estado; la acción principal de cada pantalla va en un botón de ancho completo en la parte inferior, al alcance del pulgar.
-- **Avance de la entrega:** los pasos Iniciar ruta, Llegué y Completar se muestran como una secuencia vertical; solo el siguiente paso válido está habilitado, igual que la máquina de estados del backend.
+- **Avance de la entrega:** el conductor registra Iniciar ruta, Llegué y Completar en una secuencia vertical; solo el siguiente paso válido está habilitado, según la máquina de estados del backend.
 - **Conectividad:** si no hay red, la acción queda deshabilitada con el aviso "Sin conexión" y no se muestra un estado que la API no confirmó.
 
 **IoT (Tank Monitoring Device).**
@@ -181,7 +181,7 @@ La campana de notificaciones está en la barra superior. Las pantallas de detall
 
 **Aplicación web del comprador asociado:** Mis pedidos, Pagos y Notificaciones.
 
-**Aplicación móvil del distribuidor (barra inferior):** Solicitudes, Entregas, Tanques, Flota y Perfil; las notificaciones se abren desde el ícono de la barra superior.
+**Aplicación móvil del personal del distribuidor (barra inferior):** operadores gestionan Solicitudes, Tanques y Flota; los conductores consultan Entregas y registran su avance. El Perfil y las notificaciones están disponibles para ambos.
 
 ## 5.3. Landing Page UI Design
 
@@ -272,7 +272,7 @@ Los wireflows unen los wireframes con las transiciones de cada objetivo del usua
 
 1. **Decidir una solicitud automática:** Notificación → Solicitudes → Detalle de solicitud → Aceptar → Orden creada → Asignar recursos.
 2. **Asignar conductor y cisterna:** Asignar recursos → elegir conductor → elegir cisterna → ventana y fecha → Confirmar → Entrega asignada.
-3. **Registrar el avance de la entrega (móvil):** Entregas de hoy → Detalle → Iniciar ruta → Llegué → Completar (volumen) → Entrega completada.
+3. **Registrar el avance de la entrega (conductor, móvil):** Entregas de hoy → Detalle → Iniciar ruta → Llegué → Completar (volumen) → Entrega completada.
 4. **Consultar el pedido y pagar (comprador):** Mis pedidos → Detalle de la orden → Registrar pago → Pago pendiente de confirmación.
 
 <div align="center">
@@ -323,50 +323,21 @@ Los mock-ups aplican la guía de estilo sobre los wireframes. Las decisiones vis
 
 Los diagramas de flujo de usuario describen las decisiones y los resultados posibles de cada tarea, incluidos los errores que devuelve la API.
 
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/user-flows/01-review-request.png" alt="User flow: decidir una solicitud" width="600"/>
-  <p><em>Figura 5.9: Revisar y decidir una solicitud automática.</em></p>
-</div>
-
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/user-flows/02-assign-resources.png" alt="User flow: asignar recursos" width="600"/>
-  <p><em>Figura 5.10: Asignar conductor y cisterna.</em></p>
-</div>
-
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/user-flows/03-delivery-progress.png" alt="User flow: avance de la entrega" width="600"/>
-  <p><em>Figura 5.11: Registrar el avance de la entrega desde la app móvil.</em></p>
-</div>
-
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/user-flows/04-buyer-order-payment.png" alt="User flow: pedido y pago del comprador" width="500"/>
-  <p><em>Figura 5.12: Consultar el pedido y registrar el pago (comprador asociado).</em></p>
-</div>
-
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/user-flows/05-onboard-customer-tank.png" alt="User flow: registrar cliente y tanque" width="500"/>
-  <p><em>Figura 5.13: Registrar cliente, tanque y política de reposición.</em></p>
-</div>
 
 ## 5.5. Applications Prototyping
 
 El prototipo navegable se construyó en Figma a partir de los mock-ups y cubre los cuatro wireflows de 5.4.2: decidir una solicitud, asignar recursos, registrar el avance de la entrega en móvil y consultar el pedido y pagar como comprador.
 
-- **Prototipo en Figma:** **[pendiente: enlace del prototipo]**
-- **Video de recorrido:** **[pendiente: enlace del video]**
 
-<div align="center">
-  <img src="../assets/chapter-5/apps/prototype.png" alt="Prototipo navegable" width="800"/>
-  <p><em>Figura 5.14: Vista general del prototipo navegable.</em></p>
-</div>
 
 ## 5.6. IoT Device Design
 
 El **Tank Monitoring Device** se instala en la parte superior del tanque del comprador asociado y mide la distancia hasta la superficie del combustible. Con esa distancia y la geometría del tanque calcula el volumen y lo envía a FullTank. El diseño sigue las cuatro capas de una solución IoT: física, de intercambio de datos, de integración de información y de servicio de aplicación.
 
+
 <div align="center">
-  <img src="../assets/chapter-5/diagrams/iot/device-architecture.png" alt="Arquitectura del dispositivo por capas IoT" width="900"/>
-  <p><em>Figura 5.15: Arquitectura del Tank Monitoring Device por capas IoT.</em></p>
+  <img src="../assets/chapter-5/iot/cirkit-circuit.png" alt="Circuito del dispositivo en Cirkit Designer" width="700"/>
+  <p><em>Circuito del Tank Monitoring Device en Cirkit Designer.</em></p>
 </div>
 
 **Requisitos.**
@@ -383,11 +354,13 @@ El **Tank Monitoring Device** se instala en la parte superior del tanque del com
 | ESP32 DevKit V1 | Microcontrolador con Wi-Fi que ejecuta el firmware. | Entradas a 3,3 V. |
 | JSN-SR04T | Sensor ultrasónico impermeable, rango aproximado de 25 a 450 cm. | En Cirkit Designer se reemplaza por el HC-SR04, que usa el mismo protocolo TRIG/ECHO. |
 | Resistencias 1 kΩ y 2 kΩ | Divisor de tensión para bajar la señal ECHO de 5 V a 3,3 V. | Protege el GPIO del ESP32. |
-| LED verde, ámbar y rojo + resistencias de 220 Ω | Indicador local del nivel y de errores de conexión. | Ver 5.1.2. |
-| Fuente de 5 V | Alimenta el ESP32 (pin VIN) y el sensor. | — |
+| LED verde, ámbar y rojo + resistencias de 220 Ω | Indicador local del nivel y de errores de conexión. | Ver 5.1.2. En Cirkit Designer se simulan con resistencias de 47 Ω para que el LED sea visible; en el montaje físico se usan 220 Ω. |
+| Pantalla LCD 16x2 con módulo I2C | Muestra el porcentaje y el volumen del tanque. | Dirección I2C 0x27. |
+| Pulsadores (2) | Simulan el aumento y la disminución de la distancia medida. | Solo para la simulación en Cirkit Designer; no se montan en el dispositivo final. |
+| Fuente de 5 V | Alimenta el ESP32 (pin VIN), el sensor y la pantalla LCD. | — |
 | Protoboard y cables | Montaje del prototipo. | — |
 
-**Conexiones.** Los pines son la propuesta de diseño; si el circuito de Cirkit Designer usa otros GPIO, esta tabla debe reflejarlos.
+**Conexiones.** Los pines son la propuesta de diseño y coinciden con el circuito de Cirkit Designer; si se cambia algún GPIO, esta tabla debe reflejarlo.
 
 | Desde | Hacia | Nota |
 |---|---|---|
@@ -395,12 +368,14 @@ El **Tank Monitoring Device** se instala en la parte superior del tanque del com
 | JSN-SR04T GND | GND | Tierra común. |
 | JSN-SR04T TRIG | GPIO 5 | Pulso de disparo de 10 µs. |
 | JSN-SR04T ECHO | Divisor 1 kΩ / 2 kΩ → GPIO 18 | Señal de eco reducida a 3,3 V. |
-| LED verde / ámbar / rojo | GPIO 25 / 26 / 27 (con 220 Ω) | Indicador de nivel y de error. |
+| LED verde / ámbar / rojo | GPIO 25 / 26 / 27 (con 220 Ω) | Indicador de nivel y de error. En la simulación se usan 47 Ω. |
+| LCD I2C VCC | 5 V (VIN) | Alimentación de la pantalla. |
+| LCD I2C GND | GND | Tierra común. |
+| LCD I2C SDA | GPIO 21 | Bus I2C por defecto del ESP32. |
+| LCD I2C SCL | GPIO 22 | Bus I2C por defecto del ESP32. |
+| Pulsador SUBIR | GPIO 32 (con INPUT_PULLUP) y GND | Solo simulación: aumenta la distancia. |
+| Pulsador BAJAR | GPIO 33 (con INPUT_PULLUP) y GND | Solo simulación: disminuye la distancia. |
 
-<div align="center">
-  <img src="../assets/chapter-5/iot/cirkit-circuit.png" alt="Circuito del dispositivo en Cirkit Designer" width="700"/>
-  <p><em>Figura 5.16: Circuito del Tank Monitoring Device en Cirkit Designer.</em></p>
-</div>
 
 **Procesamiento en el dispositivo.**
 
@@ -429,8 +404,3 @@ La API responde 202 cuando la lectura se aceptó, cuando es un duplicado y cuand
 - **Nivel en volumen.** La API recibe el nivel como volumen (`level` y `unit`), no como distancia; la conversión se hace en el dispositivo.
 
 **Seguridad.** El token del dispositivo lo emite la plataforma al registrar el dispositivo y en el servidor solo se guarda su hash. En el dispositivo se guarda en NVS y no en el código fuente del repositorio. Si el dispositivo se retira o se pierde, el distribuidor revoca la credencial y las lecturas siguientes quedan en cuarentena.
-
-<div align="center">
-  <img src="../assets/chapter-5/diagrams/iot/firmware-cycle.png" alt="Ciclo del firmware" width="600"/>
-  <p><em>Figura 5.17: Ciclo del firmware del Tank Monitoring Device.</em></p>
-</div>

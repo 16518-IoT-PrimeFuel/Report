@@ -78,7 +78,7 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
   </tr>
   <tr>
     <td><strong>Canales de distribución</strong></td>
-    <td>Web app responsive, potencial app móvil futura.</td>
+    <td>Aplicación web responsive y aplicación móvil Flutter en desarrollo para el personal del distribuidor.</td>
     <td>Web app, marketing digital y comunidad de flotas.</td>
     <td>Plataforma web + hardware instalado en sitio.</td>
     <td>Red de partners global, distribuidores locales e integradores de sistemas GPS.</td>
@@ -572,7 +572,7 @@ El objetivo principal fue plasmar sobre el lienzo la realidad del negocio, desde
 
 <div align="center">
   <img src="../assets/chapter-2/mapping/step1.png" alt="Step 1 - Unstructured Exploration" width="100%"/>
-  <p><em>Figura X: Step 1 - Exploración libre de eventos de dominio.</em></p>
+  <p><em>Step 1 - Exploración libre de eventos de dominio.</em></p>
 </div>
 
 ### Step 2 – Structured Organization (Líneas de Tiempo)
@@ -588,7 +588,7 @@ Esta estructura temporal nos ayudó a identificar claramente las áreas crítica
 
 <div align="center">
   <img src="../assets/chapter-2/mapping/step2.png" alt="Step 2 - Structured Organization" width="100%"/>
-  <p><em>Figura Y: Step 2 - Organización temporal por flujos de negocio.</em></p>
+  <p><em>Step 2 - Organización temporal por flujos de negocio.</em></p>
 </div>
 
 

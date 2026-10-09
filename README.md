@@ -84,7 +84,7 @@
   <tbody>
     <tr>
       <td>TB1</td>
-      <td>6/10/26</td>
+      <td>9/10/26</td>
       <td>
         FullTank Team
       </td>
@@ -97,19 +97,15 @@
 
 **Link del repositorio del informe:** [Report](https://github.com/16518-IoT-PrimeFuel/Report)
 
-**Link del repositorio de la Landing Page:** [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page)
+**Link del repositorio de la Landing Page:** [Landing Page](https://github.com/16518-IoT-PrimeFuel/landing-page)
 
-**Link del repositorio del frontend:** [frontend](https://github.com/16518-IoT-PrimeFuel/frontend)
+**Link del repositorio del frontend:** [Frontend](https://github.com/16518-IoT-PrimeFuel/frontend)
 
-**Link del repositorio del backend:** [backend](https://github.com/16518-IoT-PrimeFuel/backend)
+**Link del repositorio del backend:** [Backend](https://github.com/16518-IoT-PrimeFuel/backend)
 
 **Link de los repositorios de la organización:** [16518-IoT-PrimeFuel](https://github.com/16518-IoT-PrimeFuel)
 
-Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report), [Mobile-app](https://github.com/16518-IoT-PrimeFuel/Mobile-app), [frontend](https://github.com/16518-IoT-PrimeFuel/frontend), [backend](https://github.com/16518-IoT-PrimeFuel/backend) y [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page).
-
-**Link del Figma:** Pendiente de publicación.
-
-**Link de Swagger desplegado con Render:** Pendiente de una URL pública verificada.
+**Link de Swagger desplegado con Render:** [BackendAPI-Swagger](https://fulltank-backend.onrender.com/swagger-ui/index.html)
 
 **Link de frontend desplegado con Vercel:** [FullTank Frontend](https://primefuel-frontend-three.vercel.app/home)
 
@@ -189,7 +185,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
     - [4.2.4. Cross-Cutting Software Architecture Views](docs/chapter4.md#424-cross-cutting-software-architecture-views)
       - [Code Level Diagrams](docs/chapter4.md#4241-software-architecture-code-level-diagrams)
       - [Database Design Diagram](docs/chapter4.md#4242-software-architecture-database-design-diagram)
-    - [4.2.5. Bounded Context: Catalog](docs/chapter4.md#425-bounded-context-catalog)
+    - [4.2.5. Bounded Context: Equipment](docs/chapter4.md#425-bounded-context-equipment)
       - [Domain Layer](docs/chapter4.md#4251-domain-layer)
       - [Interface Layer](docs/chapter4.md#4252-interface-layer)
       - [Application Layer](docs/chapter4.md#4253-application-layer)
@@ -198,6 +194,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
       - [Code Level Diagrams](docs/chapter4.md#4256-bounded-context-software-architecture-code-level-diagrams)
         - [Domain Layer Class Diagram](docs/chapter4.md#42561-bounded-context-domain-layer-class-diagram)
         - [Database Design Diagram](docs/chapter4.md#42562-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#4257-runtime-evidence)
     - [4.2.6. Bounded Context: Fulfillment](docs/chapter4.md#426-bounded-context-fulfillment)
       - [Domain Layer](docs/chapter4.md#4261-domain-layer)
       - [Interface Layer](docs/chapter4.md#4262-interface-layer)
@@ -207,6 +204,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
       - [Code Level Diagrams](docs/chapter4.md#4266-bounded-context-software-architecture-code-level-diagrams)
         - [Domain Layer Class Diagram](docs/chapter4.md#42661-bounded-context-domain-layer-class-diagram)
         - [Database Design Diagram](docs/chapter4.md#42662-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#4267-runtime-evidence)
     - [4.2.7. Bounded Context: Ordering](docs/chapter4.md#427-bounded-context-ordering)
       - [Domain Layer](docs/chapter4.md#4271-domain-layer)
       - [Interface Layer](docs/chapter4.md#4272-interface-layer)
@@ -225,7 +223,7 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
       - [Code Level Diagrams](docs/chapter4.md#4286-bounded-context-software-architecture-code-level-diagrams)
         - [Domain Layer Class Diagram](docs/chapter4.md#42861-bounded-context-domain-layer-class-diagrams)
         - [Database Design Diagram](docs/chapter4.md#42862-bounded-context-database-design-diagram)
-    - [4.2.9. Bounded Context: Reporting](docs/chapter4.md#429-bounded-context-reporting)
+    - [4.2.9. Bounded Context: Analytics](docs/chapter4.md#429-bounded-context-analytics)
       - [Domain Layer](docs/chapter4.md#4291-domain-layer)
       - [Interface Layer](docs/chapter4.md#4292-interface-layer)
       - [Application Layer](docs/chapter4.md#4293-application-layer)
@@ -234,6 +232,46 @@ Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report
       - [Code Level Diagrams](docs/chapter4.md#4296-bounded-context-software-architecture-code-level-diagrams)
         - [Domain Layer Class Diagram](docs/chapter4.md#42961-bounded-context-domain-layer-class-diagrams)
         - [Database Design Diagram](docs/chapter4.md#42962-bounded-context-database-design-diagram)
+    - [4.2.10. Bounded Context: Telemetry](docs/chapter4.md#4210-bounded-context-telemetry)
+      - [Domain Layer](docs/chapter4.md#42101-domain-layer)
+      - [Interface Layer](docs/chapter4.md#42102-interface-layer)
+      - [Application Layer](docs/chapter4.md#42103-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#42104-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#42105-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#42106-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#421061-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#421062-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#42107-runtime-evidence)
+    - [4.2.11. Bounded Context: Replenishment](docs/chapter4.md#4211-bounded-context-replenishment)
+      - [Domain Layer](docs/chapter4.md#42111-domain-layer)
+      - [Interface Layer](docs/chapter4.md#42112-interface-layer)
+      - [Application Layer](docs/chapter4.md#42113-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#42114-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#42115-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#42116-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#421161-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#421162-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#42117-runtime-evidence)
+    - [4.2.12. Bounded Context: Fleet](docs/chapter4.md#4212-bounded-context-fleet)
+      - [Domain Layer](docs/chapter4.md#42121-domain-layer)
+      - [Interface Layer](docs/chapter4.md#42122-interface-layer)
+      - [Application Layer](docs/chapter4.md#42123-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#42124-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#42125-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#42126-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#421261-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#421262-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#42127-runtime-evidence)
+    - [4.2.13. Bounded Context: Supply](docs/chapter4.md#4213-bounded-context-supply)
+      - [Domain Layer](docs/chapter4.md#42131-domain-layer)
+      - [Interface Layer](docs/chapter4.md#42132-interface-layer)
+      - [Application Layer](docs/chapter4.md#42133-application-layer)
+      - [Infrastructure Layer](docs/chapter4.md#42134-infrastructure-layer)
+      - [Component Diagrams](docs/chapter4.md#42135-bounded-context-software-architecture-component-level-diagrams)
+      - [Code Level Diagrams](docs/chapter4.md#42136-bounded-context-software-architecture-code-level-diagrams)
+        - [Domain Layer Class Diagram](docs/chapter4.md#421361-bounded-context-domain-layer-class-diagram)
+        - [Database Design Diagram](docs/chapter4.md#421362-bounded-context-database-design-diagram)
+      - [Runtime Evidence](docs/chapter4.md#42137-runtime-evidence)
 - [Capítulo V: Solution UI/UX Design](docs/chapter5.md)
   - [5.1. Style Guidelines](docs/chapter5.md#51-style-guidelines)
     - [5.1.1. General Style Guidelines](docs/chapter5.md#511-general-style-guidelines)
