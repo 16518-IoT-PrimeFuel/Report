@@ -78,7 +78,7 @@ En el mercado existen diversas soluciones digitales enfocadas en la gestión de 
   </tr>
   <tr>
     <td><strong>Canales de distribución</strong></td>
-    <td>Web app responsive, potencial app móvil futura.</td>
+    <td>Aplicación web responsive y aplicación móvil Flutter en desarrollo para el personal del distribuidor.</td>
     <td>Web app, marketing digital y comunidad de flotas.</td>
     <td>Plataforma web + hardware instalado en sitio.</td>
     <td>Red de partners global, distribuidores locales e integradores de sistemas GPS.</td>
