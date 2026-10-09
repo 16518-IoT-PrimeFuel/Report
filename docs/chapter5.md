@@ -383,11 +383,13 @@ El **Tank Monitoring Device** se instala en la parte superior del tanque del com
 | ESP32 DevKit V1 | Microcontrolador con Wi-Fi que ejecuta el firmware. | Entradas a 3,3 V. |
 | JSN-SR04T | Sensor ultrasónico impermeable, rango aproximado de 25 a 450 cm. | En Cirkit Designer se reemplaza por el HC-SR04, que usa el mismo protocolo TRIG/ECHO. |
 | Resistencias 1 kΩ y 2 kΩ | Divisor de tensión para bajar la señal ECHO de 5 V a 3,3 V. | Protege el GPIO del ESP32. |
-| LED verde, ámbar y rojo + resistencias de 220 Ω | Indicador local del nivel y de errores de conexión. | Ver 5.1.2. |
-| Fuente de 5 V | Alimenta el ESP32 (pin VIN) y el sensor. | — |
+| LED verde, ámbar y rojo + resistencias de 220 Ω | Indicador local del nivel y de errores de conexión. | Ver 5.1.2. En Cirkit Designer se simulan con resistencias de 47 Ω para que el LED sea visible; en el montaje físico se usan 220 Ω. |
+| Pantalla LCD 16x2 con módulo I2C | Muestra el porcentaje y el volumen del tanque. | Dirección I2C 0x27. |
+| Pulsadores (2) | Simulan el aumento y la disminución de la distancia medida. | Solo para la simulación en Cirkit Designer; no se montan en el dispositivo final. |
+| Fuente de 5 V | Alimenta el ESP32 (pin VIN), el sensor y la pantalla LCD. | — |
 | Protoboard y cables | Montaje del prototipo. | — |
 
-**Conexiones.** Los pines son la propuesta de diseño; si el circuito de Cirkit Designer usa otros GPIO, esta tabla debe reflejarlos.
+**Conexiones.** Los pines son la propuesta de diseño y coinciden con el circuito de Cirkit Designer; si se cambia algún GPIO, esta tabla debe reflejarlo.
 
 | Desde | Hacia | Nota |
 |---|---|---|
@@ -395,7 +397,13 @@ El **Tank Monitoring Device** se instala en la parte superior del tanque del com
 | JSN-SR04T GND | GND | Tierra común. |
 | JSN-SR04T TRIG | GPIO 5 | Pulso de disparo de 10 µs. |
 | JSN-SR04T ECHO | Divisor 1 kΩ / 2 kΩ → GPIO 18 | Señal de eco reducida a 3,3 V. |
-| LED verde / ámbar / rojo | GPIO 25 / 26 / 27 (con 220 Ω) | Indicador de nivel y de error. |
+| LED verde / ámbar / rojo | GPIO 25 / 26 / 27 (con 220 Ω) | Indicador de nivel y de error. En la simulación se usan 47 Ω. |
+| LCD I2C VCC | 5 V (VIN) | Alimentación de la pantalla. |
+| LCD I2C GND | GND | Tierra común. |
+| LCD I2C SDA | GPIO 21 | Bus I2C por defecto del ESP32. |
+| LCD I2C SCL | GPIO 22 | Bus I2C por defecto del ESP32. |
+| Pulsador SUBIR | GPIO 32 (con INPUT_PULLUP) y GND | Solo simulación: aumenta la distancia. |
+| Pulsador BAJAR | GPIO 33 (con INPUT_PULLUP) y GND | Solo simulación: disminuye la distancia. |
 
 <div align="center">
   <img src="../assets/chapter-5/iot/cirkit-circuit.png" alt="Circuito del dispositivo en Cirkit Designer" width="700"/>
