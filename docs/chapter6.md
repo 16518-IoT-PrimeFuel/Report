@@ -13,7 +13,7 @@ Las herramientas que usa el equipo, agrupadas por actividad del ciclo de vida, s
 | Herramienta | Uso | Referencia |
 |---|---|---|
 | Trello | Tablero del Product Backlog y del Sprint Backlog, con las tarjetas de cada historia y su estado. | https://trello.com/ |
-| **[por confirmar: herramienta de mensajería y reuniones]** | Comunicación diaria y reuniones del equipo. | — |
+| Discord | Comunicación diaria y reuniones del equipo. | — |
 | GitHub (organización) | Repositorios, ramas e historial de cada producto. | https://github.com/16518-IoT-PrimeFuel |
 
 **Requirements Management**
