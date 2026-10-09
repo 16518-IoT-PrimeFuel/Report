@@ -84,7 +84,7 @@
   <tbody>
     <tr>
       <td>TB1</td>
-      <td>6/10/26</td>
+      <td>9/10/26</td>
       <td>
         FullTank Team
       </td>
@@ -97,19 +97,15 @@
 
 **Link del repositorio del informe:** [Report](https://github.com/16518-IoT-PrimeFuel/Report)
 
-**Link del repositorio de la Landing Page:** [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page)
+**Link del repositorio de la Landing Page:** [Landing Page](https://github.com/16518-IoT-PrimeFuel/landing-page)
 
-**Link del repositorio del frontend:** [frontend](https://github.com/16518-IoT-PrimeFuel/frontend)
+**Link del repositorio del frontend:** [Frontend](https://github.com/16518-IoT-PrimeFuel/frontend)
 
-**Link del repositorio del backend:** [backend](https://github.com/16518-IoT-PrimeFuel/backend)
+**Link del repositorio del backend:** [Backend](https://github.com/16518-IoT-PrimeFuel/backend)
 
 **Link de los repositorios de la organización:** [16518-IoT-PrimeFuel](https://github.com/16518-IoT-PrimeFuel)
 
-Repositorios principales: [Report](https://github.com/16518-IoT-PrimeFuel/Report), [Mobile-app](https://github.com/16518-IoT-PrimeFuel/Mobile-app), [frontend](https://github.com/16518-IoT-PrimeFuel/frontend), [backend](https://github.com/16518-IoT-PrimeFuel/backend) y [landing-page](https://github.com/16518-IoT-PrimeFuel/landing-page).
-
-**Link del Figma:** Pendiente de publicación.
-
-**Link de Swagger desplegado con Render:** Pendiente de una URL pública verificada.
+**Link de Swagger desplegado con Render:** [BackendAPI-Swagger](https://fulltank-backend.onrender.com/swagger-ui/index.html)
 
 **Link de frontend desplegado con Vercel:** [FullTank Frontend](https://primefuel-frontend-three.vercel.app/home)
 

@@ -136,7 +136,7 @@ Todo el código (nombres de clases, métodos, variables, rutas y tablas) se escr
 - CSS con variables en `:root` para colores, tipografía y bordes, y clases en `kebab-case`.
 - Se sigue la [Google HTML/CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html).
 
-**Gherkin.** Los criterios de aceptación de las historias de usuario se redactan con la estructura *Given – When – Then*, como se muestra en la sección 3.2.
+**Gherkin.** Los criterios de aceptación de las historias de usuario se redactan con la estructura *Given – When – Then*, como se muestra en la sección 3.1.
 
 ### 6.1.4. Software Deployment Configuration
 
